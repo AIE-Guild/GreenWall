@@ -39,3 +39,34 @@
 
 --]]-----------------------------------------------------------------------
 
+--[[-----------------------------------------------------------------------
+
+Initialization
+
+--]]-----------------------------------------------------------------------
+
+function GreenWall_OnLoad()
+
+	--
+    -- Trap the events we are interested in
+    --
+    this:RegisterEvent("ADDON_LOADED");
+    this:RegisterEvent("CHAT_MSG_CHANNEL");
+    this:RegisterEvent("CHAT_MSG_GUILD");
+
+end
+
+
+--[[-----------------------------------------------------------------------
+
+Frame Event Functions
+
+--]]-----------------------------------------------------------------------
+
+function GreenWall_OnEvent(event, arg1)
+
+	
+
+end
+	
+	
