@@ -41,18 +41,99 @@
 
 --[[-----------------------------------------------------------------------
 
+Global Variables
+
+--]]-----------------------------------------------------------------------
+
+local gwVersion			= "0.9.00";
+local gwChannelName 	= "aieCommLink007";
+local gwChannelPass 	= "KCRTZ7";
+local gwDebugLevel  	= 2;
+local gwUpdateInterval 	= 1.0;
+local gwUpdateTimer		= 0.0;
+
+--[[-----------------------------------------------------------------------
+
+Convenience Functions
+
+--]]-----------------------------------------------------------------------
+
+local function GreenWall_Write(msg)
+
+	DEFAULT_CHAT_FRAME:AddMessage("|cffff6600GreenWall:|r " .. msg);
+
+end
+
+
+local function GreenWall_Error(msg)
+
+	DEFAULT_CHAT_FRAME:AddMessage("|cffff6600GreenWall:|r [ERROR] " .. msg);
+
+end
+
+
+local function GreenWall_Debug(level, msg)
+
+	if level <= gwDebugLevel then
+		DEFAULT_CHAT_FRAME:AddMessage("|cffff6600GreenWall:|r [ERROR] " .. msg);
+	end
+	
+end
+
+local gwChatWindowTable = {};
+
+local function GreenWall_JoinChannel()
+	--
+	-- Open the communication link
+	--
+	local id, name = JoinTemporaryChannel(gwChannelName, gwChannelPass);
+		
+	if name then
+		gwChannelName = name;
+	end
+		
+	if not id then
+	
+		GreenWall_Error("Cannot create communication channel");
+
+	else 
+	
+		--
+		-- Hide the channel
+		--
+		for i = 1, 10 do
+			gwChatWindowTable = { GetChatWindowChannels(i) };
+			for j, v in ipairs(gwChatWindowTable) do
+				if v == gwChannelName then
+					local frame = "ChatFrame" .. i;
+					if _G[frame] then
+						ChatFrame_RemoveChannel(frame, gwChannelName);
+					end
+				end
+			end
+		end
+		
+	end
+	
+end
+
+
+--[[-----------------------------------------------------------------------
+
 Initialization
 
 --]]-----------------------------------------------------------------------
 
-function GreenWall_OnLoad()
+function GreenWall_OnLoad(self)
 
 	--
     -- Trap the events we are interested in
     --
-    this:RegisterEvent("ADDON_LOADED");
-    this:RegisterEvent("CHAT_MSG_CHANNEL");
-    this:RegisterEvent("CHAT_MSG_GUILD");
+    self:RegisterEvent("ADDON_LOADED");
+    self:RegisterEvent("PLAYER_ENTERING_WORLD");
+    self:RegisterEvent("CHANNEL_UI_UPDATE");
+    self:RegisterEvent("CHAT_MSG_CHANNEL");
+    self:RegisterEvent("CHAT_MSG_GUILD");
 
 end
 
@@ -63,10 +144,41 @@ Frame Event Functions
 
 --]]-----------------------------------------------------------------------
 
-function GreenWall_OnEvent(event, arg1)
+local gwChannelTable = {};
 
+function GreenWall_OnEvent(self, event, ...)
+
+	if event == "ADDON_LOADED" and select(1, ...) == "GreenWall" then
+
+		GreenWall_Write("v" .. gwVersion .. "loaded.");			
+
+	elseif event == "PLAYER_ENTERING_WORLD" then
+
+		GreenWall_JoinChannel();
+				
+	elseif event == "CHANNEL_UI_UPDATE" then
 	
+		local connected = false;
+		
+		gwChannelList = { GetChannelList() };
+		for i, v in ipairs(gwChannelList) do
+			if v == gwChannelName then
+				connected = true;
+				break;
+			end
+		end
+		
+		if not connected then
+			GreenWall_JoinChannel();
+		end
+	
+	end
 
 end
-	
-	
+
+
+--[[-----------------------------------------------------------------------
+
+END
+
+--]]-----------------------------------------------------------------------
