@@ -45,12 +45,22 @@ Global Variables
 
 --]]-----------------------------------------------------------------------
 
-local gwVersion			= "0.9.00";
-local gwChannelName 	= "aieCommLink007";
-local gwChannelPass 	= "KCRTZ7";
-local gwDebugLevel  	= 2;
+local gwVersion			= GetAddOnMetadata("GreenWall", "Version");
+
+local gwPlayerName 		= UnitName("Player");
+local gwPlayerLanguage	= GetDefaultLanguage("Player");
+
+local qwConfigString	= '';
+local gwChannelName 	= '';
+local gwChannelNumber	= 0;
+local gwChannelPass 	= '';
+local gwContainerId		= '';
+
 local gwUpdateInterval 	= 1.0;
 local gwUpdateTimer		= 0.0;
+
+local gwDebugLevel  	= 2;
+
 
 --[[-----------------------------------------------------------------------
 
@@ -75,42 +85,51 @@ end
 local function GreenWall_Debug(level, msg)
 
 	if level <= gwDebugLevel then
-		DEFAULT_CHAT_FRAME:AddMessage("|cffff6600GreenWall:|r [ERROR] " .. msg);
+		DEFAULT_CHAT_FRAME:AddMessage("|cffff6600GreenWall:|r [DEBUG] " .. msg);
 	end
 	
 end
 
+
 local gwChatWindowTable = {};
 
 local function GreenWall_JoinChannel()
-	--
-	-- Open the communication link
-	--
-	local id, name = JoinTemporaryChannel(gwChannelName, gwChannelPass);
-		
-	if name then
-		gwChannelName = name;
-	end
-		
-	if not id then
-	
-		GreenWall_Error("Cannot create communication channel");
 
-	else 
+	if gwChannelName then
 	
 		--
-		-- Hide the channel
+		-- Open the communication link
 		--
-		for i = 1, 10 do
-			gwChatWindowTable = { GetChatWindowChannels(i) };
-			for j, v in ipairs(gwChatWindowTable) do
-				if v == gwChannelName then
-					local frame = "ChatFrame" .. i;
-					if _G[frame] then
-						ChatFrame_RemoveChannel(frame, gwChannelName);
+		local id, name = JoinTemporaryChannel(gwChannelName, gwChannelPass);
+		
+		if name then
+			gwChannelName = name;
+		end
+		
+		if not id then
+
+			GreenWall_Error("Cannot create communication channel");
+
+		else 
+	
+			GreenWall_Debug(1, format('joined channel %s', gwChannelName));
+			gwChannelNumber = GetChannelName(gwChannelName);
+			
+			--
+			-- Hide the channel
+			--
+			for i = 1, 10 do
+				gwChatWindowTable = { GetChatWindowMessages(i) };
+				for j, v in ipairs(gwChatWindowTable) do
+					if v == gwChannelName then
+						local frame = "ChatFrame" .. i;
+						if _G[frame] then
+							ChatFrame_RemoveChannel(frame, gwChannelName);
+						end
 					end
 				end
 			end
+		
 		end
 		
 	end
@@ -129,11 +148,13 @@ function GreenWall_OnLoad(self)
 	--
     -- Trap the events we are interested in
     --
-    self:RegisterEvent("ADDON_LOADED");
-    self:RegisterEvent("PLAYER_ENTERING_WORLD");
-    self:RegisterEvent("CHANNEL_UI_UPDATE");
-    self:RegisterEvent("CHAT_MSG_CHANNEL");
-    self:RegisterEvent("CHAT_MSG_GUILD");
+    self:RegisterEvent('ADDON_LOADED');
+    self:RegisterEvent('CHANNEL_UI_UPDATE');
+	self:RegisterEvent('PLAYER_ENTERING_WORLD');
+    self:RegisterEvent('GUILD_ROSTER_UPDATE');
+    self:RegisterEvent('CHAT_MSG_GUILD');
+    self:RegisterEvent('CHAT_MSG_CHANNEL');
+
 
 end
 
@@ -148,15 +169,13 @@ local gwChannelTable = {};
 
 function GreenWall_OnEvent(self, event, ...)
 
-	if event == "ADDON_LOADED" and select(1, ...) == "GreenWall" then
+	GreenWall_Debug(2, format('got event %s', event));
 
-		GreenWall_Write("v" .. gwVersion .. "loaded.");			
+	if event == 'ADDON_LOADED' and select(1, ...) == 'GreenWall' then
 
-	elseif event == "PLAYER_ENTERING_WORLD" then
+		GreenWall_Write(format('v%s loaded.', gwVersion));			
 
-		GreenWall_JoinChannel();
-				
-	elseif event == "CHANNEL_UI_UPDATE" then
+	elseif event == 'CHANNEL_UI_UPDATE' then
 	
 		local connected = false;
 		
@@ -171,6 +190,49 @@ function GreenWall_OnEvent(self, event, ...)
 		if not connected then
 			GreenWall_JoinChannel();
 		end
+	
+	elseif event == 'PLAYER_ENTERING_WORLD' then
+
+		GuildRoster();
+
+	elseif event == 'GUILD_ROSTER_UPDATE' then
+	
+		local guildInfo = { strsplit("\n", GetGuildInfoText()) };
+		local configString = strmatch(GetGuildInfoText(), '(GW:%w+:%w+:%w+)');
+		
+		if configString then
+			GreenWall_Debug(2, format('found configuration: %s', configString));
+		end
+				
+		if gwConfigString ~= configString then
+		
+			--
+			-- Leave the old channel
+			--
+			LeaveChannelByName(gwChannelName);
+		
+			gwConfigString = configString;
+			_, gwChannelName, gwChannelPass, gwContainerId = strsplit(':', configString);
+				
+			GreenWall_Write(format('channel: %s, container: %s',
+					gwChannelName, gwContainerId));
+	
+			GreenWall_JoinChannel();
+			
+		end				
+
+	elseif event == 'CHAT_MSG_GUILD' then
+	
+		local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
+				
+		if sender ~= gwPlayerName then
+		
+			local index = GetChannelName(gwChannelName);
+			SendChatMessage(message , "CHANNEL", nil, index); 
+		
+		end
+	
+	elseif event == 'CHAT_MSG_CHANNEL' then
 	
 	end
 
