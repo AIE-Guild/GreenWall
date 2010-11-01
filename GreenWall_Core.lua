@@ -141,35 +141,6 @@ end
 
 --[[-----------------------------------------------------------------------
 
-Initialization
-
---]]-----------------------------------------------------------------------
-
-function GreenWall_OnLoad(self)
-
-	-- 
-	-- Set up slash commands
-	--
-	SLASH_GREENWALL1 = '/greenwall';
-	SLASH_GREENWALL2 = '/gw';
-	
-	SlashCmdList['GREENWALL'] = GreenWall_SlashCmd;
-	
-	--
-    -- Trap the events we are interested in
-    --
-    self:RegisterEvent('ADDON_LOADED');
-    self:RegisterEvent('CHANNEL_UI_UPDATE');
-	self:RegisterEvent('PLAYER_ENTERING_WORLD');
-    self:RegisterEvent('GUILD_ROSTER_UPDATE');
-    self:RegisterEvent('CHAT_MSG_GUILD');
-    self:RegisterEvent('CHAT_MSG_CHANNEL');
-
-end
-
-
---[[-----------------------------------------------------------------------
-
 Slash Command Handler
 
 --]]-----------------------------------------------------------------------
@@ -184,9 +155,37 @@ local function GreenWall_SlashCmd(message, editbox)
 		local level = arg:match('^(%d+)(%s.*)?');
 		if level ~= nil then
 			GreenWall.debugLevel = level;
+			GreenWall_Write(format('Set debugging level to %s.', level));
 		end
 		
 	end
+
+end
+
+
+--[[-----------------------------------------------------------------------
+
+Initialization
+
+--]]-----------------------------------------------------------------------
+
+function GreenWall_OnLoad(self)
+
+	-- 
+	-- Set up slash commands
+	--
+	SLASH_GREENWALL1, SLASH_GREENWALL2 = '/greenwall', '/gw';	
+	SlashCmdList['GREENWALL'] = GreenWall_SlashCmd;
+	
+	--
+    -- Trap the events we are interested in
+    --
+    self:RegisterEvent('ADDON_LOADED');
+    self:RegisterEvent('CHANNEL_UI_UPDATE');
+	self:RegisterEvent('PLAYER_ENTERING_WORLD');
+    self:RegisterEvent('GUILD_ROSTER_UPDATE');
+    self:RegisterEvent('CHAT_MSG_GUILD');
+    self:RegisterEvent('CHAT_MSG_CHANNEL');
 
 end
 
@@ -284,28 +283,38 @@ function GreenWall_OnEvent(self, event, ...)
 				
 		if sender == gwPlayerName then
 		
-			-- local index = GetChannelName(gwChannelName);
+			local payload = strsub(format('C#%s', message), 1, 255);
 			GreenWall_Debug(2, format('sending message from %s to %d', sender, gwChannelNumber));
-			SendChatMessage(message , "CHANNEL", nil, gwChannelNumber); 
+			SendChatMessage(payload , "CHANNEL", nil, gwChannelNumber); 
 		
 		end
 	
 	elseif event == 'CHAT_MSG_CHANNEL' then
 	
-		local message, sender, language, _, _, flags, _, 
+		local payload, sender, language, _, _, flags, _, 
 				chanNum, _, _, counter, guid = select(1, ...);
 		
 		GreenWall_Debug(2, format('saw message from %s to on channel %d', sender, chanNum));
 		
 		if chanNum == gwChannelNumber and sender ~= gwPlayerName then
 		
-			for i, v in ipairs(gwFrameTable) do
-				local frame = 'ChatFrame' .. v;
-				if _G[frame] then
-					GreenWall_Debug(2, format('sending message from %s to guild', sender));
-					ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_GUILD', message, 
-							sender, language, '', '', '', 0, 0, '', 0, counter, guid);
+			local opcode, message = payload:match('^(%a)#(.*)');
+			
+			if opcode == nil then
+			
+				GreenWall_Debug(1, 'Invalid message received on common channel.');
+			
+			elseif opcode == 'C' then
+		
+				for i, v in ipairs(gwFrameTable) do
+					local frame = 'ChatFrame' .. v;
+					if _G[frame] then
+						GreenWall_Debug(2, format('sending message from %s to guild', sender));
+						ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_GUILD', message, 
+								sender, language, '', '', '', 0, 0, '', 0, counter, guid);
+					end
 				end
+			
 			end
 		
 		end
