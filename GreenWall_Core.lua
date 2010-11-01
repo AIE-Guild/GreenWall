@@ -50,16 +50,15 @@ local gwVersion			= GetAddOnMetadata("GreenWall", "Version");
 local gwPlayerName 		= UnitName("Player");
 local gwPlayerLanguage	= GetDefaultLanguage("Player");
 
-local qwConfigString	= '';
+local gwConfigString	= '';
+local gwChannelTable	= {};
+local gwFrameTable		= {};
 local gwChannelName 	= '';
 local gwChannelNumber	= 0;
 local gwChannelPass 	= '';
 local gwContainerId		= '';
 
-local gwUpdateInterval 	= 1.0;
-local gwUpdateTimer		= 0.0;
-
-local gwDebugLevel  	= 2;
+local gwAddonLoaded		= false;
 
 
 --[[-----------------------------------------------------------------------
@@ -84,8 +83,10 @@ end
 
 local function GreenWall_Debug(level, msg)
 
-	if level <= gwDebugLevel then
-		DEFAULT_CHAT_FRAME:AddMessage("|cffff6600GreenWall:|r [DEBUG] " .. msg);
+	if gwAddonLoade then
+		if level <= GreenWall.debugLevel then
+			DEFAULT_CHAT_FRAME:AddMessage("|cffff6600GreenWall:|r [DEBUG] " .. msg);
+		end
 	end
 	
 end
@@ -110,10 +111,11 @@ local function GreenWall_JoinChannel()
 
 			GreenWall_Error("Cannot create communication channel");
 
-		else 
+		else
 	
-			GreenWall_Debug(1, format('joined channel %s', gwChannelName));
 			gwChannelNumber = GetChannelName(gwChannelName);
+			GreenWall_Debug(1, format('joined channel %s (%d)', 
+					gwChannelName, gwChannelNumber));
 			
 			--
 			-- Hide the channel
@@ -145,6 +147,14 @@ Initialization
 
 function GreenWall_OnLoad(self)
 
+	-- 
+	-- Set up slash commands
+	--
+	SLASH_GREENWALL1 = '/greenwall';
+	SLASH_GREENWALL2 = '/gw';
+	
+	SlashCmdList['GREENWALL'] = GreenWall_SlashCmd;
+	
 	--
     -- Trap the events we are interested in
     --
@@ -155,6 +165,28 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHAT_MSG_GUILD');
     self:RegisterEvent('CHAT_MSG_CHANNEL');
 
+end
+
+
+--[[-----------------------------------------------------------------------
+
+Slash Command Handler
+
+--]]-----------------------------------------------------------------------
+
+local GreenWall_SlashCmd(message, editbox)
+
+	local op, arg = message:match('^(%S*)%s*(.*)');
+	op = strlower(op);
+	
+	if op == 'debug' then
+	
+		local level = arg:match('^(%d+)(%s.*)?');
+		if level ~= nil then
+			GreenWall.debugLevel = level;
+		end
+		
+	end
 
 end
 
@@ -165,20 +197,39 @@ Frame Event Functions
 
 --]]-----------------------------------------------------------------------
 
-local gwChannelTable = {};
-
 function GreenWall_OnEvent(self, event, ...)
 
 	GreenWall_Debug(2, format('got event %s', event));
 
 	if event == 'ADDON_LOADED' and select(1, ...) == 'GreenWall' then
 
+		gwAddonLoaded = true;
+		if GreenWall.debugLevel == nil then
+			GreenWall.debugLevel = 0;
+		end
+		
 		GreenWall_Write(format('v%s loaded.', gwVersion));			
 
 	elseif event == 'CHANNEL_UI_UPDATE' then
 	
+		--
+		-- Refresh the list of chat frames with guild chat
+		--
+		table.wipe(gwFrameTable);
+		for i = 1, 10 do
+			local ChatWindowTable = { GetChatWindowMessages(i) }
+      		for _, v in ipairs(ChatWindowTable) do
+         		if v == "GUILD" then
+           			tinsert(gwFrameTable, i)
+         		end
+      		end 
+   		end
+	
 		local connected = false;
 		
+		--
+		-- Look for an existing connection
+		--
 		gwChannelList = { GetChannelList() };
 		for i, v in ipairs(gwChannelList) do
 			if v == gwChannelName then
@@ -204,7 +255,7 @@ function GreenWall_OnEvent(self, event, ...)
 			GreenWall_Debug(2, format('found configuration: %s', configString));
 		end
 				
-		if gwConfigString ~= configString then
+		if configString and gwConfigString ~= configString then
 		
 			--
 			-- Leave the old channel
@@ -225,15 +276,34 @@ function GreenWall_OnEvent(self, event, ...)
 	
 		local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
 				
-		if sender ~= gwPlayerName then
+		if sender == gwPlayerName then
 		
-			local index = GetChannelName(gwChannelName);
-			SendChatMessage(message , "CHANNEL", nil, index); 
+			-- local index = GetChannelName(gwChannelName);
+			GreenWall_Debug(2, format('sending message from %s to %d', sender, gwChannelNumber));
+			SendChatMessage(message , "CHANNEL", nil, gwChannelNumber); 
 		
 		end
 	
 	elseif event == 'CHAT_MSG_CHANNEL' then
 	
+		local message, sender, language, _, _, flags, _, 
+				chanNum, _, _, counter, guid = select(1, ...);
+		
+		GreenWall_Debug(2, format('saw message from %s to on channel %d', sender, chanNum));
+		
+		if chanNum == gwChannelNumber and sender ~= gwPlayerName then
+		
+			for i, v in ipairs(gwFrameTable) do
+				local frame = 'ChatFrame' .. v;
+				if _G[frame] then
+					GreenWall_Debug(2, format('sending message from %s to guild', sender));
+					ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_GUILD', message, 
+							sender, language, '', '', '', 0, 0, '', 0, counter, guid);
+				end
+			end
+		
+		end
+		
 	end
 
 end
