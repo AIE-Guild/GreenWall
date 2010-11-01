@@ -174,7 +174,7 @@ Slash Command Handler
 
 --]]-----------------------------------------------------------------------
 
-local GreenWall_SlashCmd(message, editbox)
+local function GreenWall_SlashCmd(message, editbox)
 
 	local op, arg = message:match('^(%S*)%s*(.*)');
 	op = strlower(op);
@@ -204,8 +204,14 @@ function GreenWall_OnEvent(self, event, ...)
 	if event == 'ADDON_LOADED' and select(1, ...) == 'GreenWall' then
 
 		gwAddonLoaded = true;
-		if GreenWall.debugLevel == nil then
-			GreenWall.debugLevel = 0;
+		
+		--
+		-- Initialize the saved variables
+		--
+		if GreenWall == nil then
+			GreenWall = {
+				debugLevel	= 0
+			};
 		end
 		
 		GreenWall_Write(format('v%s loaded.', gwVersion));			
