@@ -57,7 +57,7 @@ local gwChannelPass 	= nil;
 local gwContainerId		= nil;
 local gwPeerTable		= {};
 
-local gwDebug			= 2;
+local gwDebug			= 0;
 local gwChannelTable	= {};
 local gwChatWindowTable = {};
 local gwFrameTable		= {};
@@ -88,8 +88,8 @@ end
 local function GwDebug(level, msg)
 
 	if level <= gwDebug then
-		DEFAULT_CHAT_FRAME:AddMessage("|cffff6600GreenWall:|r |c9482C900[DEBUG] "
-				.. msg .. "|r");
+		DEFAULT_CHAT_FRAME:AddMessage(
+				format('|cffff6600GreenWall:|r |c9482C900[DEBUG/%d] %s|r', level, msg));
 	end
 	
 end
@@ -188,20 +188,14 @@ local function GwRefreshComms()
 	-- We will rebuild the list of peer container guilds
 	wipe(gwPeerTable);
 
-	for buffer in gmatch(GetGuildInfoText(), 'GW:(%a:.*%w)%s*$') do
+	for buffer in gmatch(GetGuildInfoText(), 'GW:([^\n]+)') do
 		
 		if buffer ~= nil then
-			
-			GwDebug(2, format('found configuration: %s', buffer));
-			
+						
+			buffer = strtrim(buffer);
 			local vector = { strsplit(':', buffer) };
 			
-			GwDebug(2, format('option type: %s', vector[1]));
-						
 			if vector[1] == 'c' then
-				
-				GwDebug(2, format('buffer: %s', buffer));
-				GwDebug(2, format('stored: %s', gwConfigString));
 				
 				if not GwIsConnected() or buffer ~= gwConfigString then
 					GwDebug(2, 'client not connected.');
@@ -215,6 +209,7 @@ local function GwRefreshComms()
 			elseif vector[1] == 'p' then
 		
 				gwPeerTable[vector[2]] = vector[3];
+				GwDebug(2, format('added peer: %s (%s)', vector[2], vector[3]));
 		
 			end
 		
@@ -254,25 +249,7 @@ Slash Command Handler
 
 local function GwSlashCmd(message, editbox)
 
-	local op, arg = message:match('^(%w+)%s*(.*)');
-	
-	if op then
-
-		op = strlower(op);
-	
-		if op == 'debug' then
-	
-			local level = arg:match('^(%d+)$');
-			if level == nil then
-				GwWrite(format('Debugging set to level %d.', gwDebug));
-			else
-				gwDebug = level;
-				GwWrite(format('Set debugging level to %s.', level));
-			end
-		
-		end
-
-	end
+	-- to do
 
 end
 
@@ -314,21 +291,11 @@ Frame Event Functions
 
 function GreenWall_OnEvent(self, event, ...)
 
-	GwDebug(2, format('got event %s', event));
+	GwDebug(4, format('got event %s', event));
 
 	if event == 'ADDON_LOADED' and select(1, ...) == 'GreenWall' then
-
-		--
-		-- Initialize the saved variables
-		--
-		if GreenWall == nil then
-			GreenWall = {
-				debugLevel	= 0
-			};
-		end
 		
 		GwWrite(format('v%s loaded.', gwVersion));			
-
 		gwAddonLoaded = true;
 		
 	elseif event == 'CHANNEL_UI_UPDATE' then
@@ -362,7 +329,7 @@ function GreenWall_OnEvent(self, event, ...)
 		local payload, sender, language, _, _, flags, _, 
 				chanNum, _, _, counter, guid = select(1, ...);
 		
-		GwDebug(2, format('saw message from %s to on channel %d', sender, chanNum));
+		GwDebug(3, format('saw message from %s to on channel %d', sender, chanNum));
 		
 		if chanNum == gwChannelNumber and sender ~= gwPlayerName then
 		
