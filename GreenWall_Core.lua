@@ -47,6 +47,9 @@ Global Variables
 
 local gwVersion			= GetAddOnMetadata("GreenWall", "Version");
 
+local gwHandoffTimeout	= 30;
+local gwHandoffTimer	= nil;
+
 local gwPlayerName 		= UnitName("Player");
 local gwPlayerLanguage	= GetDefaultLanguage("Player");
 
@@ -57,10 +60,14 @@ local gwChannelPass 	= nil;
 local gwContainerId		= nil;
 local gwPeerTable		= {};
 
-local gwDebug			= 0;
+local gwDebug			= 5;
 local gwChannelTable	= {};
 local gwChatWindowTable = {};
 local gwFrameTable		= {};
+
+local gwFlagOwner		= false;
+local gwFlagModerator	= false;
+local gwFlagHandoff		= false;
 
 local gwAddonLoaded		= false;
 
@@ -125,6 +132,25 @@ local function GwIsConnected()
 end
 
 
+local function GwIsOfficer(target)
+
+	local rank;
+	local ochat;
+	
+	if target == nil then
+		_, _, rank = GetGuildInfo('player');
+	else
+		_, _, rank = GetGuildInfo(target);
+	end
+	
+	GuildControlSetRank(rank);
+	_, _, ochat = GuildControlGetRankFlags();
+	
+	return ochat;
+
+end
+
+
 local function GwJoinChannel(name, pass, container)
 
 	if gwChannelName then
@@ -158,6 +184,14 @@ local function GwJoinChannel(name, pass, container)
 			gwChannelNumber = GetChannelName(gwChannelName);
 			gwContainerId = container;
 			GwDebug(1, format('joined channel %s (%d)', gwChannelName, gwChannelNumber));
+
+			--
+			-- Check for default permissions
+			--
+			local _, _, _, _, count = GetChannelDisplayInfo(gwChannelNumber);
+			if count == 1 then
+				gwFlagOwner = true;
+			end
 			
 			--
 			-- Hide the channel
@@ -220,27 +254,6 @@ local function GwRefreshComms()
 end
 
 
-local function FindRankingMember()
-
-	SortGuildRoster('rank');
-	local n = GetNumGuildMembers(true);
-
-	for i = i, n do
-		local name, _, rank, _, _, _, _, _, online = GetGuildRosterInfo(i);
-		if online then
-			GuildControlSetRank(i);
-			local _, _, ochat = GuildControlGetRankFlags();
-			if ochat then
-				return name;
-			end
-		end
-	end
-	
-end
-
-
-
-
 --[[-----------------------------------------------------------------------
 
 Slash Command Handler
@@ -276,8 +289,10 @@ function GreenWall_OnLoad(self)
 	self:RegisterEvent('PLAYER_ENTERING_WORLD');
     self:RegisterEvent('GUILD_ROSTER_UPDATE');
     self:RegisterEvent('GUILD_EVENT_LOG_UPDATE');
-    self:RegisterEvent('CHAT_MSG_GUILD');
+    self:RegisterEvent('CHAT_MSG_ADDON');
     self:RegisterEvent('CHAT_MSG_CHANNEL');
+    self:RegisterEvent('CHAT_MSG_GUILD');
+	self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN');
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE_USER');
     
 end
@@ -293,6 +308,9 @@ function GreenWall_OnEvent(self, event, ...)
 
 	GwDebug(4, format('got event %s', event));
 
+	--
+	-- Event switch
+	--
 	if event == 'ADDON_LOADED' and select(1, ...) == 'GreenWall' then
 		
 		GwWrite(format('v%s loaded.', gwVersion));			
@@ -309,7 +327,7 @@ function GreenWall_OnEvent(self, event, ...)
 		GuildRoster();
 
 	elseif event == 'GUILD_ROSTER_UPDATE' or event == 'GUILD_EVENT_LOG_UPDATE' then
-	
+		
 		GwRefreshComms();
 
 	elseif event == 'CHAT_MSG_GUILD' then
@@ -354,11 +372,107 @@ function GreenWall_OnEvent(self, event, ...)
 		
 		end
 		
+	elseif event == 'CHAT_MSG_CHANNEL_JOIN' then
+	
+		local name = select(2, ...);
+		local chanNum = select(8, ...);
+		
+		GwDebug(4, strjoin(', ', name, chanNum));
+			
 	elseif event == 'CHAT_MSG_CHANNEL_NOTICE_USER' then
 	
-		local message, sender, _, _, target, _, _, chanNum = select(1, ...);
-		GwDebug(2, strjoin(', ', message, sender, target, chanNum));	
+		local message, name, _, _, target, _, _, chanNum = select(1, ...);
+		GwDebug(4, strjoin(', ', message, name, target, chanNum));	
 	
+		if target == gwPlayerName then
+		
+			if message == 'OWNER_CHANGED' or message == 'SET_MODERATOR' then
+			
+				if message == 'OWNER_CHANGED' then
+					gwFlagOwner = true;
+				else
+					gwFlagModerator = true;
+				end
+			
+				if not GwIsOfficer() then
+					-- Set a time to drop moderator status
+					gwHandoffTimer = time() + gwHandoffTimeout;
+					gwFlagHandoff = false;
+				end
+				
+				-- Query the members of the container guild for officers
+				SendAddonMessage('GreenWall', 'C#officer', 'GUILD');
+			
+			end
+		
+		end
+		
+	elseif event == 'CHAT_MSG_ADDON' then
+	
+		local prefix, message, dist, sender = select(1, ...);
+		GwDebug(4, strjoin(', ', prefix, message, dist, sender));
+		
+		if prefix == 'GreenWall' and dist == 'GUILD' and sender ~= gwPlayerName then
+		
+			local type, command = strsplit('#', message);
+			
+			if type == 'C' then
+			
+				if command == 'officer' then
+				
+					if GwIsOfficer() then
+					
+						-- Let 'em know you have the authoritay!
+						SendAddonMessage('GreenWall', 'R#officer', 'GUILD');
+						
+					end
+					
+				end
+			
+			elseif type == 'R' then
+			
+				if command == 'officer' then
+				
+					if gwFlagModerator or gwFlagOwner then
+				
+						-- Verify the claim
+						if GwIsOfficer(sender) then
+						
+							if gwFlagOwner then
+								GwDebug(2, format('Giving owner status to $s.', sender));
+								SetChannelOwner(gwChannelName, sender);
+							else
+								GwDebug(2, format('Giving moderator status to $s.', sender));
+								ChannelModerator(gwChannelName, sender);
+							end
+							gwFlagHandoff = true;
+							
+						end
+						
+					end
+				
+				end
+			
+			else
+			
+				GwDebug(2, format('Unknown container message type: %s', opcode));
+		
+			end
+			
+		end
+		
+	end
+
+	--
+	-- Take care of our lazy timers
+	--
+	if gwHandoffTimer ~= nil then
+		if gwHandoffTimer <= time() then
+			-- Abdicate moderator status
+			GwDebug(1, 'Handoff timer expired, releasing moderator status.');
+			ChannelUnmoderator(gwChannelName, gwPlayerName);
+			gwHandoffTimer = nil;
+		end
 	end
 
 end
