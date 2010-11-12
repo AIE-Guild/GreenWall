@@ -61,7 +61,6 @@ local gwChannelPass 	= nil;
 local gwContainerId		= nil;
 local gwPeerTable		= {};
 
-local gwDebug			= 5;
 local gwChannelTable	= {};
 local gwChatWindowTable = {};
 local gwFrameTable		= {};
@@ -69,6 +68,9 @@ local gwFrameTable		= {};
 local gwFlagOwner		= false;
 local gwFlagModerator	= false;
 local gwFlagHandoff		= false;
+
+local gwReloadHolddown	= 180;
+local gwLastReload		= 0;
 
 local gwAddonLoaded		= false;
 
@@ -81,23 +83,25 @@ Convenience Functions
 
 local function GwWrite(msg)
 
-	DEFAULT_CHAT_FRAME:AddMessage('|cffff6600GreenWall:|r ' .. msg);
+	DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r ' .. msg);
 
 end
 
 
 local function GwError(msg)
 
-	DEFAULT_CHAT_FRAME:AddMessage('|cffff6600GreenWall:|r [ERROR] ' .. msg);
+	DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r |cffff6000[ERROR] ' .. msg);
 
 end
 
 
 local function GwDebug(level, msg)
 
-	if level <= gwDebug then
-		DEFAULT_CHAT_FRAME:AddMessage(
-				format('|cffff6600GreenWall:|r |c9482C900[DEBUG/%d] %s|r', level, msg));
+	if GreenWall ~= nil then
+		if level <= GreenWall.debugLevel then
+			DEFAULT_CHAT_FRAME:AddMessage(
+					format('|cffabd473GreenWall:|r |cff0070de[DEBUG/%d] %s|r', level, msg));
+		end
 	end
 	
 end
@@ -160,7 +164,7 @@ local function GwJoinChannel(name, pass, container)
 		--
 		if gwChannelName then
 			LeaveChannelByName(gwChannelName);
-			GwDebug(1, format('left channel: %s', gwChannelName));
+			GwDebug(1, format('left channel: %s (%d)', gwChannelName, gwChannelNumber));
 		end
 	end
 	
@@ -203,8 +207,8 @@ local function GwJoinChannel(name, pass, container)
 					if v == gwChannelName then
 						local frame = format('ChatFrame%d', i);
 						if _G[frame] then
-							GwDebug(2, format('hiding channel %s in %s', 
-									gwChannelName, frame));
+							GwDebug(2, format('hiding channel %s (%d) in %s', 
+									gwChannelName, gwChannelNumber, frame));
 							ChatFrame_RemoveChannel(frame, gwChannelName);
 						end
 					end
@@ -248,7 +252,6 @@ local function GwRefreshComms()
 				
 				if not GwIsConnected() or buffer ~= gwConfigString then
 					GwDebug(2, 'client not connected.');
-					GwDebug(2, format('joining channel: %s', vector[2]));
 					gwConfigString 	= buffer;
 					GwJoinChannel(vector[2], vector[3], vector[4]);
 				else
@@ -269,6 +272,15 @@ local function GwRefreshComms()
 end
 
 
+local function GwForceReload()
+	if GwIsConnected() then
+		local payload = strjoin('#', 'R', gwVersion);
+		GwDebug(3, format('Tx<%d, *, %s>: %s', gwChannelNumber, gwPlayerName, payload));
+		SendChatMessage(payload , 'CHANNEL', nil, gwChannelNumber);
+	end 
+end
+
+
 --[[-----------------------------------------------------------------------
 
 Slash Command Handler
@@ -277,7 +289,35 @@ Slash Command Handler
 
 local function GwSlashCmd(message, editbox)
 
-	-- to do
+	if GreenWall == nil then
+		GreenWall = {
+			debugLevel = 4
+		};
+	end
+		
+
+	local command, argstr = message:match('^(%S*)%s*(.*)');
+	command = command:lower();
+	
+	if command == 'debug' then
+	
+		local level = argstr:match('^(%d+)%s*$');
+		if level ~= nil then
+			GreenWall.debugLevel = level + 0; -- Lua typing stinks, gotta coerce an integer.
+			GwWrite(format('Set debugging level to %d.', GreenWall.debugLevel));
+		else
+			GwError(format('Invalid argument: %s', argstr));
+		end
+		
+	elseif command == 'reload' then
+	
+		GwForceReload();
+	
+	else
+	
+		GwError(format('Unknown command: %s', command));
+
+	end
 
 end
 
@@ -293,7 +333,8 @@ function GreenWall_OnLoad(self)
 	-- 
 	-- Set up slash commands
 	--
-	SLASH_GREENWALL1, SLASH_GREENWALL2 = '/greenwall', '/gw';	
+	SLASH_GREENWALL1 = '/greenwall';
+	SLASH_GREENWALL2 = '/gw';	
 	SlashCmdList['GREENWALL'] = GwSlashCmd;
 	
 	--
@@ -303,11 +344,10 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHANNEL_UI_UPDATE');
 	self:RegisterEvent('PLAYER_ENTERING_WORLD');
 	self:RegisterEvent('PLAYER_GUILD_UPDATE');
-    self:RegisterEvent('GUILD_ROSTER_UPDATE');
-    self:RegisterEvent('GUILD_EVENT_LOG_UPDATE');
     self:RegisterEvent('CHAT_MSG_ADDON');
     self:RegisterEvent('CHAT_MSG_CHANNEL');
     self:RegisterEvent('CHAT_MSG_GUILD');
+    self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT');
 	self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN');
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE_USER');
     
@@ -322,15 +362,15 @@ Frame Event Functions
 
 function GreenWall_OnEvent(self, event, ...)
 
-	GwDebug(4, format('got event %s', event));
+	GwDebug(4, format('event: %s', event));
 
 	--
 	-- Event switch
 	--
 	if event == 'ADDON_LOADED' and select(1, ...) == 'GreenWall' then
 		
-		GwWrite(format('v%s loaded.', gwVersion));			
 		gwAddonLoaded = true;
+		GwWrite(format('v%s loaded.', gwVersion));			
 		
 	elseif event == 'CHANNEL_UI_UPDATE' then
 	
@@ -340,7 +380,7 @@ function GreenWall_OnEvent(self, event, ...)
 	
 	elseif event == 'PLAYER_ENTERING_WORLD' then
 
-		GuildRoster();
+		GwRefreshComms();
 
 	elseif event == 'PLAYER_GUILD_UPDATE' then
 	
@@ -351,10 +391,6 @@ function GreenWall_OnEvent(self, event, ...)
 			GwLeaveChannel();
 		end
 
-	elseif event == 'GUILD_ROSTER_UPDATE' or event == 'GUILD_EVENT_LOG_UPDATE' then
-		
-		GwRefreshComms();
-
 	elseif event == 'CHAT_MSG_GUILD' then
 	
 		local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
@@ -362,7 +398,19 @@ function GreenWall_OnEvent(self, event, ...)
 		if sender == gwPlayerName then
 		
 			local payload = strsub(format('C#%s', message), 1, 255);
-			GwDebug(2, format('sending message from %s to %d', sender, gwChannelNumber));
+			GwDebug(3, format('Tx<%d, *, %s>: %s', gwChannelNumber, gwPlayerName, payload));
+			SendChatMessage(payload , "CHANNEL", nil, gwChannelNumber); 
+		
+		end
+	
+	elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
+	
+		local message, sender, _, _, _, flags, _, chanNum = select(1, ...);
+				
+		if sender == gwPlayerName then
+		
+			local payload = strsub(format('A#%s', message), 1, 255);
+			GwDebug(3, format('Tx<%d, *, %s>: %s', gwChannelNumber, gwPlayerName, payload));
 			SendChatMessage(payload , "CHANNEL", nil, gwChannelNumber); 
 		
 		end
@@ -372,25 +420,81 @@ function GreenWall_OnEvent(self, event, ...)
 		local payload, sender, language, _, _, flags, _, 
 				chanNum, _, _, counter, guid = select(1, ...);
 		
-		GwDebug(3, format('saw message from %s to on channel %d', sender, chanNum));
+		GwDebug(3, format('Rx<%d, %s>: %s', chanNum, sender, payload));
 		
-		if chanNum == gwChannelNumber and sender ~= gwPlayerName then
+		if chanNum == gwChannelNumber then
 		
 			local opcode, message = payload:match('^(%a)#(.*)');
 			
-			if opcode == nil then
-			
-				GwDebug(1, 'Invalid message received on common channel.');
-			
-			elseif opcode == 'C' then
+			if opcode == 'C' and sender ~= gwPlayerName then
 		
+				--
+				-- Incoming chat message
+				--
+				
 				for i, v in ipairs(gwFrameTable) do
 					local frame = 'ChatFrame' .. v;
 					if _G[frame] then
-						GwDebug(2, format('sending message from %s to guild', sender));
-						ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_GUILD', message, 
-								sender, language, '', '', '', 0, 0, '', 0, counter, guid);
+						GwDebug(3, format('Tx<GUILD, *, %s>: %s', sender, message));
+						ChatFrame_MessageEventHandler(
+								_G[frame], 
+								'CHAT_MSG_GUILD', 
+								message, 
+								sender, 
+								language, 
+								'', 
+								'', 
+								'', 
+								0, 
+								0, 
+								'', 
+								0, 
+								counter, 
+								guid
+							);
 					end
+				end
+			
+			elseif opcode == 'A' and sender ~= gwPlayerName then
+			
+				--
+				-- Incoming achievement spam
+				--
+				
+				for i, v in ipairs(gwFrameTable) do
+					local frame = 'ChatFrame' .. v;
+					if _G[frame] then
+						GwDebug(3, 
+								format('Tx<GUILD_ACHIEVEMENT, *, %s>: %s', sender, message));
+						ChatFrame_MessageEventHandler(
+								_G[frame], 
+								'CHAT_MSG_GUILD_ACHIEVEMENT',
+								message,
+								sender,
+								language, 
+								'',
+								'', 
+								'', 
+								0, 
+								0, 
+								'', 
+								0, 
+								counter, 
+								guid
+							);
+					end
+				end
+			
+			elseif opcode == 'R' then
+			
+				--
+				-- Incoming reload request
+				--
+				
+				local diff = time() - gwLastReload;
+				if diff >= gwReloadHolddown then
+					GwRefreshComms();
+					gwLastReload = time();
 				end
 			
 			end
@@ -401,7 +505,6 @@ function GreenWall_OnEvent(self, event, ...)
 	
 		local name = select(2, ...);
 		local chanNum = select(8, ...);
-		GwDebug(4, strjoin(', ', name, chanNum));
 		
 		if chanNum == gwChannelNumber and (gwFlagOwner or gwFlagModerator) then
 			local guild = GetGuildInfo(name);
@@ -415,7 +518,6 @@ function GreenWall_OnEvent(self, event, ...)
 	elseif event == 'CHAT_MSG_CHANNEL_NOTICE_USER' then
 	
 		local message, name, _, _, target, _, _, chanNum = select(1, ...);
-		GwDebug(4, strjoin(', ', message, name, target, chanNum));	
 	
 		--
 		-- Set the appropriate flags
@@ -446,10 +548,11 @@ function GreenWall_OnEvent(self, event, ...)
 	elseif event == 'CHAT_MSG_ADDON' then
 	
 		local prefix, message, dist, sender = select(1, ...);
-		GwDebug(4, strjoin(', ', prefix, message, dist, sender));
 		
 		if prefix == 'GreenWall' and dist == 'GUILD' and sender ~= gwPlayerName then
 		
+			GwDebug(3, format('Rx<ADDON(GreenWall), %s>: %s', sender, message));
+
 			local type, command = strsplit('#', message);
 			
 			if type == 'C' then
@@ -457,7 +560,10 @@ function GreenWall_OnEvent(self, event, ...)
 				if command == 'officer' then
 					if GwIsOfficer() then
 						-- Let 'em know you have the authoritay!
-						SendAddonMessage('GreenWall', 'R#officer', 'GUILD');
+						local payload = strjoin('#', 'R', 'officer');
+						GwDebug(3, format('Tx<ADDON, GreenWall, %s>: %s', 
+								gwPlayerName, message));
+						SendAddonMessage('GreenWall', payload, 'GUILD');
 					end
 				end
 			
@@ -468,10 +574,10 @@ function GreenWall_OnEvent(self, event, ...)
 						-- Verify the claim
 						if GwIsOfficer(sender) then
 							if gwFlagOwner then
-								GwDebug(2, format('Giving owner status to $s.', sender));
+								GwDebug(1, format('Granting owner status to $s.', sender));
 								SetChannelOwner(gwChannelName, sender);
 							else
-								GwDebug(2, format('Giving moderator status to $s.', sender));
+								GwDebug(1, format('Granting moderator status to $s.', sender));
 								ChannelModerator(gwChannelName, sender);
 							end
 							gwFlagHandoff = true;
@@ -479,10 +585,6 @@ function GreenWall_OnEvent(self, event, ...)
 					end
 				end
 			
-			else
-			
-				GwDebug(2, format('Unknown container message type: %s', opcode));
-		
 			end
 			
 		end
