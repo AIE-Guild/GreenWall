@@ -73,6 +73,7 @@ local gwReloadHolddown	= 180;
 local gwLastReload		= 0;
 
 local gwAddonLoaded		= false;
+local gwRosterLoaded	= false;
 
 
 --[[-----------------------------------------------------------------------
@@ -344,6 +345,7 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHANNEL_UI_UPDATE');
 	self:RegisterEvent('PLAYER_ENTERING_WORLD');
 	self:RegisterEvent('PLAYER_GUILD_UPDATE');
+	self:RegisterEvent('GUILD_ROSTER_UPDATE');
     self:RegisterEvent('CHAT_MSG_ADDON');
     self:RegisterEvent('CHAT_MSG_CHANNEL');
     self:RegisterEvent('CHAT_MSG_GUILD');
@@ -380,7 +382,17 @@ function GreenWall_OnEvent(self, event, ...)
 	
 	elseif event == 'PLAYER_ENTERING_WORLD' then
 
-		GwRefreshComms();
+		GuildRoster();
+
+	elseif event == 'GUILD_ROSTER_UPDATE' then
+	
+		if not gwRosterLoaded then
+			GwRefreshComms();
+		end
+		
+		if GwIsConnected() then
+			gwRosterLoaded = true;
+		end
 
 	elseif event == 'PLAYER_GUILD_UPDATE' then
 	
