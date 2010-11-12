@@ -275,7 +275,7 @@ end
 
 local function GwForceReload()
 	if GwIsConnected() then
-		local payload = strjoin('#', 'R', gwVersion);
+		local payload = strjoin('#', 'R', gwContainerId, gwVersion);
 		GwDebug(3, format('Tx<%d, *, %s>: %s', gwChannelNumber, gwPlayerName, payload));
 		SendChatMessage(payload , 'CHANNEL', nil, gwChannelNumber);
 	end 
@@ -292,7 +292,7 @@ local function GwSlashCmd(message, editbox)
 
 	if GreenWall == nil then
 		GreenWall = {
-			debugLevel = 4
+			debugLevel = 0
 		};
 	end
 		
@@ -409,7 +409,7 @@ function GreenWall_OnEvent(self, event, ...)
 				
 		if sender == gwPlayerName then
 		
-			local payload = strsub(format('C#%s', message), 1, 255);
+			local payload = strsub(strjoin('#', 'C', gwContainerId, message), 1, 255);
 			GwDebug(3, format('Tx<%d, *, %s>: %s', gwChannelNumber, gwPlayerName, payload));
 			SendChatMessage(payload , "CHANNEL", nil, gwChannelNumber); 
 		
@@ -421,7 +421,7 @@ function GreenWall_OnEvent(self, event, ...)
 				
 		if sender == gwPlayerName then
 		
-			local payload = strsub(format('A#%s', message), 1, 255);
+			local payload = strsub(strjoin('#', 'A', gwContainerId, message), 1, 255);
 			GwDebug(3, format('Tx<%d, *, %s>: %s', gwChannelNumber, gwPlayerName, payload));
 			SendChatMessage(payload , "CHANNEL", nil, gwChannelNumber); 
 		
@@ -436,9 +436,9 @@ function GreenWall_OnEvent(self, event, ...)
 		
 		if chanNum == gwChannelNumber then
 		
-			local opcode, message = payload:match('^(%a)#(.*)');
+			local opcode, container, message = payload:match('^(%a)#(%w+)#(.*)');
 			
-			if opcode == 'C' and sender ~= gwPlayerName then
+			if opcode == 'C' and sender ~= gwPlayerName and container ~= gwContainerId then
 		
 				--
 				-- Incoming chat message
@@ -467,7 +467,7 @@ function GreenWall_OnEvent(self, event, ...)
 					end
 				end
 			
-			elseif opcode == 'A' and sender ~= gwPlayerName then
+			elseif opcode == 'A' and sender ~= gwPlayerName and container ~= gwContainerId then
 			
 				--
 				-- Incoming achievement spam
