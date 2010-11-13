@@ -45,14 +45,25 @@ Global Variables
 
 --]]-----------------------------------------------------------------------
 
+--
+-- Add-on metadata
+--
+
 local gwVersion			= GetAddOnMetadata('GreenWall', 'Version');
 
-local gwHandoffTimeout	= 30;
-local gwHandoffTimer	= nil;
+
+--
+-- Player variables
+--
 
 local gwPlayerName 		= UnitName('Player');
 local gwGuildName		= GetGuildInfo('Player'); 
 local gwPlayerLanguage	= GetDefaultLanguage('Player');
+
+
+--
+-- Co-guild variables
+--
 
 local gwConfigString	= '';
 local gwChannelName 	= nil;
@@ -61,19 +72,36 @@ local gwChannelPass 	= nil;
 local gwContainerId		= nil;
 local gwPeerTable		= {};
 
-local gwChannelTable	= {};
-local gwChatWindowTable = {};
-local gwFrameTable		= {};
+
+--
+-- State variables
+--
 
 local gwFlagOwner		= false;
 local gwFlagModerator	= false;
 local gwFlagHandoff		= false;
+local gwAddonLoaded		= false;
+local gwRosterLoaded	= false;
+
+
+--
+-- Timers and thresholds
+--
+
+local gwHandoffTimeout	= 30;
+local gwHandoffTimer	= nil;
 
 local gwReloadHolddown	= 180;
 local gwLastReload		= 0;
 
-local gwAddonLoaded		= false;
-local gwRosterLoaded	= false;
+
+--
+-- Tables external to functions
+--
+
+local gwChannelTable	= {};
+local gwChatWindowTable = {};
+local gwFrameTable		= {};
 
 
 --[[-----------------------------------------------------------------------
@@ -239,36 +267,61 @@ end
 
 local function GwRefreshComms()
 
-	-- We will rebuild the list of peer container guilds
-	wipe(gwPeerTable);
+	local info = GetGuildInfoText();
+	
+	if info == '' then
 
-	for buffer in gmatch(GetGuildInfoText(), 'GW:([^\n]+)') do
+		GwDebug(2, 'Guild Info not yet available.');
 		
-		if buffer ~= nil then
+	else	
+	
+		local config 	= '';
+		local channel	= nil;
+		local password	= nil;
+		local container	= nil;
+		
+		-- We will rebuild the list of peer container guilds
+		wipe(gwPeerTable);
+
+		for buffer in gmatch(info, 'GW:([^\n]+)') do
+		
+			if buffer ~= nil then
 						
-			buffer = strtrim(buffer);
-			local vector = { strsplit(':', buffer) };
+				buffer = strtrim(buffer);
+				local vector = { strsplit(':', buffer) };
 			
-			if vector[1] == 'c' then
+				if vector[1] == 'c' then
 				
-				if not GwIsConnected() or buffer ~= gwConfigString then
-					GwDebug(2, 'client not connected.');
-					gwConfigString 	= buffer;
-					GwJoinChannel(vector[2], vector[3], vector[4]);
-				else
-					GwDebug(2, 'client already connected.');
-				end
-				
-			elseif vector[1] == 'p' then
+					config 		= buffer;
+					channel 	= vector[2];
+					password	= vector[3];
+					GwDebug(2, format('channel: %s, password: %s', channel, password));
+									
+				elseif vector[1] == 'p' then
 		
-				gwPeerTable[vector[2]] = vector[3];
-				GwDebug(2, format('added peer: %s (%s)', vector[2], vector[3]));
+					if vector[2] == gwGuildName then
+						container = vector[3];
+						GwDebug(2, format('container: %s', container));
+					else 
+						gwPeerTable[vector[2]] = vector[3];
+						GwDebug(2, format('peer: %s (%s)', vector[2], vector[3]));
+					end
+					
+				end
 		
 			end
+	
+		end	
 		
+		if not GwIsConnected() or config ~= gwConfigString then
+			GwDebug(2, 'client not connected.');
+			gwConfigString 	= config;
+			GwJoinChannel(channel, password, container);
+		else
+			GwDebug(2, 'client already connected.');
 		end
-		
-	end		
+
+	end
 
 end
 
