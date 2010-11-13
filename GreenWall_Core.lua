@@ -280,6 +280,11 @@ local function GwRefreshComms()
 		local password	= nil;
 		local container	= nil;
 		
+		-- Make sure we know which co-guild we are in.
+		if gwGuildName == nil or gwGuildName == '' then
+			gwGuildName = GetGuildInfo('Player');
+		end
+		
 		-- We will rebuild the list of peer container guilds
 		wipe(gwPeerTable);
 
@@ -301,7 +306,7 @@ local function GwRefreshComms()
 		
 					if vector[2] == gwGuildName then
 						container = vector[3];
-						GwDebug(2, format('container: %s', container));
+						GwDebug(2, format('container: %s (%s)', gwGuildName, container));
 					else 
 						gwPeerTable[vector[2]] = vector[3];
 						GwDebug(2, format('peer: %s (%s)', vector[2], vector[3]));
@@ -313,10 +318,24 @@ local function GwRefreshComms()
 	
 		end	
 		
-		if not GwIsConnected() or config ~= gwConfigString then
-			GwDebug(2, 'client not connected.');
+		--
+		-- Update the top-level variables
+		--
+		local confUpdate = false;
+		if config ~= gwConfigString then
 			gwConfigString 	= config;
-			GwJoinChannel(channel, password, container);
+			confUpdate = true;
+		end
+		gwChannelName 	= channel;
+		gwChannelPass 	= password;
+		gwContainerID 	= container;
+		
+		--
+		-- Reconnect if necessary
+		--
+		if not GwIsConnected() or confUpdate then
+			GwDebug(2, 'client not connected.');
+			GwJoinChannel(gwChannelName, gwChannelPass, gwContainerID);
 		else
 			GwDebug(2, 'client already connected.');
 		end
@@ -326,11 +345,40 @@ local function GwRefreshComms()
 end
 
 
+local function GwSendConfederationMsg(type, message)
+
+	local opcode;
+	
+	if type == nil then
+		GwDebug(2, 'missing arguments to GwSendConfederationMsg().');
+		return;
+	elseif type == 'chat' then
+		opcode = 'C';
+	elseif type == 'achievement' then
+		opcode = 'A';
+	elseif type == 'notice' then
+		opcode = 'N';
+	elseif type == 'reload' then
+		opcode = 'R';
+		message = gwVersion;
+	end
+	
+	if message == nil then
+		message = '';
+	end
+	
+	local payload = strsub(strjoin('#', opcode, gwContainerId, '', message), 1, 255);
+
+	GwDebug(3, format('Tx<%d, *, %s>: %s', gwChannelNumber, gwPlayerName, payload));
+
+	SendChatMessage(payload , "CHANNEL", nil, gwChannelNumber); 
+
+end
+
+
 local function GwForceReload()
 	if GwIsConnected() then
-		local payload = strjoin('#', 'R', gwContainerId, gwVersion);
-		GwDebug(3, format('Tx<%d, *, %s>: %s', gwChannelNumber, gwPlayerName, payload));
-		SendChatMessage(payload , 'CHANNEL', nil, gwChannelNumber);
+		GwSendConfederationMsg('reload');
 	end 
 end
 
@@ -360,6 +408,8 @@ local function GwSlashCmd(message, editbox)
 	--
 	local command, argstr = message:match('^(%S*)%s*(.*)');
 	command = command:lower();
+	
+	GwDebug(4, format('command: %s, args: %s', command, argstr));
 	
 	if command == 'debug' then
 	
@@ -467,25 +517,15 @@ function GreenWall_OnEvent(self, event, ...)
 	elseif event == 'CHAT_MSG_GUILD' then
 	
 		local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
-				
 		if sender == gwPlayerName then
-		
-			local payload = strsub(strjoin('#', 'C', gwContainerId, message), 1, 255);
-			GwDebug(3, format('Tx<%d, *, %s>: %s', gwChannelNumber, gwPlayerName, payload));
-			SendChatMessage(payload , "CHANNEL", nil, gwChannelNumber); 
-		
+			GwSendConfederationMsg('chat', message);		
 		end
 	
 	elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
 	
 		local message, sender, _, _, _, flags, _, chanNum = select(1, ...);
-				
 		if sender == gwPlayerName then
-		
-			local payload = strsub(strjoin('#', 'A', gwContainerId, message), 1, 255);
-			GwDebug(3, format('Tx<%d, *, %s>: %s', gwChannelNumber, gwPlayerName, payload));
-			SendChatMessage(payload , "CHANNEL", nil, gwChannelNumber); 
-		
+			GwSendConfederationMsg('achievement', message);
 		end
 	
 	elseif event == 'CHAT_MSG_CHANNEL' then
@@ -497,7 +537,7 @@ function GreenWall_OnEvent(self, event, ...)
 		
 		if chanNum == gwChannelNumber then
 		
-			local opcode, container, message = payload:match('^(%a)#(%w+)#(.*)');
+			local opcode, container, _, message = payload:match('^(%a)#(%w+)#([^#]*)#(.*)');
 			
 			if opcode == 'C' and sender ~= gwPlayerName and container ~= gwContainerId then
 		
