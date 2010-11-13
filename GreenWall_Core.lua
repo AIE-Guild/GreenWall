@@ -343,13 +343,21 @@ Slash Command Handler
 
 local function GwSlashCmd(message, editbox)
 
+	--
+	-- Initialize the saved variables
+	--
 	if GreenWall == nil then
 		GreenWall = {
+			version	= gwVersion,
 			debugLevel = 0
 		};
 	end
-		
 
+	GreenWall.version = gwVersion;
+
+	--
+	-- Parse the command
+	--
 	local command, argstr = message:match('^(%S*)%s*(.*)');
 	command = command:lower();
 	
