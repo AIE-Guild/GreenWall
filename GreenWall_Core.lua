@@ -656,8 +656,29 @@ function GreenWall_OnEvent(self, event, ...)
 				ChannelKick(gwChannelName, name);
 			end			
 
+			--
+			-- Advertise the member status
+			--
+			DEFAULT_CHAT_FRAME:AddMessage(format(ERR_FRIEND_ONLINE_SS, name, name),
+					1.0, 1.0, 0.0, GetChatTypeIndex('CHAT_MSG_SYSTEM'));
+
 		end
 			
+	elseif event == 'CHAT_MSG_CHANNEL_LEAVE' then
+	
+		local name = select(2, ...);
+		local chanNum = select(8, ...);
+		
+		if chanNum == gwChannelNumber then
+
+			--
+			-- Advertise the member status
+			--
+			DEFAULT_CHAT_FRAME:AddMessage(format(ERR_FRIEND_OFFLINE_S, name),
+					1.0, 1.0, 0.0, GetChatTypeIndex('CHAT_MSG_SYSTEM'));
+
+		end
+
 	elseif event == 'CHAT_MSG_CHANNEL_NOTICE_USER' then
 	
 		local message, name, _, _, target, _, _, chanNum = select(1, ...);
