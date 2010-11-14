@@ -185,16 +185,19 @@ local function GwIsOfficer(target)
 end
 
 
+local function GwLeaveChannel()
+
+	LeaveChannelByName(gwChannelName);
+	GwDebug(1, format('left channel %s (%d)', gwChannelName, gwChannelNumber));
+	gwChannelNumber	= 0;
+
+end
+
+
 local function GwJoinChannel(name, pass, container)
 
-	if gwChannelName then
-		--
-		-- Leave the old channel
-		--
-		if gwChannelName then
-			LeaveChannelByName(gwChannelName);
-			GwDebug(1, format('left channel: %s (%d)', gwChannelName, gwChannelNumber));
-		end
+	if GwIsConnected() then
+		GwLeaveChannel()
 	end
 	
 	if name then
@@ -248,20 +251,6 @@ local function GwJoinChannel(name, pass, container)
 		
 	end
 	
-end
-
-
-local function GwLeaveChannel()
-
-	if GwIsConnected() then
-		LeaveChannelByName(gwChannelName);
-	end
-
-	gwChannelName 	= nil;
-	gwChannelNumber	= 0;
-	gwChannelPass 	= nil;
-	gwContainerId	= nil;
-
 end
 
 
@@ -347,6 +336,8 @@ end
 
 local function GwSendConfederationMsg(type, message)
 
+	GwDebug(2, format('conf_msg type=%s, message=%s', type, message));
+
 	local opcode;
 	
 	if type == nil then
@@ -358,9 +349,11 @@ local function GwSendConfederationMsg(type, message)
 		opcode = 'A';
 	elseif type == 'notice' then
 		opcode = 'N';
-	elseif type == 'reload' then
+	elseif type == 'request' then
 		opcode = 'R';
-		message = gwVersion;
+	else
+		GwDebug(2, format('unknown message type: %s', type));
+		return;
 	end
 	
 	if message == nil then
@@ -368,17 +361,42 @@ local function GwSendConfederationMsg(type, message)
 	end
 	
 	local payload = strsub(strjoin('#', opcode, gwContainerId, '', message), 1, 255);
-
 	GwDebug(3, format('Tx<%d, *, %s>: %s', gwChannelNumber, gwPlayerName, payload));
-
 	SendChatMessage(payload , "CHANNEL", nil, gwChannelNumber); 
 
 end
 
 
+local function GwSendContainerMsg(type, message)
+
+	GwDebug(2, format('cont_msg type=%s, message=%s', type, message));
+
+	local opcode;
+	
+	if type == nil then
+		GwDebug(2, 'missing arguments to GwSendContainerMsg().');
+		return;
+	elseif type == 'request' then
+		opcode = 'C';
+	elseif type == 'response' then
+		opcode = 'R';
+	elseif type == 'info' then
+		opcode = 'I';
+	else
+		GwDebug(2, format('unknown message type: %s', type));
+		return;
+	end
+
+	local payload = strsub(strjoin('#', opcode, message), 1, 255);
+	GwDebug(3, format('Tx<ADDON/GUILD, *, %s>: %s', gwPlayerName, payload));
+	SendAddonMessage('GreenWall', payload, 'GUILD');
+	
+end
+
+
 local function GwForceReload()
 	if GwIsConnected() then
-		GwSendConfederationMsg('reload');
+		GwSendConfederationMsg('request', 'reload');
 	end 
 end
 
@@ -454,15 +472,16 @@ function GreenWall_OnLoad(self)
     --
     self:RegisterEvent('ADDON_LOADED');
     self:RegisterEvent('CHANNEL_UI_UPDATE');
-	self:RegisterEvent('PLAYER_ENTERING_WORLD');
-	self:RegisterEvent('PLAYER_GUILD_UPDATE');
-	self:RegisterEvent('GUILD_ROSTER_UPDATE');
     self:RegisterEvent('CHAT_MSG_ADDON');
     self:RegisterEvent('CHAT_MSG_CHANNEL');
+	self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN');
+	self:RegisterEvent('CHAT_MSG_CHANNEL_LEAVE');
+    self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE_USER');
     self:RegisterEvent('CHAT_MSG_GUILD');
     self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT');
-	self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN');
-    self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE_USER');
+	self:RegisterEvent('GUILD_ROSTER_UPDATE');
+	self:RegisterEvent('PLAYER_ENTERING_WORLD');
+	self:RegisterEvent('PLAYER_GUILD_UPDATE');
     
 end
 
@@ -601,13 +620,15 @@ function GreenWall_OnEvent(self, event, ...)
 			elseif opcode == 'R' then
 			
 				--
-				-- Incoming reload request
+				-- Incoming request
 				--
 				
-				local diff = time() - gwLastReload;
-				if diff >= gwReloadHolddown then
-					GwRefreshComms();
-					gwLastReload = time();
+				if message:match('^reload(%w.*)?$') then 
+					local diff = time() - gwLastReload;
+					if diff >= gwReloadHolddown then
+						GwRefreshComms();
+						gwLastReload = time();
+					end
 				end
 			
 			end
@@ -619,13 +640,22 @@ function GreenWall_OnEvent(self, event, ...)
 		local name = select(2, ...);
 		local chanNum = select(8, ...);
 		
-		if chanNum == gwChannelNumber and (gwFlagOwner or gwFlagModerator) then
-			local guild = GetGuildInfo(name);
-			if gwPeerTable[guild] == nil then
-				-- Take action
+		if chanNum == gwChannelNumber then
+		
+			local oneOfUs = true;  -- Benefit of the doubt
+			if gwFlagOwner or gwFlagModerator then
+				local guild = GetGuildInfo(name);
+				if gwPeerTable[guild] == nil then
+					oneOfUs = false;
+				end
+			end
+
+			if oneOfUs then
+			else
 				ChannelBan(gwChannelName, name);
 				ChannelKick(gwChannelName, name);
-			end
+			end			
+
 		end
 			
 	elseif event == 'CHAT_MSG_CHANNEL_NOTICE_USER' then
@@ -655,7 +685,7 @@ function GreenWall_OnEvent(self, event, ...)
 				gwFlagHandoff = false;
 			end
 			-- Query the members of the container guild for officers
-			SendAddonMessage('GreenWall', 'C#officer', 'GUILD');
+			GwSendContainerMsg('request', 'officer');
 		end
 		
 	elseif event == 'CHAT_MSG_ADDON' then
@@ -673,10 +703,7 @@ function GreenWall_OnEvent(self, event, ...)
 				if command == 'officer' then
 					if GwIsOfficer() then
 						-- Let 'em know you have the authoritay!
-						local payload = strjoin('#', 'R', 'officer');
-						GwDebug(3, format('Tx<ADDON, GreenWall, %s>: %s', 
-								gwPlayerName, message));
-						SendAddonMessage('GreenWall', payload, 'GUILD');
+						GwSendContainerMsg('response', 'officer');
 					end
 				end
 			
