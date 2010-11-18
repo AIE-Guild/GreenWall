@@ -317,14 +317,14 @@ local function GwRefreshComms()
 		end
 		gwChannelName 	= channel;
 		gwChannelPass 	= password;
-		gwContainerID 	= container;
+		gwContainerId 	= container;
 		
 		--
 		-- Reconnect if necessary
 		--
 		if not GwIsConnected() or confUpdate then
 			GwDebug(2, 'client not connected.');
-			GwJoinChannel(gwChannelName, gwChannelPass, gwContainerID);
+			GwJoinChannel(gwChannelName, gwChannelPass, gwContainerId);
 		else
 			GwDebug(2, 'client already connected.');
 		end
