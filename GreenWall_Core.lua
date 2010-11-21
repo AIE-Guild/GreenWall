@@ -650,17 +650,20 @@ function GreenWall_OnEvent(self, event, ...)
 		if chanNum == gwChannelNumber then
 		
 			local oneOfUs = true;  -- Benefit of the doubt
+			local guild = GetGuildInfo(name);
 			if gwFlagOwner or gwFlagModerator then
-				local guild = GetGuildInfo(name);
 				if gwPeerTable[guild] == nil then
 					oneOfUs = false;
 				end
+				GwDebug(5, format('name=%s, guild=%s', name, guild));
 			end
 
-			if oneOfUs then
+			if not oneOfUs then
 			else
 				-- ChannelBan(gwChannelName, name);
 				ChannelKick(gwChannelName, name);
+				GwSendConfederationMsg('notice', 
+						format('removed %s (%s), not in a co-guild.', name, guild)); 
 			end			
 
 			--
@@ -688,10 +691,10 @@ function GreenWall_OnEvent(self, event, ...)
 
 	elseif event == 'CHAT_MSG_CHANNEL_NOTICE_USER' then
 	
-		local message, target, _, _, _, _, _, chanNum = select(1, ...);
+		local message, target, _, _, actor, _, _, chanNum = select(1, ...);
 	
-		GwDebug(5, format('event=%s, message=%s, target=%s, chanNum=%s',
-				event, message, target, chanNum));
+		GwDebug(5, format('event=%s, message=%s, target=%s, actor=%s, chanNum=%s',
+				event, message, target, actor, chanNum));
 	
 		--
 		-- Set the appropriate flags
