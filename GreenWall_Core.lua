@@ -129,7 +129,7 @@ local function GwDebug(level, msg)
 	if GreenWall ~= nil then
 		if level <= GreenWall.debugLevel then
 			DEFAULT_CHAT_FRAME:AddMessage(
-					format('|cffabd473GreenWall:|r |cff0070de[DEBUG/%d] %s|r', level, msg));
+					format('|cffabd473GreenWall:|r |cff778899[DEBUG/%d] %s|r', level, msg));
 		end
 	end
 	
@@ -169,16 +169,21 @@ end
 local function GwIsOfficer(target)
 
 	local rank;
-	local ochat;
+	local ochat = false;
 	
 	if target == nil then
-		_, _, rank = GetGuildInfo('Player');
-	else
-		_, _, rank = GetGuildInfo(target);
+		target = 'Player';
 	end
+	_, _, rank = GetGuildInfo(target);
 	
 	GuildControlSetRank(rank);
 	_, _, ochat = GuildControlGetRankFlags();
+	
+	if ochat then
+		GwDebug(5, format('%s is rank %d and can see ochat', target, rank));
+	else
+		GwDebug(5, format('%s is rank %d and cannot see ochat', target, rank));
+	end
 	
 	return ochat;
 
@@ -336,7 +341,7 @@ end
 
 local function GwSendConfederationMsg(type, message)
 
-	GwDebug(2, format('conf_msg type=%s, message=%s', type, message));
+	GwDebug(5, format('conf_msg type=%s, message=%s', type, message));
 
 	local opcode;
 	
@@ -369,7 +374,7 @@ end
 
 local function GwSendContainerMsg(type, message)
 
-	GwDebug(2, format('cont_msg type=%s, message=%s', type, message));
+	GwDebug(5, format('cont_msg type=%s, message=%s', type, message));
 
 	local opcode;
 	
@@ -507,7 +512,8 @@ function GreenWall_OnEvent(self, event, ...)
 	elseif event == 'CHANNEL_UI_UPDATE' then
 	
 		if gwPlayerGuild ~= nil and not GwIsConnected() then
-			GwJoinChannel(gwChannelName, gwChannelPass);
+			-- GwJoinChannel(gwChannelName, gwChannelPass);
+			GwRefreshComms();
 		end
 	
 	elseif event == 'PLAYER_ENTERING_WORLD' then
@@ -528,6 +534,7 @@ function GreenWall_OnEvent(self, event, ...)
 	
 		gwPlayerGuild = GetGuildInfo('Player');
 		if gwPlayerGuild ~= nil then
+			GuildRoster();
 			GwRefreshComms();
 		elseif GwIsConnected() then
 			GwLeaveChannel();
@@ -652,7 +659,7 @@ function GreenWall_OnEvent(self, event, ...)
 
 			if oneOfUs then
 			else
-				ChannelBan(gwChannelName, name);
+				-- ChannelBan(gwChannelName, name);
 				ChannelKick(gwChannelName, name);
 			end			
 
@@ -681,7 +688,10 @@ function GreenWall_OnEvent(self, event, ...)
 
 	elseif event == 'CHAT_MSG_CHANNEL_NOTICE_USER' then
 	
-		local message, name, _, _, target, _, _, chanNum = select(1, ...);
+		local message, target, _, _, _, _, _, chanNum = select(1, ...);
+	
+		GwDebug(5, format('event=%s, message=%s, target=%s, chanNum=%s',
+				event, message, target, chanNum));
 	
 		--
 		-- Set the appropriate flags
@@ -713,11 +723,16 @@ function GreenWall_OnEvent(self, event, ...)
 	
 		local prefix, message, dist, sender = select(1, ...);
 		
+		GwDebug(5, format('event=%s, prefix=%s, sender=%s, dist=%s, message=%s',
+				event, prefix, sender, dist, message));
+		
+		GwDebug(3, format('Rx<ADDON(GreenWall), %s>: %s', sender, message));
+		
 		if prefix == 'GreenWall' and dist == 'GUILD' and sender ~= gwPlayerName then
 		
-			GwDebug(3, format('Rx<ADDON(GreenWall), %s>: %s', sender, message));
-
 			local type, command = strsplit('#', message);
+			
+			GwDebug(5, format('type=%s, command=%s', type, command));
 			
 			if type == 'C' then
 			
