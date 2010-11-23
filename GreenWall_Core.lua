@@ -80,6 +80,7 @@ local gwPeerTable		= {};
 local gwFlagOwner		= false;
 local gwFlagModerator	= false;
 local gwFlagHandoff		= false;
+local gwStateSendWho	= 0;
 local gwAddonLoaded		= false;
 local gwRosterLoaded	= false;
 
@@ -102,6 +103,7 @@ local gwLastReload		= 0;
 local gwChannelTable	= {};
 local gwChatWindowTable = {};
 local gwFrameTable		= {};
+local gwGuildCheck		= {};
 
 
 --[[-----------------------------------------------------------------------
@@ -441,13 +443,23 @@ local function GwSlashCmd(message, editbox)
 			GreenWall.debugLevel = level + 0; -- Lua typing stinks, gotta coerce an integer.
 			GwWrite(format('Set debugging level to %d.', GreenWall.debugLevel));
 		else
-			GwError(format('Invalid argument: %s', argstr));
+			GwWrite(format('Debugging level is %d', GreenWall.debugLevel));
 		end
 		
 	elseif command == 'reload' then
 	
 		GwForceReload();
+		GwWrite('Broadcast configuration reload request.');
 	
+	elseif command == 'refresh' then
+	
+		GwRefreshComms();
+		GwWrite('Refreshed communication link.');
+	
+	elseif command == 'version' then
+
+		GwWrite(format('GreenWall version %s.', gwVersion));
+
 	else
 	
 		GwError(format('Unknown command: %s', command));
@@ -484,6 +496,7 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE_USER');
     self:RegisterEvent('CHAT_MSG_GUILD');
     self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT');
+    self:RegisterEvent('CHAT_MSG_SYSTEM');
 	self:RegisterEvent('GUILD_ROSTER_UPDATE');
 	self:RegisterEvent('PLAYER_ENTERING_WORLD');
 	self:RegisterEvent('PLAYER_GUILD_UPDATE');
@@ -629,12 +642,15 @@ function GreenWall_OnEvent(self, event, ...)
 				--
 				-- Incoming request
 				--
-				
 				if message:match('^reload(%w.*)?$') then 
 					local diff = time() - gwLastReload;
+					GwWrite(format('Received configuration reload request from %s.', sender));
 					if diff >= gwReloadHolddown then
 						GwRefreshComms();
+						GwWrite('Refeshed communication link.');
 						gwLastReload = time();
+					else
+						GwWrite('Request squelched.');
 					end
 				end
 			
@@ -648,29 +664,46 @@ function GreenWall_OnEvent(self, event, ...)
 		local chanNum = select(8, ...);
 		
 		if chanNum == gwChannelNumber then
-		
-			local oneOfUs = true;  -- Benefit of the doubt
-			local guild = GetGuildInfo(name);
-			if gwFlagOwner or gwFlagModerator then
-				if gwPeerTable[guild] == nil then
-					oneOfUs = false;
-				end
-				GwDebug(5, format('name=%s, guild=%s', name, guild));
-			end
-
-			if not oneOfUs then
-			else
-				-- ChannelBan(gwChannelName, name);
-				ChannelKick(gwChannelName, name);
-				GwSendConfederationMsg('notice', 
-						format('removed %s (%s), not in a co-guild.', name, guild)); 
-			end			
-
+					
 			--
 			-- Advertise the member status
 			--
 			DEFAULT_CHAT_FRAME:AddMessage(format(ERR_FRIEND_ONLINE_SS, name, name),
 					1.0, 1.0, 0.0, GetChatTypeIndex('CHAT_MSG_SYSTEM'));
+
+			--
+			-- One of us?
+			-- 
+			if gwFlagOwner or gwFlagModerator then
+				
+				local guild = GetGuildInfo(name);
+				
+				if guild == nil then
+					
+					--
+					-- Query the server for the individual's guild
+					--
+					tinsert(gwGuildCheck, name);
+					SetWhoToUI(0);
+					SendWho(format('n-%s', name));
+				
+				else
+				
+					--
+					-- Boot intruders
+					--
+					if gwPeerTable[guild] == nil then
+						-- ChannelBan(gwChannelName, name);
+						ChannelKick(gwChannelName, name);
+						GwSendConfederationMsg('notice', 
+								format('removed %s (%s), not in a co-guild.', name, guild));
+						GwDebug(1, 
+								format('removed %s (%s), not in a co-guild.', name, guild));
+					end
+				
+				end
+			
+			end
 
 		end
 			
@@ -766,6 +799,51 @@ function GreenWall_OnEvent(self, event, ...)
 			
 			end
 			
+		end
+		
+	elseif event == 'CHAT_MSG_SYSTEM' then
+
+		local message = select(1, ...);
+		
+		GwDebug(5, format('event=%s, message=%s', event, message));
+		
+		local n = message:match('^(%d+) players? total');
+		
+		if n ~= nil and n > 0 then
+
+			for i = 1, n do
+
+				local name, guild = GetWhoInfo(i);
+
+				if tContains(gwGuildCheck, name) then
+
+					--
+					-- Boot if an intruder
+					--
+					if gwPeerTable[guild] == nil then
+						-- ChannelBan(gwChannelName, name);
+						ChannelKick(gwChannelName, name);
+						GwSendConfederationMsg('notice', 
+								format('removed %s (%s), not in a co-guild.', name, guild));
+						GwDebug(1,
+								format('removed %s (%s), not in a co-guild.', name, guild));
+					end
+
+					--
+					-- Clean up the table
+					--
+					local i = 1;
+					while gwGuildCheck[i] do
+						if name == gwGuildCheck[i] then
+							tremove(gwGuildCheck, i);
+							break;
+						end
+					end
+
+				end
+
+			end
+
 		end
 		
 	end
