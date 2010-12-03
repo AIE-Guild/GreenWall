@@ -729,30 +729,44 @@ function GreenWall_OnEvent(self, event, ...)
 		GwDebug(5, format('event=%s, message=%s, target=%s, actor=%s, chanNum=%s',
 				event, message, target, actor, chanNum));
 	
-		--
-		-- Set the appropriate flags
-		--
-		if message == 'OWNER_CHANGED' then
-			if target == gwPlayerName then
-				gwFlagOwner = true;
-			else
-				gwFlagOwner = false;
+		if chanNum == gwChannelNumber then
+			
+			--
+			-- Set the appropriate flags
+			--
+
+			if message == 'OWNER_CHANGED' then
+
+				if target == gwPlayerName then
+					gwFlagOwner = true;
+				else
+					gwFlagOwner = false;
+				end
+
+			elseif message == 'SET_MODERATOR' and target == gwPlayerName then
+
+				gwFlagModerator = true;
+
+			elseif message == 'UNSET_MODERATOR' and target == gwPlayerName then
+
+				gwFlagModerator = false;
+
 			end
-		elseif message == 'SET_MODERATOR' and target == gwPlayerName then
-			gwFlagModerator = true;
-		elseif message == 'UNSET_MODERATOR' and target == gwPlayerName then
-			gwFlagModerator = false;
-		end
 	
-		if (message == 'OWNER_CHANGED' or message == 'SET_MODERATOR') 
-				and target == gwPlayerName then
-			if not GwIsOfficer() then
-				-- Set a time to drop moderator status
-				gwHandoffTimer = time() + gwHandoffTimeout;
-				gwFlagHandoff = false;
+			if (message == 'OWNER_CHANGED' or message == 'SET_MODERATOR') 
+					and target == gwPlayerName then
+
+				if not GwIsOfficer() then
+					-- Set a time to drop moderator status
+					gwHandoffTimer = time() + gwHandoffTimeout;
+					gwFlagHandoff = false;
+				end
+
+				-- Query the members of the container guild for officers
+				GwSendContainerMsg('request', 'officer');
+
 			end
-			-- Query the members of the container guild for officers
-			GwSendContainerMsg('request', 'officer');
+			
 		end
 		
 	elseif event == 'CHAT_MSG_ADDON' then
@@ -805,41 +819,39 @@ function GreenWall_OnEvent(self, event, ...)
 
 		local message = select(1, ...);
 		
-		GwDebug(5, format('event=%s, message=%s', event, message));
-		
-		local n = message:match('^(%d+) players? total');
-		
-		if n ~= nil and n > 0 then
+		local name, _, guild = message:match('%[(%w+)%].*(<(.+)>)?');
 
-			for i = 1, n do
+		if name ~= nil then
 
-				local name, guild = GetWhoInfo(i);
+			if guild == nil then
+				GwDebug(5, format('found %s in no guild', name));
+			else
+				GwDebug(5, format('found %s in guild %s', name, guild));
+			end
 
-				if tContains(gwGuildCheck, name) then
+			if tContains(gwGuildCheck, name) then
 
-					--
-					-- Boot if an intruder
-					--
-					if gwPeerTable[guild] == nil then
-						-- ChannelBan(gwChannelName, name);
-						ChannelKick(gwChannelName, name);
-						GwSendConfederationMsg('notice', 
-								format('removed %s (%s), not in a co-guild.', name, guild));
-						GwDebug(1,
-								format('removed %s (%s), not in a co-guild.', name, guild));
+				--
+				-- Boot if an intruder
+				--
+				if guild == nil or gwPeerTable[guild] == nil then
+					-- ChannelBan(gwChannelName, name);
+					ChannelKick(gwChannelName, name);
+					GwSendConfederationMsg('notice', 
+							format('removed %s (%s), not in a co-guild.', name, guild));
+					GwDebug(1,
+							format('removed %s (%s), not in a co-guild.', name, guild));
+				end
+
+				--
+				-- Clean up the table
+				--
+				local i = 1;
+				while gwGuildCheck[i] do
+					if name == gwGuildCheck[i] then
+						tremove(gwGuildCheck, i);
+						break;
 					end
-
-					--
-					-- Clean up the table
-					--
-					local i = 1;
-					while gwGuildCheck[i] do
-						if name == gwGuildCheck[i] then
-							tremove(gwGuildCheck, i);
-							break;
-						end
-					end
-
 				end
 
 			end
