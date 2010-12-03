@@ -368,7 +368,7 @@ local function GwRefreshComms()
 						container = vector[3];
 						GwDebug(2, format('container: %s (%s)', gwGuildName, container));
 					else 
-						gwPeerTable[vector[2]] = vector[3];
+						gwPeerTable[vector[3]] = vector[2];
 						GwDebug(2, format('peer: %s (%s)', vector[2], vector[3]));
 					end
 					
@@ -469,8 +469,30 @@ local function GwSlashCmd(message, editbox)
 			flag = 'false';
 		end
 		
-		GwWrite(format('chan=%s(%d), pass=%s, container=%s, connected=%s',
-				gwChannelName, gwChannelNumber, gwChannelPass, gwContainerId, flag));
+		GwWrite(format('chan=%s(%d), pass=%s, container=%s',
+				gwChannelName, gwChannelNumber, gwChannelPass, gwContainerId));
+		
+		if GwIsConnected() then
+			GwWrite('connected=yes');
+		else
+			GwWrite('connected=no');
+		end
+
+		if gwFlagOwner then
+			GwWrite('chan_own=yes');
+		else
+			GwWrite('chan_own=no');
+		end
+
+		if gwFlagModerator then
+			GwWrite('chan_mod=yes');
+		else
+			GwWrite('chan_mod=no');
+		end
+		
+		for i, v in pairs(gwPeerTable) do
+			GwWrite(format('peer[%s] => %s', i, v));
+		end
 	
 	elseif command == 'version' then
 
@@ -721,7 +743,7 @@ function GreenWall_OnEvent(self, event, ...)
 					--
 					-- Boot intruders
 					--
-					if gwPeerTable[guild] == nil then
+					if not tContains(gwPeerTable, guild) then
 						-- ChannelBan(gwChannelName, name);
 						ChannelKick(gwChannelName, name);
 						GwSendConfederationMsg('notice', 
@@ -847,7 +869,10 @@ function GreenWall_OnEvent(self, event, ...)
 
 		local message = select(1, ...);
 		
-		local name, _, guild = message:match('%[(%w+)%].*(<(.+)>)?');
+		GwDebug(5, format('system message: %s', message));
+		
+		local name = string.match(message, '%[(.+)%]');
+		local guild = string.match(message, '<(.+)>');
 
 		if name ~= nil then
 
@@ -862,7 +887,7 @@ function GreenWall_OnEvent(self, event, ...)
 				--
 				-- Boot if an intruder
 				--
-				if guild == nil or gwPeerTable[guild] == nil then
+				if guild == nil or not tContains(gwPeerTable, guild) then
 					-- ChannelBan(gwChannelName, name);
 					ChannelKick(gwChannelName, name);
 					GwSendConfederationMsg('notice', 
