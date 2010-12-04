@@ -194,6 +194,31 @@ local function GwIsOfficer(target)
 end
 
 
+local function GwInitializeConfig()
+	gwConfigString	= '';
+	gwChannelName 	= nil;
+	gwChannelNumber	= 0;
+	gwChannelPass 	= nil;
+	gwContainerId	= nil;
+	gwPeerTable		= {};
+	gwFlagOwner		= false;
+	gwFlagModerator	= false;
+	gwFlagHandoff	= false;
+	gwStateSendWho	= 0;
+	gwRosterUpdate	= false;
+end
+
+
+local function GwIsContainer(guild)
+	for i, v in pairs(gwPeerTable) do
+		if v == guild then
+			return true;
+		end
+	end
+	return false;
+end
+
+
 local function GwSendConfederationMsg(type, message)
 
 	GwDebug(5, format('conf_msg type=%s, message=%s', type, message));
@@ -571,18 +596,7 @@ function GreenWall_OnEvent(self, event, ...)
 	
 	elseif event == 'PLAYER_ENTERING_WORLD' then
 
-		gwConfigString	= '';
-		gwChannelName 	= nil;
-		gwChannelNumber	= 0;
-		gwChannelPass 	= nil;
-		gwContainerId	= nil;
-		gwPeerTable		= {};
-		gwFlagOwner		= false;
-		gwFlagModerator	= false;
-		gwFlagHandoff	= false;
-		gwStateSendWho	= 0;
-		gwRosterUpdate	= false;
-
+		GwInitializeConfig();
 		GuildRoster();
 
 	elseif event == 'GUILD_ROSTER_UPDATE' then
@@ -599,14 +613,14 @@ function GreenWall_OnEvent(self, event, ...)
 
 	elseif event == 'PLAYER_GUILD_UPDATE' then
 	
-		-- Invalidate pending updates
-		gwRosterUpdate = false;
-		
 		-- Drop from current channel
 		if GwIsConnected() then
 			GwLeaveChannel();
 		end
 		
+		-- Reinitialize
+		GwInitializeConfig();
+
 		if IsInGuild() then
 			GuildRoster();
 			gwRosterUpdate = true;
@@ -751,7 +765,7 @@ function GreenWall_OnEvent(self, event, ...)
 					--
 					-- Boot intruders
 					--
-					if not tContains(gwPeerTable, guild) then
+					if not GwIsContainer(guild) then
 						-- ChannelBan(gwChannelName, name);
 						ChannelKick(gwChannelName, name);
 						GwSendConfederationMsg('notice', 
@@ -895,7 +909,7 @@ function GreenWall_OnEvent(self, event, ...)
 				--
 				-- Boot if an intruder
 				--
-				if guild == nil or not tContains(gwPeerTable, guild) then
+				if guild == nil or not GwIsContainer(guild) then
 					-- ChannelBan(gwChannelName, name);
 					ChannelKick(gwChannelName, name);
 					GwSendConfederationMsg('notice', 
