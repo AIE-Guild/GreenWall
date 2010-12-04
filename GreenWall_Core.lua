@@ -588,7 +588,7 @@ function GreenWall_OnEvent(self, event, ...)
 	elseif event == 'GUILD_ROSTER_UPDATE' then
 	
 		if gwRosterUpdate then
-			gwPlayerGuild = GetGuildInfo();
+			gwPlayerGuild = GetGuildInfo('Player');
 			if gwPlayerGuild then
 				GwRefreshComms();
 				if gwConfigString then
