@@ -82,7 +82,7 @@ local gwFlagModerator	= false;
 local gwFlagHandoff		= false;
 local gwStateSendWho	= 0;
 local gwAddonLoaded		= false;
-local gwRosterLoaded	= false;
+local gwRosterUpdate	= false;
 
 
 --
@@ -343,6 +343,9 @@ local function GwRefreshComms()
 		-- Make sure we know which co-guild we are in.
 		if gwGuildName == nil or gwGuildName == '' then
 			gwGuildName = GetGuildInfo('Player');
+			if gwGuildName == nil then
+				return;
+			end
 		end
 		
 		-- We will rebuild the list of peer container guilds
@@ -578,32 +581,37 @@ function GreenWall_OnEvent(self, event, ...)
 		gwFlagModerator	= false;
 		gwFlagHandoff	= false;
 		gwStateSendWho	= 0;
-		gwRosterLoaded	= false;
+		gwRosterUpdate	= false;
 
 		GuildRoster();
 
 	elseif event == 'GUILD_ROSTER_UPDATE' then
 	
-		if not gwRosterLoaded then
-			GwRefreshComms();
-		end
-		
-		if GwIsConnected() then
-			gwRosterLoaded = true;
+		if gwRosterUpdate then
+			gwPlayerGuild = GetGuildInfo();
+			if gwPlayerGuild then
+				GwRefreshComms();
+				if gwConfigString then
+					gwRosterUpdate = false;
+				end
+			end
 		end
 
 	elseif event == 'PLAYER_GUILD_UPDATE' then
 	
-		gwRosterLoaded = false;
-		gwPlayerGuild = GetGuildInfo('Player');
+		-- Invalidate pending updates
+		gwRosterUpdate = false;
 		
-		if gwPlayerGuild ~= nil then
-			GuildRoster();
-			GwRefreshComms();
-		elseif GwIsConnected() then
+		-- Drop from current channel
+		if GwIsConnected() then
 			GwLeaveChannel();
 		end
-
+		
+		if IsInGuild() then
+			GuildRoster();
+			gwRosterUpdate = true;
+		end
+		
 	elseif event == 'CHAT_MSG_GUILD' then
 	
 		local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
