@@ -465,21 +465,6 @@ Slash Command Handler
 local function GwSlashCmd(message, editbox)
 
 	--
-	-- Initialize the saved variables
-	--
-	if GreenWall == nil then
-		GreenWall = {
-			version	= gwVersion,
-			debugLevel = 0,
-			announce = 0
-		};
-	end
-
-	GreenWall.version = gwVersion;
-	if GreenWall.debugLevel == nil 	then GreenWall.debugLevel = 0 		end
-	if GreenWall.announce == nil 	then GreenWall.announce = false 	end
-
-	--
 	-- Parse the command
 	--
 	local command, argstr = message:match('^(%S*)%s*(.*)');
@@ -601,17 +586,41 @@ Frame Event Functions
 
 function GreenWall_OnEvent(self, event, ...)
 
-	GwDebug(4, format('event: %s', event));
-
 	--
 	-- Event switch
 	--
 	if event == 'ADDON_LOADED' and select(1, ...) == 'GreenWall' then
 		
+		--
+		-- Initialize the saved variables
+		--
+		if GreenWall == nil then
+			GreenWall = {
+				version	= gwVersion,
+				debugLevel = 0,
+				announce = 0
+			};
+		end
+
+		--
+		-- Remedial configuration
+		--
+		GreenWall.version = gwVersion;
+		if GreenWall.debugLevel == nil 	then GreenWall.debugLevel = 0 		end
+		if GreenWall.announce == nil 	then GreenWall.announce = false 	end
+
 		gwAddonLoaded = true;
-		GwWrite(format('v%s loaded.', gwVersion));			
+		GwWrite(format('v%s loaded.', gwVersion));
 		
-	elseif event == 'CHANNEL_UI_UPDATE' then
+	end			
+		
+	if gwAddonLoaded then
+		GwDebug(4, format('event: %s', event));
+	else
+		return;  -- early exit
+	end
+
+	if event == 'CHANNEL_UI_UPDATE' then
 	
 		if gwPlayerGuild ~= nil and not GwIsConnected() then
 			GwRefreshComms();
