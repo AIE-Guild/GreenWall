@@ -85,6 +85,14 @@ local gwRosterUpdate	= false;
 
 
 --
+-- Options
+--
+local gwOptMinVersion	= gwVersion;
+local gwOptChanKick		= false;
+local gwOptChanBan		= false;
+
+
+--
 -- Timers and thresholds
 --
 
@@ -405,6 +413,36 @@ local function GwRefreshComms()
 					channel 	= vector[2];
 					password	= vector[3];
 					GwDebug(2, format('channel: %s, password: %s', channel, password));
+				
+				elseif vector[1] == 'o' then
+				
+					local optlist = { strsplit(',', gsub(vector[2], '%s+', '')) };
+					
+					for i, opt in ipairs(optlist) do
+						
+						local k, v = strsplit('=', opt);
+						
+						k = strlower(k);
+						v = strlower(v);
+						
+						if k == 'mv' then
+							if strmatch(v, '^%d+%.%d+%.%d+%w*$') then
+								gwOptMinVersion = v;
+								GwDebug(2, format('minimum version: %s', gwOptMinVersion));
+							end
+						elseif k == 'cd' then
+							if v == 'k' then
+								gwOptChanKick = true;
+								GwDebug(2, 'channel defense: kick');
+						    elseif v == 'kb' then
+								gwOptChanBan = true;
+								GwDebug(2, 'channel defense: kick/ban');
+							else
+								GwDebug(2, 'channel defense: none');
+							end
+						end
+						
+					end
 									
 				elseif vector[1] == 'p' then
 		
@@ -528,6 +566,20 @@ local function GwSlashCmd(message, editbox)
 
 		for i, v in pairs(gwPeerTable) do
 			GwWrite(format('peer[%s] => %s', i, v));
+		end
+
+		GwWrite(format('min_version=%s', gwOptMinVersion));
+
+		if gwOptChanKick then
+			GwWrite('chan_kick=yes');
+		else
+			GwWrite('chan_kick=no');
+		end
+		
+		if gwOptChanBan then
+			GwWrite('chan_ban=yes');
+		else
+			GwWrite('chan_ban=no');
 		end
 	
 	elseif command == 'version' then
@@ -781,7 +833,7 @@ function GreenWall_OnEvent(self, event, ...)
 			--
 			-- One of us?
 			-- 
-			if gwFlagOwner then
+			if gwFlagOwner and (gwOptChanKick or gwOptChanBan) then
 				
 				local guild = GetGuildInfo(name);
 				
@@ -800,12 +852,16 @@ function GreenWall_OnEvent(self, event, ...)
 					-- Boot intruders
 					--
 					if not GwIsContainer(guild) then
-						-- ChannelBan(gwChannelName, name);
-						ChannelKick(gwChannelName, name);
-						GwSendConfederationMsg('notice', 
-								format('removed %s (%s), not in a co-guild.', name, guild));
-						GwDebug(1, 
-								format('removed %s (%s), not in a co-guild.', name, guild));
+						if gwOptChanKick then
+							if gwOptChanBan then
+								ChannelBan(gwChannelName, name);
+							end
+							ChannelKick(gwChannelName, name);
+							GwSendConfederationMsg('notice', 
+									format('removed %s (%s), not in a co-guild.', name, guild));
+							GwDebug(1, 
+									format('removed %s (%s), not in a co-guild.', name, guild));
+						end
 					end
 				
 				end
@@ -932,12 +988,16 @@ function GreenWall_OnEvent(self, event, ...)
 				-- Boot if an intruder
 				--
 				if guild == nil or not GwIsContainer(guild) then
-					-- ChannelBan(gwChannelName, name);
-					ChannelKick(gwChannelName, name);
-					GwSendConfederationMsg('notice', 
-							format('removed %s (%s), not in a co-guild.', name, guild));
-					GwDebug(1,
-							format('removed %s (%s), not in a co-guild.', name, guild));
+					if gwOptChanKick then
+						if gwOptChanBan then
+							ChannelBan(gwChannelName, name);
+						end
+						ChannelKick(gwChannelName, name);
+						GwSendConfederationMsg('notice', 
+								format('removed %s (%s), not in a co-guild.', name, guild));
+						GwDebug(1,
+								format('removed %s (%s), not in a co-guild.', name, guild));
+					end
 				end
 
 				--
