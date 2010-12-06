@@ -880,9 +880,11 @@ function GreenWall_OnEvent(self, event, ...)
 			--
 			-- Advertise the member status
 			--
-			DEFAULT_CHAT_FRAME:AddMessage(format(ERR_FRIEND_OFFLINE_S, name),
-					1.0, 1.0, 0.0, GetChatTypeIndex('CHAT_MSG_SYSTEM'));
-
+			if GreenWall.announce then
+				DEFAULT_CHAT_FRAME:AddMessage(format(ERR_FRIEND_OFFLINE_S, name),
+						1.0, 1.0, 0.0, GetChatTypeIndex('CHAT_MSG_SYSTEM'));
+			end
+			
 		end
 
 	elseif event == 'CHAT_MSG_CHANNEL_NOTICE_USER' then
@@ -903,11 +905,13 @@ function GreenWall_OnEvent(self, event, ...)
 
 					gwFlagOwner = true;
 				
+					--[[
 					if not GwIsOfficer() then
 						-- Set a time to drop moderator status
 						gwHandoffTimer = time() + gwHandoffTimeout;
 						gwFlagHandoff = false;
 					end
+					]]--
 
 					-- Query the members of the container guild for officers
 					GwSendContainerMsg('request', 'officer');
@@ -1020,6 +1024,7 @@ function GreenWall_OnEvent(self, event, ...)
 	--
 	-- Take care of our lazy timers
 	--
+	--[[
 	if gwHandoffTimer ~= nil then
 		if gwHandoffTimer <= time() then
 			-- Abdicate moderator status
@@ -1028,6 +1033,7 @@ function GreenWall_OnEvent(self, event, ...)
 			gwHandoffTimer = nil;
 		end
 	end
+	]]--
 
 end
 
