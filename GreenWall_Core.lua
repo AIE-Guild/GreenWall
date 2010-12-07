@@ -85,7 +85,7 @@ local gwRosterUpdate	= false;
 
 
 --
--- Options
+-- Guild options
 --
 local gwOptMinVersion	= gwVersion;
 local gwOptChanKick		= false;
@@ -336,6 +336,7 @@ local function GwJoinChannel()
 
 		else
 	
+			GwWrite('connected to confederation.');
 			GwDebug(1, format('joined channel %s (%d)', gwChannelName, gwChannelNumber));
 
 			--
@@ -467,6 +468,7 @@ local function GwRefreshComms()
 		if config ~= gwConfigString then
 			gwConfigString 	= config;
 			confUpdate = true;
+			GwWrite('configuration updated.');
 		end
 		gwChannelName 	= channel;
 		gwChannelPass 	= password;
@@ -542,17 +544,37 @@ local function GwSlashCmd(message, editbox)
 	
 	elseif command == 'status' then
 	
-		local flag;
+		local flag, chanName, chanNumber, chanPass, container;
+		
 		if GwIsConnected() then
 			flag = 'true';
 		else
 			flag = 'false';
 		end
 		
-        local chanName  = gwChannelName == nil      and ''  or gwChannelName;
-        local chanNum   = gwChannelNumber == nil    and ''  or gwChannelNumber;
-        local chanPass  = gwChannelPass == nil      and ''  or gwChannelPass;
-        local container = gwContainerID == nil      and ''  or gwContainerID;
+		if gwChannelName == nil then
+			chanName = '<none>';
+		else
+			chanName = gwChannelName;
+		end
+
+		if gwChannelNumber == nil then
+			chanNumber = 0;
+		else
+			chanNumber = gwChannelNumber;
+		end
+
+		if gwChannelPass == nil then
+			chanPass = '<none>';
+		else
+			chanPass = gwChannelPass;
+		end
+
+		if gwContainerId == nil then
+			container = '<none>';
+		else
+			container = gwContainerId;
+		end
 
 		GwWrite(format('chan=%s(%d), pass=%s, container=%s',
 				chanName, chanNumber, chanPass, container));
@@ -585,6 +607,28 @@ local function GwSlashCmd(message, editbox)
 			GwWrite('chan_ban=yes');
 		else
 			GwWrite('chan_ban=no');
+		end
+	
+		if GreenWall.announce then
+			GwWrite('announce=yes');
+		else
+			GwWrite('announce=no');
+		end
+	
+		if GreenWall.tag then
+			GwWrite('tag=yes');
+		else
+			GwWrite('tag=no');
+		end
+	
+	elseif command == 'tag' then
+	
+		if GreenWall.tag then
+			GreenWall.tag = false;
+			GwWrite('co-guild tagging turned OFF.');
+		else
+			GreenWall.tag = true;
+			GwWrite('co-guild tagging turned ON.');
 		end
 	
 	elseif command == 'version' then
@@ -655,7 +699,8 @@ function GreenWall_OnEvent(self, event, ...)
 			GreenWall = {
 				version	= gwVersion,
 				debugLevel = 0,
-				announce = 0
+				announce = false,
+				tag = false
 			};
 		end
 
@@ -663,8 +708,20 @@ function GreenWall_OnEvent(self, event, ...)
 		-- Remedial configuration
 		--
 		GreenWall.version = gwVersion;
-		if GreenWall.debugLevel == nil 	then GreenWall.debugLevel = 0 		end
-		if GreenWall.announce == nil 	then GreenWall.announce = false 	end
+		if GreenWall.debugLevel == nil then
+			GreenWall.debugLevel = 0;
+		end
+		
+		if GreenWall.announce == nil then
+			GreenWall.announce = false;
+		elseif GreenWall.announce == 0 then
+			-- fix a previous sin
+			GreenWall.announce = false;
+		end
+
+		if GreenWall.tag == nil then
+			GreenWall.tag = false;
+		end
 
 		gwAddonLoaded = true;
 		GwWrite(format('v%s loaded.', gwVersion));
@@ -746,6 +803,10 @@ function GreenWall_OnEvent(self, event, ...)
 				-- Incoming chat message
 				--
 				
+				if GreenWall.tag then
+					message = format('<%s> %s', container, message);
+				end
+				
 				for i, v in ipairs(gwFrameTable) do
 					local frame = 'ChatFrame' .. v;
 					if _G[frame] then
@@ -774,6 +835,10 @@ function GreenWall_OnEvent(self, event, ...)
 				--
 				-- Incoming achievement spam
 				--
+				
+				if GreenWall.tag then
+					message = format('<%s> %s', container, message);
+				end
 				
 				for i, v in ipairs(gwFrameTable) do
 					local frame = 'ChatFrame' .. v;
