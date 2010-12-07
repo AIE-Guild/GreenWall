@@ -549,8 +549,13 @@ local function GwSlashCmd(message, editbox)
 			flag = 'false';
 		end
 		
+        local chanName  = gwChannelName == nil      and ''  or gwChannelName;
+        local chanNum   = gwChannelNumber == nil    and ''  or gwChannelNumber;
+        local chanPass  = gwChannelPass == nil      and ''  or gwChannelPass;
+        local container = gwContainerID == nil      and ''  or gwContainerID;
+
 		GwWrite(format('chan=%s(%d), pass=%s, container=%s',
-				gwChannelName, gwChannelNumber, gwChannelPass, gwContainerId));
+				chanName, chanNumber, chanPass, container));
 		
 		if GwIsConnected() then
 			GwWrite('connected=yes');
