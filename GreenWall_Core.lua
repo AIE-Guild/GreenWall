@@ -531,14 +531,14 @@ local function GwSlashCmd(message, editbox)
     
     GwDebug(4, format('command: %s, args: %s', command, argstr));
     
-    if command == 'announce' then
+    if command == 'achievements' then
     
-        if GreenWall.announce then
-            GreenWall.announce = false;
-            GwWrite('join announcements turned OFF.');
+        if GreenWall.achievements then
+            GreenWall.achievements = false;
+            GwWrite('co-guild achievements turned OFF.');
         else
-            GreenWall.announce = true;
-            GwWrite('join announcements turned ON.');
+            GreenWall.achievements = true;
+            GwWrite('co-guild achievements turned ON.');
         end
     
     elseif command == 'debug' then
@@ -628,10 +628,10 @@ local function GwSlashCmd(message, editbox)
             GwWrite('chan_ban=no');
         end
     
-        if GreenWall.announce then
-            GwWrite('announce=yes');
+        if GreenWall.achievements then
+            GwWrite('achievements=yes');
         else
-            GwWrite('announce=no');
+            GwWrite('achievements=no');
         end
     
         if GreenWall.tag then
@@ -718,7 +718,7 @@ function GreenWall_OnEvent(self, event, ...)
             GreenWall = {
                 version    = gwVersion,
                 debugLevel = 0,
-                announce = false,
+                achievements = false,
                 tag = false
             };
         end
@@ -731,11 +731,8 @@ function GreenWall_OnEvent(self, event, ...)
             GreenWall.debugLevel = 0;
         end
         
-        if GreenWall.announce == nil then
-            GreenWall.announce = false;
-        elseif GreenWall.announce == 0 then
-            -- fix a previous sin
-            GreenWall.announce = false;
+        if GreenWall.achievements == nil then
+            GreenWall.achievements = false;
         end
 
         if GreenWall.tag == nil then
@@ -829,7 +826,7 @@ function GreenWall_OnEvent(self, event, ...)
                 for i, v in ipairs(gwFrameTable) do
                     local frame = 'ChatFrame' .. v;
                     if _G[frame] then
-                        GwDebug(3, format('Tx<GUILD, *, %s>: %s', sender, message));
+                        GwDebug(3, format('Tx<%s/GUILD, *, %s>: %s', frame, sender, message));
                         ChatFrame_MessageEventHandler(
                                 _G[frame], 
                                 'CHAT_MSG_GUILD', 
@@ -855,32 +852,36 @@ function GreenWall_OnEvent(self, event, ...)
                 -- Incoming achievement spam
                 --
                 
-                if GreenWall.tag then
-                    message = format('<%s> %s', container, message);
-                end
+                if GreenWall.achievements then
                 
-                for i, v in ipairs(gwFrameTable) do
-                    local frame = 'ChatFrame' .. v;
-                    if _G[frame] then
-                        GwDebug(3, 
-                                format('Tx<GUILD_ACHIEVEMENT, *, %s>: %s', sender, message));
-                        ChatFrame_MessageEventHandler(
-                                _G[frame], 
-                                'CHAT_MSG_GUILD_ACHIEVEMENT',
-                                message,
-                                sender,
-                                language, 
-                                '',
-                                '', 
-                                '', 
-                                0, 
-                                0, 
-                                '', 
-                                0, 
-                                counter, 
-                                guid
-                            );
+                    if GreenWall.tag then
+                        message = format('<%s> %s', container, message);
                     end
+                
+                    for i, v in ipairs(gwFrameTable) do
+                        local frame = 'ChatFrame' .. v;
+                        if _G[frame] then
+                            GwDebug(3, 
+                                    format('Tx<%s/GUILD_ACHIEVEMENT, *, %s>: %s', frame, sender, message));
+                            ChatFrame_MessageEventHandler(
+                                    _G[frame], 
+                                    'CHAT_MSG_GUILD_ACHIEVEMENT',
+                                    message,
+                                    sender,
+                                    language, 
+                                    '',
+                                    '', 
+                                    '', 
+                                    0, 
+                                    0, 
+                                    '', 
+                                    0, 
+                                    counter, 
+                                    guid
+                                );
+                        end
+                    end
+                
                 end
             
             elseif opcode == 'R' then
@@ -908,14 +909,6 @@ function GreenWall_OnEvent(self, event, ...)
         local chanNum = select(8, ...);
         
         if chanNum == gwChannelNumber then
-                    
-            --
-            -- Advertise the member status
-            --
-            if GreenWall.announce then
-                DEFAULT_CHAT_FRAME:AddMessage(format(ERR_FRIEND_ONLINE_SS, name, name),
-                        1.0, 1.0, 0.0, GetChatTypeIndex('CHAT_MSG_SYSTEM'));
-            end
 
             --
             -- One of us?
@@ -955,23 +948,6 @@ function GreenWall_OnEvent(self, event, ...)
             
             end
 
-        end
-            
-    elseif event == 'CHAT_MSG_CHANNEL_LEAVE' then
-    
-        local name = select(2, ...);
-        local chanNum = select(8, ...);
-        
-        if chanNum == gwChannelNumber then
-
-            --
-            -- Advertise the member status
-            --
-            if GreenWall.announce then
-                DEFAULT_CHAT_FRAME:AddMessage(format(ERR_FRIEND_OFFLINE_S, name),
-                        1.0, 1.0, 0.0, GetChatTypeIndex('CHAT_MSG_SYSTEM'));
-            end
-            
         end
 
     elseif event == 'CHAT_MSG_CHANNEL_NOTICE_USER' then
