@@ -51,6 +51,30 @@ Global Variables
 
 local gwVersion = GetAddOnMetadata('GreenWall', 'Version');
 
+local gwUsage = [[
+ 
+  Usage:
+  
+  /greenwall <command>  or  /gw <command>
+  
+  Commands:
+  
+  help
+        -- Print this message.
+  version
+        -- Print the add-on version.
+  status
+        -- Print configuration and state information.
+  refresh
+        -- Repair communications link.
+  achievements
+        -- Echo achievements from other co-guilds.
+  tag
+        -- Show co-guild identifier in messages.
+  debug <level>
+        -- Set debugging level to integer <level>.
+ 
+]];
 
 --
 -- Player variables
@@ -531,7 +555,13 @@ local function GwSlashCmd(message, editbox)
     
     GwDebug(4, format('command: %s, args: %s', command, argstr));
     
-    if command == 'achievements' then
+    if command == nil or command == '' or command == 'help' then
+    
+        for line in string.gmatch(gwUsage, '([^\n]*)\n') do
+            GwWrite(line);
+        end
+    
+    elseif command == 'achievements' then
     
         if GreenWall.achievements then
             GreenWall.achievements = false;
