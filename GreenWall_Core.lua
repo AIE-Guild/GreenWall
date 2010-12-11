@@ -604,7 +604,7 @@ local function GwSlashCmd(message, editbox)
         if gwChannelName == nil then
             chanName = '<none>';
         else
-            chanName = gwChannelName;
+            chanName = '[REDACTED]';
         end
 
         if gwChannelNumber == nil then
@@ -616,7 +616,7 @@ local function GwSlashCmd(message, editbox)
         if gwChannelPass == nil then
             chanPass = '<none>';
         else
-            chanPass = gwChannelPass;
+            chanPass = '[REDACTED]';
         end
 
         if gwContainerId == nil then
@@ -716,7 +716,7 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHAT_MSG_ADDON');
     self:RegisterEvent('CHAT_MSG_CHANNEL');
     self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN');
-    self:RegisterEvent('CHAT_MSG_CHANNEL_LEAVE');
+    -- self:RegisterEvent('CHAT_MSG_CHANNEL_LEAVE');
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE_USER');
     self:RegisterEvent('CHAT_MSG_GUILD');
     self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT');
