@@ -324,7 +324,7 @@ local function GwLeaveChannel()
 
     LeaveChannelByName(gwChannelName);
     GwDebug(1, format('left channel %s (%d)', gwChannelName, gwChannelNumber));
-    gwChannelNumber    = 0;
+    gwChannelNumber = 0;
 
 end
 
@@ -384,6 +384,8 @@ local function GwJoinChannel()
         end
         
     end
+    
+    return gwChannelNumber;
     
 end
 
@@ -496,7 +498,7 @@ local function GwRefreshComms()
         --
         if not GwIsConnected() or confUpdate then
             GwDebug(2, 'client not connected.');
-            gwChannelNumber = GwJoinChannel();
+            GwJoinChannel();
         else
             GwDebug(2, 'client already connected.');
         end
