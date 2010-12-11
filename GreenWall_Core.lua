@@ -96,11 +96,20 @@ local gwOptChanBan		= false;
 -- Timers and thresholds
 --
 
+-- Holddown for join messages
+local gwHoldIntJoinMsg  = 180;
+local gwHoldTimeJoinMsg = 0;
+
+-- Holddown for configuration announcements
+local gwHoldIntConfMsg  = 180;
+local gwHoldTimeConfMsg = 0;
+
+-- Holddown for reload requests
+local gwHoldIntReload  = 180;
+local gwHoldTimeReload      = 0;
+
 local gwHandoffTimeout	= 30;
 local gwHandoffTimer	= nil;
-
-local gwReloadHolddown	= 180;
-local gwLastReload		= 0;
 
 
 --
@@ -121,7 +130,7 @@ Convenience Functions
 
 local function GwWrite(msg)
 
-	DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r ' .. msg);
+    DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r ' .. msg);
 
 end
 
@@ -335,9 +344,13 @@ local function GwJoinChannel()
 			return 0;
 
 		else
-	
-			GwWrite('connected to confederation.');
+		
 			GwDebug(1, format('joined channel %s (%d)', gwChannelName, gwChannelNumber));
+            local t = time();
+            if t <= gwHoldTimeJoinMsg + gwHoldIntJoinMsg then
+                GwWrite('connected to confederation.');
+            end
+            gwHoldTimeJoinMsg = t;
 
 			--
 			-- Check for default permissions
@@ -468,7 +481,11 @@ local function GwRefreshComms()
 		if config ~= gwConfigString then
 			gwConfigString 	= config;
 			confUpdate = true;
-			GwWrite('configuration updated.');
+			local t = time();
+            if t <= gwHoldTimeConfMsg + gwHoldIntConfMsg then
+                GwWrite('configuration updated.');
+            end
+            gwHoldTimeConfMsg = t;
 		end
 		gwChannelName 	= channel;
 		gwChannelPass 	= password;
@@ -870,14 +887,12 @@ function GreenWall_OnEvent(self, event, ...)
 				-- Incoming request
 				--
 				if message:match('^reload(%w.*)?$') then 
-					local diff = time() - gwLastReload;
+					local diff = time() - gwHoldTimeReload;
 					GwWrite(format('Received configuration reload request from %s.', sender));
-					if diff >= gwReloadHolddown then
+					if diff >= gwHoldIntReload then
 						GwRefreshComms();
 						GwWrite('Refeshed communication link.');
-						gwLastReload = time();
-					else
-						GwWrite('Request squelched.');
+						gwHoldTimeReload = time();
 					end
 				end
 			
