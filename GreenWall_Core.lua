@@ -127,14 +127,6 @@ local gwOptChanBan      = false;
 local gwTimeOutChatBlock    = 30;
 local gwTimeStampChatBlock  = 0;
 
--- Holddown for join messages
-local gwHoldIntJoinMsg  = 180;
-local gwHoldTimeJoinMsg = 0;
-
--- Holddown for configuration announcements
-local gwHoldIntConfMsg  = 180;
-local gwHoldTimeConfMsg = 0;
-
 -- Holddown for reload requests
 local gwHoldIntReload   = 180;
 local gwHoldTimeReload  = 0;
@@ -442,15 +434,10 @@ local function GwJoinChannel()
         else
         
             GwDebug(1, format('joined channel %s (%d)', gwChannelName, gwChannelNumber));
+            GwWrite('Connected to confederation.');
             
             gwStats.sconn = gwStats.sconn + 1;
             
-            local t = time();
-            if t <= gwHoldTimeJoinMsg + gwHoldIntJoinMsg then
-                GwWrite('connected to confederation.');
-            end
-            gwHoldTimeJoinMsg = t;
-
             --
             -- Check for default permissions
             --
@@ -605,11 +592,7 @@ local function GwRefreshComms()
         if config ~= gwConfigString then
             gwConfigString     = config;
             confUpdate = true;
-            local t = time();
-            if t <= gwHoldTimeConfMsg + gwHoldIntConfMsg then
-                GwWrite('configuration updated.');
-            end
-            gwHoldTimeConfMsg = t;
+            GwWrite('Configuration updated.');
         end
         gwChannelName     = channel;
         gwChannelPass     = password;
