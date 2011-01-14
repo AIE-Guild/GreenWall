@@ -105,6 +105,7 @@ local gwPeerTable       = {};
 
 local gwFlagOwner       = nil;
 local gwFlagHandoff     = false;
+local gwFlagChatBlock   = true;
 local gwStateSendWho    = 0;
 local gwAddonLoaded     = false;
 local gwRosterUpdate    = false;
@@ -122,6 +123,10 @@ local gwOptChanBan      = false;
 -- Timers and thresholds
 --
 
+-- Timeout for General chat barrier
+local gwTimeOutChatBlock    = 30;
+local gwTimeStampChatBlock  = 0;
+
 -- Holddown for join messages
 local gwHoldIntJoinMsg  = 180;
 local gwHoldTimeJoinMsg = 0;
@@ -134,7 +139,7 @@ local gwHoldTimeConfMsg = 0;
 local gwHoldIntReload   = 180;
 local gwHoldTimeReload  = 0;
 
-local gwHandoffTimeout  = 30;
+local gwHandoffTimeout  = 15;
 local gwHandoffTimer    = nil;
 
 
@@ -504,6 +509,11 @@ end
 --- Parse confederation configuration and connect to the common channel.
 local function GwRefreshComms()
 
+    if gwFlagChatBlock then
+        GwDebug(2, 'Deferring comms refresh, General not yet joined.');
+        return;
+    end
+
     local info = GetGuildInfoText();
     
     if info == '' then
@@ -733,6 +743,7 @@ local function GwSlashCmd(message, editbox)
             GwWrite(format('peer[%s] => %s', i, v));
         end
 
+        GwWrite(format('version=%s.', gwVersion));
         GwWrite(format('min_version=%s', gwOptMinVersion));
 
         if gwOptChanKick then
@@ -816,7 +827,6 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT');
     self:RegisterEvent('CHAT_MSG_SYSTEM');
     self:RegisterEvent('GUILD_ROSTER_UPDATE');
-    self:RegisterEvent('PLAYER_LOGIN');
     self:RegisterEvent('PLAYER_GUILD_UPDATE');
     
 end
@@ -874,15 +884,19 @@ function GreenWall_OnEvent(self, event, ...)
         return;  -- early exit
     end
 
-    if event == 'CHANNEL_UI_UPDATE' then
+
+    if event == 'ADDON_LOADED' then
+
+        GwPrepComms();
+        
+        -- Timer in case player has left General at some point
+        gwTimeStampChatBlock = time();
+
+    elseif event == 'CHANNEL_UI_UPDATE' then
     
         if gwGuildName ~= nil and not GwIsConnected() then
             GwRefreshComms();
         end
-    
-    elseif event == 'PLAYER_LOGIN' then
-
-        GwPrepComms();
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
@@ -1075,10 +1089,20 @@ function GreenWall_OnEvent(self, event, ...)
         local action, _, _, _, _, _, type, number, name = select(1, ...);
         
         if number == gwChannelNumber then
+            
             if action == 'YOU_LEFT' then
                 gwStats.disco = gwStats.disco + 1;
                 GwPrepComms();
-            end    
+            end
+        
+        elseif type == 1 then
+        
+            if action == 'YOU_JOINED' then
+                GwDebug(2, 'General joined, unblocking reconnect.');
+                gwFlagChatBlock = false;
+                GwPrepComms();
+            end
+                
         end
 
     elseif event == 'CHAT_MSG_CHANNEL_NOTICE_USER' then
@@ -1218,16 +1242,15 @@ function GreenWall_OnEvent(self, event, ...)
     --
     -- Take care of our lazy timers
     --
-    --[[
-    if gwHandoffTimer ~= nil then
-        if gwHandoffTimer <= time() then
-            -- Abdicate moderator status
-            GwDebug(1, 'Handoff timer expired, releasing moderator status.');
-            ChannelUnmoderator(gwChannelName, gwPlayerName);
-            gwHandoffTimer = nil;
+    
+    if gwFlagChatBlock then
+        if gwTimeStampChatBlock + gwTimeOutChatBlock <= time() then
+            -- Give up
+            GwDebug(2, 'Reconnect deferral timeout expired.');
+            gwFlagChatBlock = false;
+            GwPrepComms();
         end
     end
-    ]]--
 
 end
 
