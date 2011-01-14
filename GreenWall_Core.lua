@@ -152,6 +152,8 @@ Convenience Functions
 
 --]]-----------------------------------------------------------------------
 
+--- Write a message to the default chat frame.
+-- @param msg The message to send.
 local function GwWrite(msg)
 
     DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r ' .. msg);
@@ -159,6 +161,8 @@ local function GwWrite(msg)
 end
 
 
+--- Write an error message to the default chat frame.
+-- @param msg The error message to send.
 local function GwError(msg)
 
     DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r |cffff6000[ERROR] ' .. msg);
@@ -166,6 +170,10 @@ local function GwError(msg)
 end
 
 
+--- Write a debugging message to the default chat frame with a detail level.
+-- Messages willl be filtered with the "/greenwall debug <level>" command.
+-- @param level A positive integer specifying the debug level to display this under.
+-- @param msg The message to send.
 local function GwDebug(level, msg)
 
     if GreenWall ~= nil then
@@ -178,6 +186,8 @@ local function GwDebug(level, msg)
 end
 
 
+--- Check if a connection exists to the common chat.
+-- @return True if connected, otherwise false.
 local function GwIsConnected()
 
     --
@@ -210,6 +220,9 @@ local function GwIsConnected()
 end
 
 
+--- Check a target player for officer status in the same container guild.
+-- @param target The name of the player to check.
+-- @return True is the target has access to officer chat, false otherwise.
 local function GwIsOfficer(target)
 
     local rank;
@@ -234,6 +247,7 @@ local function GwIsOfficer(target)
 end
 
 
+--- Reset all confederation configuration.
 local function GwInitializeConfig()
     gwConfigString  = '';
     gwChannelName   = nil;
@@ -248,7 +262,10 @@ local function GwInitializeConfig()
 end
 
 
-local function GwIsContainer(guild)
+--- Check a guild for peer status.
+-- @param guild The name of the guild to check.
+-- @return True if the target guild is a peer co-guild, false otherwise.
+local function GwIsPeer(guild)
     for i, v in pairs(gwPeerTable) do
         if v == guild then
             return true;
@@ -258,6 +275,22 @@ local function GwIsContainer(guild)
 end
 
 
+--- Check a guild for membership within the confederation.
+-- @param guild The name of the guild to check.
+-- @return True if the target guild is in the confederation, false otherwise.
+local function GwIsContainer(guild)
+    if guild == gwGuildName then
+        return gwContainerId ~= nil;
+    else
+        return GwIsPeer(guild);
+    end
+end
+
+
+--- Finds channel roles for a player.
+-- @param name Name of the player to check.
+-- @return True if target is the channel owner, false otherwise.
+-- @return True if target is a channel moderator, false otherwise.
 local function GwChannelRoles(name)
         
     if name == nil then
@@ -279,6 +312,13 @@ local function GwChannelRoles(name)
 end
 
 
+--- Sends an encoded message to the rest of the confederation on the shared channel.
+-- @param type The message type.
+-- @field chat Broadcast as a chat message.
+-- @field achievement Broadcast as a chat message.
+-- @field notice Informational, out-of-band message.
+-- @field request Out-of-band request.
+-- @param message Text of the message.
 local function GwSendConfederationMsg(type, message)
 
     GwDebug(5, format('conf_msg type=%s, message=%s', type, message));
@@ -317,6 +357,12 @@ local function GwSendConfederationMsg(type, message)
 end
 
 
+--- Sends an encoded message to the rest of the same container on the add-on channel.
+-- @param type The message type.
+-- @field request Command request.
+-- @field response Command response.
+-- @field info Informational message.
+-- @param message Text of the message.
 local function GwSendContainerMsg(type, message)
 
     GwDebug(5, format('cont_msg type=%s, message=%s', type, message));
@@ -344,6 +390,7 @@ local function GwSendContainerMsg(type, message)
 end
 
 
+--- Leave the shared confederation channel.
 local function GwLeaveChannel()
 
     LeaveChannelByName(gwChannelName);
@@ -353,6 +400,9 @@ local function GwLeaveChannel()
 end
 
 
+--- Join the shared confederation channel.
+-- Configuration globals must be populated before this is called.
+-- @return Integer channel number, 0 on failure.
 local function GwJoinChannel()
 
     if gwChannelName then
@@ -414,6 +464,24 @@ local function GwJoinChannel()
 end
 
 
+--- Clear confederation configuration and request updated guild roster 
+-- information from the server.
+local function GwPrepComms()
+    
+    GwDebug(2, 'Initiating reconnect, querying guild roster.');
+    
+    if not GwIsConnected() then
+        GwInitializeConfig();
+        if IsInGuild() then
+            GuildRoster();
+            gwRosterUpdate = true;
+        end
+    end
+    
+end
+
+
+--- Parse confederation configuration and connect to the common channel.
 local function GwRefreshComms()
 
     local info = GetGuildInfoText();
@@ -532,6 +600,7 @@ local function GwRefreshComms()
 end
 
 
+--- Send a configuration reload request to the rest of the confederation.
 local function GwForceReload()
     if GwIsConnected() then
         GwSendConfederationMsg('request', 'reload');
@@ -716,13 +785,12 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHAT_MSG_ADDON');
     self:RegisterEvent('CHAT_MSG_CHANNEL');
     self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN');
-    -- self:RegisterEvent('CHAT_MSG_CHANNEL_LEAVE');
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE_USER');
     self:RegisterEvent('CHAT_MSG_GUILD');
     self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT');
     self:RegisterEvent('CHAT_MSG_SYSTEM');
     self:RegisterEvent('GUILD_ROSTER_UPDATE');
-    self:RegisterEvent('PLAYER_ENTERING_WORLD');
+    self:RegisterEvent('PLAYER_LOGIN');
     self:RegisterEvent('PLAYER_GUILD_UPDATE');
     
 end
@@ -746,10 +814,10 @@ function GreenWall_OnEvent(self, event, ...)
         --
         if GreenWall == nil then
             GreenWall = {
-                version    = gwVersion,
-                debugLevel = 0,
-                achievements = false,
-                tag = false
+                version         = gwVersion,
+                debugLevel      = 0,
+                achievements    = false,
+                tag             = false
             };
         end
 
@@ -782,20 +850,19 @@ function GreenWall_OnEvent(self, event, ...)
 
     if event == 'CHANNEL_UI_UPDATE' then
     
-        if gwPlayerGuild ~= nil and not GwIsConnected() then
+        if gwGuildName ~= nil and not GwIsConnected() then
             GwRefreshComms();
         end
     
-    elseif event == 'PLAYER_ENTERING_WORLD' then
+    elseif event == 'PLAYER_LOGIN' then
 
-        GwInitializeConfig();
-        GuildRoster();
+        GwPrepComms();
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
         if gwRosterUpdate then
-            gwPlayerGuild = GetGuildInfo('Player');
-            if gwPlayerGuild then
+            gwGuildName = GetGuildInfo('Player');
+            if gwGuildName then
                 GwRefreshComms();
                 if gwConfigString then
                     gwRosterUpdate = false;
@@ -805,17 +872,14 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'PLAYER_GUILD_UPDATE' then
     
-        -- Drop from current channel
-        if GwIsConnected() then
-            GwLeaveChannel();
-        end
-        
-        -- Reinitialize
-        GwInitializeConfig();
-
-        if IsInGuild() then
-            GuildRoster();
-            gwRosterUpdate = true;
+        if not IsInGuild() then
+            -- Drop comms on quit or boot
+            if  GwIsConnected() then
+                GwLeaveChannel();
+            end
+        else
+            -- Start the connection process otherwise
+            GwPrepComms();
         end
         
     elseif event == 'CHAT_MSG_GUILD' then
