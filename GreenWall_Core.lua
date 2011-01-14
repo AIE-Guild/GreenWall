@@ -4,7 +4,7 @@
 
     $HeadURL$
 
-    Copyright (c) 2010; Mark Rogaski.
+    Copyright (c) 2010, 2011; Mark Rogaski.
 
     All rights reserved.
 
@@ -65,6 +65,8 @@ local gwUsage = [[
         -- Print the add-on version.
   status
         -- Print configuration and state information.
+  stats
+        -- Print connection statistics.
   refresh
         -- Repair communications link.
   achievements
@@ -144,6 +146,17 @@ local gwChannelTable    = {};
 local gwChatWindowTable = {};
 local gwFrameTable      = {};
 local gwGuildCheck      = {};
+
+
+--
+-- Connection Statistics
+--
+local gwStats = {
+    sconn = 0,
+    fconn = 0,
+    leave = 0,
+    disco = 0
+};
 
 
 --[[-----------------------------------------------------------------------
@@ -396,6 +409,7 @@ local function GwLeaveChannel()
     LeaveChannelByName(gwChannelName);
     GwDebug(1, format('left channel %s (%d)', gwChannelName, gwChannelNumber));
     gwChannelNumber = 0;
+    gwStats.leave = gwStats.leave + 1;
 
 end
 
@@ -415,11 +429,17 @@ local function GwJoinChannel()
         if gwChannelNumber == 0 then
 
             GwError(format('cannot create communication channel: %s', gwChannelNumber));
+            
+            gwStats.fconn = gwStats.fconn + 1;
+            
             return 0;
 
         else
         
             GwDebug(1, format('joined channel %s (%d)', gwChannelName, gwChannelNumber));
+            
+            gwStats.sconn = gwStats.sconn + 1;
+            
             local t = time();
             if t <= gwHoldTimeJoinMsg + gwHoldIntJoinMsg then
                 GwWrite('connected to confederation.');
@@ -739,6 +759,11 @@ local function GwSlashCmd(message, editbox)
             GwWrite('tag=no');
         end
     
+    elseif command == 'stats' then
+    
+        GwWrite(format('%d sconn, %d fconn, %d leave, %d disco', 
+                gwStats.sconn, gwStats.fconn, gwStats.leave, gwStats.disco));
+    
     elseif command == 'tag' then
     
         if GreenWall.tag then
@@ -785,6 +810,7 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHAT_MSG_ADDON');
     self:RegisterEvent('CHAT_MSG_CHANNEL');
     self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN');
+    self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE');
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE_USER');
     self:RegisterEvent('CHAT_MSG_GUILD');
     self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT');
@@ -1042,6 +1068,17 @@ function GreenWall_OnEvent(self, event, ...)
             
             end
 
+        end
+
+    elseif event == 'CHAT_MSG_CHANNEL_NOTICE' then
+
+        local action, _, _, _, _, _, type, number, name = select(1, ...);
+        
+        if number == gwChannelNumber then
+            if action == 'YOU_LEFT' then
+                gwStats.disco = gwStats.disco + 1;
+                GwPrepComms();
+            end    
         end
 
     elseif event == 'CHAT_MSG_CHANNEL_NOTICE_USER' then
