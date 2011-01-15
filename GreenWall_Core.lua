@@ -675,83 +675,25 @@ local function GwSlashCmd(message, editbox)
     
     elseif command == 'status' then
     
-        local flag, chanName, chanNumber, chanPass, container;
-        
-        if GwIsConnected() then
-            flag = 'true';
-        else
-            flag = 'false';
-        end
-        
-        if gwChannelName == nil then
-            chanName = '<none>';
-        else
-            chanName = '[REDACTED]';
-        end
-
-        if gwChannelNumber == nil then
-            chanNumber = 0;
-        else
-            chanNumber = gwChannelNumber;
-        end
-
-        if gwChannelPass == nil then
-            chanPass = '<none>';
-        else
-            chanPass = '[REDACTED]';
-        end
-
-        if gwContainerId == nil then
-            container = '<none>';
-        else
-            container = gwContainerId;
-        end
-
         GwWrite(format('chan=%s(%d), pass=%s, container=%s',
-                chanName, chanNumber, chanPass, container));
+                (gwChannelName == nil   and '<none>'    or '[REDACTED]'), 
+                (gwChannelNumber == nil and 0           or gwChannelNumber), 
+                (gwChannelPass == nil   and '<none>'    or '[REDACTED]'), 
+                (gwContainerId == nil   and '<none>'    or gwContainerId) 
+            ));
+        GwWrite('connected='    .. (GwIsConnected()         and 'yes' or 'no'));
+        GwWrite('chan_own='     .. (gwFlagOwn               and 'yes' or 'no'));
+        GwWrite('chan_kick='    .. (gwOptKick               and 'yes' or 'no'));
+        GwWrite('chan_ban='     .. (gwOptBan                and 'yes' or 'no'));
         
-        if GwIsConnected() then
-            GwWrite('connected=yes');
-        else
-            GwWrite('connected=no');
-        end
-
-        if gwFlagOwner then
-            GwWrite('chan_own=yes');
-        else
-            GwWrite('chan_own=no');
-        end
-
         for i, v in pairs(gwPeerTable) do
             GwWrite(format('peer[%s] => %s', i, v));
         end
-
-        GwWrite(format('version=%s.', gwVersion));
-        GwWrite(format('min_version=%s', gwOptMinVersion));
-
-        if gwOptChanKick then
-            GwWrite('chan_kick=yes');
-        else
-            GwWrite('chan_kick=no');
-        end
-        
-        if gwOptChanBan then
-            GwWrite('chan_ban=yes');
-        else
-            GwWrite('chan_ban=no');
-        end
     
-        if GreenWall.achievements then
-            GwWrite('achievements=yes');
-        else
-            GwWrite('achievements=no');
-        end
-    
-        if GreenWall.tag then
-            GwWrite('tag=yes');
-        else
-            GwWrite('tag=no');
-        end
+        GwWrite('version='      .. gwVersion);
+        GwWrite('min_version='  .. gwOptMinVersion);
+        GwWrite('achievements=' .. (GreenWall.achievements  and 'yes' or 'no'));
+        GwWrite('tag='          .. (GreenWall.tag           and 'yes' or 'no'));
     
     elseif command == 'stats' then
     
@@ -811,6 +753,7 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHAT_MSG_SYSTEM');
     self:RegisterEvent('GUILD_ROSTER_UPDATE');
     self:RegisterEvent('PLAYER_GUILD_UPDATE');
+    self:RegisterEvent('PLAYER_LOGIN');
     
 end
 
@@ -868,12 +811,16 @@ function GreenWall_OnEvent(self, event, ...)
     end
 
 
-    if event == 'ADDON_LOADED' then
+    if event == 'PLAYER_LOGIN' then
 
+        -- Initiate the comms
         GwPrepComms();
         
+        -- Defer joining to allow General to grab slot 1
+        gwFlagChatBlock = true;
+        
         -- Timer in case player has left General at some point
-        gwTimeStampChatBlock = time();
+        gwTimeStampChatBlock = time() + gwTimeOutChatBlock;
 
     elseif event == 'CHANNEL_UI_UPDATE' then
     
@@ -1227,7 +1174,7 @@ function GreenWall_OnEvent(self, event, ...)
     --
     
     if gwFlagChatBlock then
-        if gwTimeStampChatBlock + gwTimeOutChatBlock <= time() then
+        if gwTimeStampChatBlock <= time() then
             -- Give up
             GwDebug(2, 'Reconnect deferral timeout expired.');
             gwFlagChatBlock = false;
