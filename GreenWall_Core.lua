@@ -811,47 +811,12 @@ function GreenWall_OnEvent(self, event, ...)
     end
 
 
-    if event == 'PLAYER_LOGIN' then
-
-        -- Initiate the comms
-        GwPrepComms();
-        
-        -- Defer joining to allow General to grab slot 1
-        gwFlagChatBlock = true;
-        
-        -- Timer in case player has left General at some point
-        gwTimeStampChatBlock = time() + gwTimeOutChatBlock;
-
-    elseif event == 'CHANNEL_UI_UPDATE' then
+    if  event == 'CHANNEL_UI_UPDATE' then
     
         if gwGuildName ~= nil and not GwIsConnected() then
             GwRefreshComms();
         end
 
-    elseif event == 'GUILD_ROSTER_UPDATE' then
-    
-        if gwRosterUpdate then
-            gwGuildName = GetGuildInfo('Player');
-            if gwGuildName then
-                GwRefreshComms();
-                if gwConfigString then
-                    gwRosterUpdate = false;
-                end
-            end
-        end
-
-    elseif event == 'PLAYER_GUILD_UPDATE' then
-    
-        if not IsInGuild() then
-            -- Drop comms on quit or boot
-            if  GwIsConnected() then
-                GwLeaveChannel();
-            end
-        else
-            -- Start the connection process otherwise
-            GwPrepComms();
-        end
-        
     elseif event == 'CHAT_MSG_GUILD' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
@@ -1167,6 +1132,41 @@ function GreenWall_OnEvent(self, event, ...)
 
         end
         
+    elseif event == 'GUILD_ROSTER_UPDATE' then
+    
+        if gwRosterUpdate then
+            gwGuildName = GetGuildInfo('Player');
+            if gwGuildName then
+                GwRefreshComms();
+                if gwConfigString then
+                    gwRosterUpdate = false;
+                end
+            end
+        end
+
+    elseif event == 'PLAYER_GUILD_UPDATE' then
+    
+        if not IsInGuild() then
+            -- Drop comms on quit or boot
+            if  GwIsConnected() then
+                GwLeaveChannel();
+            end
+        else
+            -- Start the connection process otherwise
+            GwPrepComms();
+        end
+        
+    elseif event == 'PLAYER_LOGIN' then
+
+        -- Initiate the comms
+        GwPrepComms();
+        
+        -- Defer joining to allow General to grab slot 1
+        gwFlagChatBlock = true;
+        
+        -- Timer in case player has left General at some point
+        gwTimeStampChatBlock = time() + gwTimeOutChatBlock;
+    
     end
 
     --
