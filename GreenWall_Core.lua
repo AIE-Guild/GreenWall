@@ -181,7 +181,7 @@ end
 
 
 --- Write a debugging message to the default chat frame with a detail level.
--- Messages willl be filtered with the "/greenwall debug <level>" command.
+-- Messages will be filtered with the "/greenwall debug <level>" command.
 -- @param level A positive integer specifying the debug level to display this under.
 -- @param msg The message to send.
 local function GwDebug(level, msg)
@@ -310,21 +310,30 @@ end
 -- target chat channel.
 -- @param target Target channel type.
 -- @param sender The sender of the message.
+-- @param container Container ID of the sender.
 -- @param language The language used for the message.
 -- @param flags Status flags for the message sender.
 -- @param message Text of the message.
 -- @param counter System message counter.
 -- @param guid GUID for the sender.
-local function GwReplicateMessage(target, sender, language, flags, message, counter, guid)
+local function GwReplicateMessage(target, sender, container, language, flags,
+        message, counter, guid)
     
     local event;
     if target == 'GUILD' then
         event = 'CHAT_MSG_GUILD';
     elseif target == 'GUILD_ACHIEVEMENT' then
+        if not GreenWall.achievements then
+            return;
+        end
         event = 'CHAT_MSG_GUILD_ACHIEVEMENT';
     else
         GwError('invalid target channel: ' .. target);
         return;
+    end
+    
+    if GreenWall.tag then
+        message = format('<%s> %s', container, message);
     end
         
     for i = 1, NUM_CHAT_WINDOWS do
@@ -887,17 +896,15 @@ function GreenWall_OnEvent(self, event, ...)
             
             local opcode, container, _, message = payload:match('^(%a)#(%w+)#([^#]*)#(.*)');
             
-            if GreenWall.tag then
-                message = format('<%s> %s', container, message);
-            end
-                            
             if opcode == 'C' and sender ~= gwPlayerName and container ~= gwContainerId then
 
-                GwReplicateMessage('GUILD', sender, language, flags, message, counter, guid);
+                GwReplicateMessage('GUILD', sender, container, language, flags,
+                        message, counter, guid);
         
             elseif opcode == 'A' and sender ~= gwPlayerName and container ~= gwContainerId then
 
-                GwReplicateMessage('GUILD_ACHIEVEMENT', sender, language, flags, message, counter, guid);
+                GwReplicateMessage('GUILD_ACHIEVEMENT', sender, container, language,
+                        flags, message, counter, guid);
 
             elseif opcode == 'R' then
             
