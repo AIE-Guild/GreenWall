@@ -1,0 +1,568 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li><strong>GreenWall_Core.lua</strong></li>
+	
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>GreenWall_Core.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannelRoles">GwChannelRoles</a>&nbsp;(name)</td>
+	<td class="summary">Finds channel roles for a player.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwDebug">GwDebug</a>&nbsp;(level, msg)</td>
+	<td class="summary">Write a debugging message to the default chat frame with a detail level.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwError">GwError</a>&nbsp;(msg)</td>
+	<td class="summary">Write an error message to the default chat frame.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwForceReload">GwForceReload</a>&nbsp;()</td>
+	<td class="summary">Send a configuration reload request to the rest of the confederation.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwInitializeConfig">GwInitializeConfig</a>&nbsp;()</td>
+	<td class="summary">Reset all confederation configuration.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwIsConnected">GwIsConnected</a>&nbsp;()</td>
+	<td class="summary">Check if a connection exists to the common chat.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwIsContainer">GwIsContainer</a>&nbsp;(guild)</td>
+	<td class="summary">Check a guild for membership within the confederation.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwIsOfficer">GwIsOfficer</a>&nbsp;(target)</td>
+	<td class="summary">Check a target player for officer status in the same container guild.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwIsPeer">GwIsPeer</a>&nbsp;(guild)</td>
+	<td class="summary">Check a guild for peer status.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwJoinChannel">GwJoinChannel</a>&nbsp;()</td>
+	<td class="summary">Join the shared confederation channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwLeaveChannel">GwLeaveChannel</a>&nbsp;()</td>
+	<td class="summary">Leave the shared confederation channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwPrepComms">GwPrepComms</a>&nbsp;()</td>
+	<td class="summary">Clear confederation configuration and request updated guild roster information from the server.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwRefreshComms">GwRefreshComms</a>&nbsp;()</td>
+	<td class="summary">Parse confederation configuration and connect to the common channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwSendConfederationMsg">GwSendConfederationMsg</a>&nbsp;(type, message)</td>
+	<td class="summary">Sends an encoded message to the rest of the confederation on the shared channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwSendContainerMsg">GwSendContainerMsg</a>&nbsp;(type, message)</td>
+	<td class="summary">Sends an encoded message to the rest of the same container on the add-on channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwWrite">GwWrite</a>&nbsp;(msg)</td>
+	<td class="summary">Write a message to the default chat frame.</td>
+	</tr>
+
+</table>
+
+
+
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="GwChannelRoles"></a><strong>GwChannelRoles</strong>&nbsp;(name)</dt>
+<dd>
+Finds channel roles for a player.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  name: Name of the player to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>True if target is the channel owner, false otherwise.
+	
+	<li>True if target is a channel moderator, false otherwise.
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwDebug"></a><strong>GwDebug</strong>&nbsp;(level, msg)</dt>
+<dd>
+Write a debugging message to the default chat frame with a detail level. Messages will be filtered with the "/greenwall debug <level>" command.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  level: A positive integer specifying the debug level to display this under.
+	</li>
+	
+	<li>
+	  msg: The message to send.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwError"></a><strong>GwError</strong>&nbsp;(msg)</dt>
+<dd>
+Write an error message to the default chat frame.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  msg: The error message to send.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwForceReload"></a><strong>GwForceReload</strong>&nbsp;()</dt>
+<dd>
+Send a configuration reload request to the rest of the confederation.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwInitializeConfig"></a><strong>GwInitializeConfig</strong>&nbsp;()</dt>
+<dd>
+Reset all confederation configuration.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwIsConnected"></a><strong>GwIsConnected</strong>&nbsp;()</dt>
+<dd>
+Check if a connection exists to the common chat.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+True if connected, otherwise false.
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwIsContainer"></a><strong>GwIsContainer</strong>&nbsp;(guild)</dt>
+<dd>
+Check a guild for membership within the confederation.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  guild: The name of the guild to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+True if the target guild is in the confederation, false otherwise.
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwIsOfficer"></a><strong>GwIsOfficer</strong>&nbsp;(target)</dt>
+<dd>
+Check a target player for officer status in the same container guild.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  target: The name of the player to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+True is the target has access to officer chat, false otherwise.
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwIsPeer"></a><strong>GwIsPeer</strong>&nbsp;(guild)</dt>
+<dd>
+Check a guild for peer status.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  guild: The name of the guild to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+True if the target guild is a peer co-guild, false otherwise.
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwJoinChannel"></a><strong>GwJoinChannel</strong>&nbsp;()</dt>
+<dd>
+Join the shared confederation channel. Configuration globals must be populated before this is called.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+Integer channel number, 0 on failure.
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwLeaveChannel"></a><strong>GwLeaveChannel</strong>&nbsp;()</dt>
+<dd>
+Leave the shared confederation channel.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwPrepComms"></a><strong>GwPrepComms</strong>&nbsp;()</dt>
+<dd>
+Clear confederation configuration and request updated guild roster information from the server.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwRefreshComms"></a><strong>GwRefreshComms</strong>&nbsp;()</dt>
+<dd>
+Parse confederation configuration and connect to the common channel.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwSendConfederationMsg"></a><strong>GwSendConfederationMsg</strong>&nbsp;(type, message)</dt>
+<dd>
+Sends an encoded message to the rest of the confederation on the shared channel.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  type: The message type.
+	</li>
+	
+	<li>
+	  message: Text of the message.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwSendContainerMsg"></a><strong>GwSendContainerMsg</strong>&nbsp;(type, message)</dt>
+<dd>
+Sends an encoded message to the rest of the same container on the add-on channel.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  type: The message type.
+	</li>
+	
+	<li>
+	  message: Text of the message.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwWrite"></a><strong>GwWrite</strong>&nbsp;(msg)</dt>
+<dd>
+Write a message to the default chat frame.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  msg: The message to send.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>
