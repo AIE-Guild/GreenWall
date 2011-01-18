@@ -306,6 +306,67 @@ local function GwChannelRoles(name)
 end
 
 
+--- Copies a message received on the common channel to all chat window instances of a 
+-- target chat channel.
+-- @param target Target channel type.
+-- @param sender The sender of the message.
+-- @param language The language used for the message.
+-- @param flags Status flags for the message sender.
+-- @param message Text of the message.
+-- @param counter System message counter.
+-- @param guid GUID for the sender.
+local function GwReplicateMessage(target, sender, language, flags, message, counter, guid)
+    
+    local event;
+    if target == 'GUILD' then
+        event = 'CHAT_MSG_GUILD';
+    elseif target == 'GUILD_ACHIEVEMENT' then
+        event = 'CHAT_MSG_GUILD_ACHIEVEMENT';
+    else
+        GwError('invalid target channel: ' .. target);
+        return;
+    end
+        
+    for i = 1, NUM_CHAT_WINDOWS do
+
+        gwFrameTable = { GetChatWindowMessages(i) }
+        
+        for _, v in ipairs(gwFrameTable) do
+                        
+            if v == target then
+                    
+                local frame = 'ChatFrame' .. i;
+                if _G[frame] then
+                    GwDebug(3, format('Tx<%s/%s, *, %s>: %s', frame, target, sender, message));
+                    
+                    ChatFrame_MessageEventHandler(
+                            _G[frame], 
+                            event, 
+                            message, 
+                            sender, 
+                            language, 
+                            '', 
+                            '', 
+                            '', 
+                            0, 
+                            0, 
+                            '', 
+                            0, 
+                            counter, 
+                            guid
+                        );
+                end
+                break;
+                        
+            end
+                        
+        end
+                    
+    end
+    
+end
+
+
 --- Sends an encoded message to the rest of the confederation on the shared channel.
 -- @param type The message type.
 -- @field chat Broadcast as a chat message.
@@ -826,103 +887,18 @@ function GreenWall_OnEvent(self, event, ...)
             
             local opcode, container, _, message = payload:match('^(%a)#(%w+)#([^#]*)#(.*)');
             
+            if GreenWall.tag then
+                message = format('<%s> %s', container, message);
+            end
+                            
             if opcode == 'C' and sender ~= gwPlayerName and container ~= gwContainerId then
+
+                GwReplicateMessage('GUILD', sender, language, flags, message, counter, guid);
         
-                --
-                -- Incoming chat message
-                --
-                
-                if GreenWall.tag then
-                    message = format('<%s> %s', container, message);
-                end
-                
-                for i = 1, NUM_CHAT_WINDOWS do
-                    
-                    gwFrameTable = { GetChatWindowMessages(i) }
-                        
-                    for _, v in ipairs(gwFrameTable) do
-                        
-                        if v == 'GUILD' then
-                    
-                            local frame = 'ChatFrame' .. i;
-                            if _G[frame] then
-                                GwDebug(3, format('Tx<%s/GUILD, *, %s>: %s', frame, sender, message));
-                                ChatFrame_MessageEventHandler(
-                                        _G[frame], 
-                                        'CHAT_MSG_GUILD', 
-                                        message, 
-                                        sender, 
-                                        language, 
-                                        '', 
-                                        '', 
-                                        '', 
-                                        0, 
-                                        0, 
-                                        '', 
-                                        0, 
-                                        counter, 
-                                    guid
-                                );
-                            end
-                            break;
-                        
-                        end
-                        
-                    end
-                    
-                end
-            
             elseif opcode == 'A' and sender ~= gwPlayerName and container ~= gwContainerId then
-            
-                --
-                -- Incoming achievement spam
-                --
-                
-                if GreenWall.achievements then
-                
-                    if GreenWall.tag then
-                        message = format('<%s> %s', container, message);
-                    end
-                
-                    for i = 1, NUM_CHAT_WINDOWS do
-                    
-                        gwFrameTable = { GetChatWindowMessages(i) }
-                        
-                        for _, v in ipairs(gwFrameTable) do
-                        
-                            if v == 'GUILD' then
-                            
-                                local frame = 'ChatFrame' .. i;
-                                if _G[frame] then
-                                    GwDebug(3, format('Tx<%s/GUILD_ACHIEVEMENT, *, %s>: %s',
-                                            frame, sender, message));
-                                    ChatFrame_MessageEventHandler(
-                                            _G[frame], 
-                                            'CHAT_MSG_GUILD_ACHIEVEMENT',
-                                            message,
-                                            sender,
-                                            language, 
-                                            '',
-                                            '', 
-                                            '', 
-                                            0, 
-                                            0, 
-                                            '', 
-                                            0, 
-                                            counter, 
-                                            guid
-                                        );
-                                end
-                                break;
-                            
-                            end
-                            
-                        end
-                        
-                    end
-                
-                end
-            
+
+                GwReplicateMessage('GUILD_ACHIEVEMENT', sender, language, flags, message, counter, guid);
+
             elseif opcode == 'R' then
             
                 --
