@@ -200,22 +200,6 @@ end
 -- @return True if connected, otherwise false.
 local function GwIsConnected()
 
-    --
-    -- Refresh the list of chat frames with guild chat
-    --
-    table.wipe(gwFrameTable);
-    for i = 1, 10 do
-        local ChatWindowTable = { GetChatWindowMessages(i) }
-        for _, v in ipairs(ChatWindowTable) do
-            if v == 'GUILD' then
-                tinsert(gwFrameTable, i)
-            end
-        end 
-    end
-    
-    --
-    -- Look for an existing connection
-    --
     if gwChannelName ~= nil then
         gwChannelNumber = GetChannelName(gwChannelName);
         GwDebug(5, format('conn_check: chan_name=%s, chan_id=%d',
@@ -852,27 +836,40 @@ function GreenWall_OnEvent(self, event, ...)
                     message = format('<%s> %s', container, message);
                 end
                 
-                for i, v in ipairs(gwFrameTable) do
-                    local frame = 'ChatFrame' .. v;
-                    if _G[frame] then
-                        GwDebug(3, format('Tx<%s/GUILD, *, %s>: %s', frame, sender, message));
-                        ChatFrame_MessageEventHandler(
-                                _G[frame], 
-                                'CHAT_MSG_GUILD', 
-                                message, 
-                                sender, 
-                                language, 
-                                '', 
-                                '', 
-                                '', 
-                                0, 
-                                0, 
-                                '', 
-                                0, 
-                                counter, 
-                                guid
-                            );
+                for i = 1, NUM_CHAT_WINDOWS do
+                    
+                    gwFrameTable = { GetChatWindowMessages(i) }
+                        
+                    for _, v in ipairs(gwFrameTable) do
+                        
+                        if v == 'GUILD' then
+                    
+                            local frame = 'ChatFrame' .. i;
+                            if _G[frame] then
+                                GwDebug(3, format('Tx<%s/GUILD, *, %s>: %s', frame, sender, message));
+                                ChatFrame_MessageEventHandler(
+                                        _G[frame], 
+                                        'CHAT_MSG_GUILD', 
+                                        message, 
+                                        sender, 
+                                        language, 
+                                        '', 
+                                        '', 
+                                        '', 
+                                        0, 
+                                        0, 
+                                        '', 
+                                        0, 
+                                        counter, 
+                                    guid
+                                );
+                            end
+                            break;
+                        
+                        end
+                        
                     end
+                    
                 end
             
             elseif opcode == 'A' and sender ~= gwPlayerName and container ~= gwContainerId then
@@ -887,28 +884,41 @@ function GreenWall_OnEvent(self, event, ...)
                         message = format('<%s> %s', container, message);
                     end
                 
-                    for i, v in ipairs(gwFrameTable) do
-                        local frame = 'ChatFrame' .. v;
-                        if _G[frame] then
-                            GwDebug(3, 
-                                    format('Tx<%s/GUILD_ACHIEVEMENT, *, %s>: %s', frame, sender, message));
-                            ChatFrame_MessageEventHandler(
-                                    _G[frame], 
-                                    'CHAT_MSG_GUILD_ACHIEVEMENT',
-                                    message,
-                                    sender,
-                                    language, 
-                                    '',
-                                    '', 
-                                    '', 
-                                    0, 
-                                    0, 
-                                    '', 
-                                    0, 
-                                    counter, 
-                                    guid
-                                );
+                    for i = 1, NUM_CHAT_WINDOWS do
+                    
+                        gwFrameTable = { GetChatWindowMessages(i) }
+                        
+                        for _, v in ipairs(gwFrameTable) do
+                        
+                            if v == 'GUILD' then
+                            
+                                local frame = 'ChatFrame' .. i;
+                                if _G[frame] then
+                                    GwDebug(3, format('Tx<%s/GUILD_ACHIEVEMENT, *, %s>: %s',
+                                            frame, sender, message));
+                                    ChatFrame_MessageEventHandler(
+                                            _G[frame], 
+                                            'CHAT_MSG_GUILD_ACHIEVEMENT',
+                                            message,
+                                            sender,
+                                            language, 
+                                            '',
+                                            '', 
+                                            '', 
+                                            0, 
+                                            0, 
+                                            '', 
+                                            0, 
+                                            counter, 
+                                            guid
+                                        );
+                                end
+                                break;
+                            
+                            end
+                            
                         end
+                        
                     end
                 
                 end
