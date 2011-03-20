@@ -400,6 +400,8 @@ local function GwSendConfederationMsg(type, message)
         opcode = 'N';
     elseif type == 'request' then
         opcode = 'R';
+    elseif type == 'addon' then
+        opcode = 'M';
     else
         GwDebug(2, format('unknown message type: %s', type));
         return;
@@ -806,6 +808,7 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT');
     self:RegisterEvent('CHAT_MSG_SYSTEM');
     self:RegisterEvent('GUILD_ROSTER_UPDATE');
+    self:RegisterEvent('PLAYER_ENTERING_WORLD');
     self:RegisterEvent('PLAYER_GUILD_UPDATE');
     self:RegisterEvent('PLAYER_LOGIN');
     
@@ -865,27 +868,7 @@ function GreenWall_OnEvent(self, event, ...)
     end
 
 
-    if  event == 'CHANNEL_UI_UPDATE' then
-    
-        if gwGuildName ~= nil and not GwIsConnected() then
-            GwRefreshComms();
-        end
-
-    elseif event == 'CHAT_MSG_GUILD' then
-    
-        local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
-        if sender == gwPlayerName then
-            GwSendConfederationMsg('chat', message);        
-        end
-    
-    elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
-    
-        local message, sender, _, _, _, flags, _, chanNum = select(1, ...);
-        if sender == gwPlayerName then
-            GwSendConfederationMsg('achievement', message);
-        end
-    
-    elseif event == 'CHAT_MSG_CHANNEL' then
+    if event == 'CHAT_MSG_CHANNEL' then
     
         local payload, sender, language, _, _, flags, _, 
                 chanNum, _, _, counter, guid = select(1, ...);
@@ -925,6 +908,69 @@ function GreenWall_OnEvent(self, event, ...)
         
         end
         
+    elseif event == 'CHAT_MSG_GUILD' then
+    
+        local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
+        if sender == gwPlayerName then
+            GwSendConfederationMsg('chat', message);        
+        end
+    
+    elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
+    
+        local message, sender, _, _, _, flags, _, chanNum = select(1, ...);
+        if sender == gwPlayerName then
+            GwSendConfederationMsg('achievement', message);
+        end
+    
+    elseif event == 'CHAT_MSG_ADDON' then
+    
+        local prefix, message, dist, sender = select(1, ...);
+        
+        GwDebug(5, format('event=%s, prefix=%s, sender=%s, dist=%s, message=%s',
+                event, prefix, sender, dist, message));
+        
+        GwDebug(3, format('Rx<ADDON(%s), %s>: %s', prefix, sender, message));
+        
+        if prefix == 'GreenWall' and dist == 'GUILD' and sender ~= gwPlayerName then
+        
+            local type, command = strsplit('#', message);
+            
+            GwDebug(5, format('type=%s, command=%s', type, command));
+            
+            if type == 'C' then
+            
+                if command == 'officer' then
+                    if GwIsOfficer() then
+                        -- Let 'em know you have the authoritay!
+                        GwSendContainerMsg('response', 'officer');
+                    end
+                end
+            
+            elseif type == 'R' then
+            
+                if command == 'officer' then
+                    if gwFlagOwner then
+                        -- Verify the claim
+                        if GwIsOfficer(sender) then
+                            if gwFlagOwner then
+                                GwDebug(1, format('Granting owner status to $s.', sender));
+                                SetChannelOwner(gwChannelName, sender);
+                            end
+                            gwFlagHandoff = true;
+                        end
+                    end
+                end
+            
+            end
+            
+        end
+        
+    elseif  event == 'CHANNEL_UI_UPDATE' then
+    
+        if gwGuildName ~= nil and not GwIsConnected() then
+            GwRefreshComms();
+        end
+
     elseif event == 'CHAT_MSG_CHANNEL_JOIN' then
     
         local name = select(2, ...);
@@ -1032,49 +1078,6 @@ function GreenWall_OnEvent(self, event, ...)
             
         end
         
-    elseif event == 'CHAT_MSG_ADDON' then
-    
-        local prefix, message, dist, sender = select(1, ...);
-        
-        GwDebug(5, format('event=%s, prefix=%s, sender=%s, dist=%s, message=%s',
-                event, prefix, sender, dist, message));
-        
-        GwDebug(3, format('Rx<ADDON(%s), %s>: %s', prefix, sender, message));
-        
-        if prefix == 'GreenWall' and dist == 'GUILD' and sender ~= gwPlayerName then
-        
-            local type, command = strsplit('#', message);
-            
-            GwDebug(5, format('type=%s, command=%s', type, command));
-            
-            if type == 'C' then
-            
-                if command == 'officer' then
-                    if GwIsOfficer() then
-                        -- Let 'em know you have the authoritay!
-                        GwSendContainerMsg('response', 'officer');
-                    end
-                end
-            
-            elseif type == 'R' then
-            
-                if command == 'officer' then
-                    if gwFlagOwner then
-                        -- Verify the claim
-                        if GwIsOfficer(sender) then
-                            if gwFlagOwner then
-                                GwDebug(1, format('Granting owner status to $s.', sender));
-                                SetChannelOwner(gwChannelName, sender);
-                            end
-                            gwFlagHandoff = true;
-                        end
-                    end
-                end
-            
-            end
-            
-        end
-        
     elseif event == 'CHAT_MSG_SYSTEM' then
 
         local message = select(1, ...);
@@ -1135,6 +1138,13 @@ function GreenWall_OnEvent(self, event, ...)
                     gwRosterUpdate = false;
                 end
             end
+        end
+
+    elseif event == 'PLAYER_ENTERING_WORLD' then
+    
+        -- Added for 4.1
+        if RegisterAddonMessagePrefix then
+            RegisterAddonMessagePrefix("GreenWall")
         end
 
     elseif event == 'PLAYER_GUILD_UPDATE' then
