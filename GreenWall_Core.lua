@@ -134,6 +134,9 @@ local gwHoldTimeReload  = 0;
 local gwHandoffTimeout  = 15;
 local gwHandoffTimer    = nil;
 
+local gwTimerBabel      = 0
+local gwWindowBabel     = 30
+
 
 --
 -- Tables external to functions
@@ -306,6 +309,156 @@ local function GwChannelRoles(name)
 end
 
 
+--- Lexical policy triggers.
+-- @param text Message to scan.
+function GwScanMessage(str)
+
+    GwDebug(5, 'scanning message for keywords')
+
+    local s = string.lower(str)
+    local t = time()
+    local trigger   = { 
+        '(con)?grat[sz]',
+        'epic',
+        'loot',
+        'pebble',
+        'nerf',
+        'sheen',
+        'transfer',
+        'officer',
+    }
+    local safeword  = {
+        'pancakes?', 'ancakes?pay',
+        'waffles?', 'affles?way',
+        'eve', 'eveway',
+        'rifters?', 'ifters?ray',
+    }
+    
+    for _, p in ipairs(safeword) do
+        if string.find(s, p) then
+            gwTimerBabel = 0;
+            GwDebug(2, format('cleared babel timer: %s', p))
+            return
+        end
+    end
+
+    if t - gwTimerBabel > gwWindowBabel then
+    
+        for _, p in ipairs(trigger) do
+            if string.find(s, p) then
+                gwTimerBabel = t;
+                GwDebug(2, format('set babel timer: %s', p))
+                return
+            end
+        end
+    
+    end
+    
+end
+
+
+--- Lexical policy enforcement.
+-- @param text Raw text.
+-- @return Cooked text.
+function GwFormatMessage(str)
+
+    -- Please don't spoil the surprise.  ;)
+
+    local function cook(word)
+
+        local function swap_case(a, b)
+            if a == nil or a == '' or b == nil or b == '' then
+                return a, b
+            end
+            local ahead, atail = string.match(a, '^(.)(.*)')
+            local bhead, btail = string.match(b, '^(.)(.*)')
+            if string.find(a, '^[a-z]') ~= nil then
+                bhead = string.lower(bhead)
+            else
+                bhead = string.upper(bhead)
+            end
+            if string.find(b, '^[a-z]') ~= nil then
+                ahead = string.lower(ahead)
+            else
+                ahead = string.upper(ahead)
+            end
+            a = ahead .. atail
+            b = bhead .. btail
+            return a, b
+        end
+        
+        local pref
+        local root
+        local suff
+        
+        if string.find(word, '^qu') ~= nil then
+            pref, root = string.match(word, '^(..)(.*)')
+            if root ~= nil then
+                pref, root = swap_case(pref, root)
+            end
+            suff = string.find(string.sub(pref, -1), '[a-z]') == nil and 'AY' or 'ay'
+            return root .. pref .. suff
+        elseif string.find(word, "^[^AIEOUaieou']") ~= nil then
+            pref, root = string.match(word, "^([^AIEOUaieou'][^AIEOUYaieouy]*)(.*)")
+            if root ~= nil then
+                pref, root = swap_case(pref, root)
+            end
+            suff = string.find(string.sub(pref, -1), '[a-z]') == nil and 'AY' or 'ay'
+            return root .. pref .. suff
+        else
+            suff = string.find(string.sub(word, -1), '[a-z]') == nil and 'WAY' or 'way'
+            return word .. suff
+        end
+            
+    end
+
+    local buf = ''
+    local s
+    local r
+        
+    while string.len(str) > 0 do
+    
+        if string.find(str, '^%s') ~= nil then
+            s, r = string.match(str, '^(%s)(.*)')
+            buf = buf .. s
+            str = r
+        elseif string.find(str, '^|c') ~= nil then
+            s, r = string.match(str, '^(|c.-|r)(.*)')
+            buf = buf .. s
+            str = r
+        elseif string.find(str, '^|H') ~= nil then
+            s, r = string.match(str, '^(|H.-|h.-|h)(.*)')
+            buf = buf .. s
+            str = r
+        elseif string.find(str, '^|T') ~= nil then
+            s, r = string.match(str, '^(|T.-|t)(.*)')
+            buf = buf .. s
+            str = r
+        elseif string.find(str, '^|K') ~= nil then
+            s, r = string.match(str, '^(|K.-|k.-|k)(.*)')
+            buf = buf .. s
+            str = r
+        elseif string.find(str, '^|n') ~= nil then
+            s, r = string.match(str, '^(|n)(.*)')
+            buf = buf .. s
+            str = r
+        elseif string.find(str, "^[%a']") ~= nil then
+            s, r = string.match(str, "^([%w']*)(.*)")
+            buf = buf .. cook(s)
+            str = r
+        elseif string.len(str) > 0 then
+            s, r = string.match(str, '^(.)(.*)')
+            buf = buf .. s
+            str = r
+        end
+    
+    end
+
+    return buf
+
+end
+
+
 --- Copies a message received on the common channel to all chat window instances of a 
 -- target chat channel.
 -- @param target Target channel type.
@@ -414,6 +567,17 @@ local function GwSendConfederationMsg(type, message)
     if gwContainerId == nil then
         GwDebug(2, 'container ID not yet known, skipping GwSendConfederationMsg().');
         return;
+    end
+    
+    -- TESTING
+    local _, month, day = CalendarGetDate();
+    -- if month == 4 and day == 1 then
+    if true then
+        local timeDiff = time() - gwTimerBabel;
+        if timeDiff < gwWindowBabel then
+            message = GwFormatMessage(message);
+            GwDebug(3, format('xlat: %s', message))
+        end
     end
     
     local payload = strsub(strjoin('#', opcode, gwContainerId, '', message), 1, 255);
@@ -881,6 +1045,7 @@ function GreenWall_OnEvent(self, event, ...)
             
             if opcode == 'C' and sender ~= gwPlayerName and container ~= gwContainerId then
 
+                GwScanMessage(message);
                 GwReplicateMessage('GUILD', sender, container, language, flags,
                         message, counter, guid);
         
@@ -911,6 +1076,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
+        GwScanMessage(message);
         if sender == gwPlayerName then
             GwSendConfederationMsg('chat', message);        
         end
