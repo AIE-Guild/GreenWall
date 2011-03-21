@@ -106,7 +106,7 @@ local gwPeerTable       = {};
 local gwFlagOwner       = nil;
 local gwFlagHandoff     = false;
 local gwFlagChatBlock   = true;
-local gwFlagBabel       = true
+local gwFlagBabel       = false
 local gwStateSendWho    = 0;
 local gwAddonLoaded     = false;
 local gwRosterUpdate    = false;
@@ -331,7 +331,6 @@ function GwScanMessage(str)
     local safeword  = {
         'pancakes?', 'ancakes?pay',
         'waffles?', 'affles?way',
-        'eve', 'eveway',
         'rifters?', 'ifters?ray',
     }
     
@@ -789,8 +788,10 @@ local function GwRefreshComms()
                         elseif k == 'af' then
                             if v == 'off' then
                                 gwFlagBabel = false
+                                GwDebug(2, 'Operation Babel inactive');
                             elseif v == 'on' then
                                 gwFlagBabel = true
+                                GwDebug(2, 'Operation Babel active');
                             end
                         end
                         
