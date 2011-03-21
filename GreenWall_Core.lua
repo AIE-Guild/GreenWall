@@ -788,7 +788,7 @@ local function GwRefreshComms()
                             else
                                 GwDebug(2, 'channel defense: none');
                             end
-                        elseif k = 'af' then
+                        elseif k == 'af' then
                             if v == 'off' then
                                 gwFlagBabel = false
                             elseif v == 'on' then
