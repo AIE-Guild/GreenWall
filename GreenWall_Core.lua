@@ -106,6 +106,7 @@ local gwPeerTable       = {};
 local gwFlagOwner       = nil;
 local gwFlagHandoff     = false;
 local gwFlagChatBlock   = true;
+local gwFlagBabel       = true
 local gwStateSendWho    = 0;
 local gwAddonLoaded     = false;
 local gwRosterUpdate    = false;
@@ -312,7 +313,7 @@ end
 --- Lexical policy triggers.
 -- @param text Message to scan.
 function GwScanMessage(str)
-
+  
     GwDebug(5, 'scanning message for keywords')
 
     local s = string.lower(str)
@@ -570,13 +571,15 @@ local function GwSendConfederationMsg(type, message)
     end
     
     -- TESTING
-    local _, month, day = CalendarGetDate();
-    -- if month == 4 and day == 1 then
-    if true then
-        local timeDiff = time() - gwTimerBabel;
-        if timeDiff < gwWindowBabel then
-            message = GwFormatMessage(message);
-            GwDebug(3, format('xlat: %s', message))
+    if gwFlagBabel then
+        local _, month, day = CalendarGetDate();
+        -- if month == 4 and day == 1 then
+        if true then
+            local timeDiff = time() - gwTimerBabel;
+            if timeDiff < gwWindowBabel then
+                message = GwFormatMessage(message);
+                GwDebug(3, format('xlat: %s', message))
+            end
         end
     end
     
@@ -784,6 +787,12 @@ local function GwRefreshComms()
                                 GwDebug(2, 'channel defense: kick/ban');
                             else
                                 GwDebug(2, 'channel defense: none');
+                            end
+                        elseif k = 'af' then
+                            if v == 'off' then
+                                gwFlagBabel = false
+                            elseif v == 'on' then
+                                gwFlagBabel = true
                             end
                         end
                         
@@ -1045,7 +1054,10 @@ function GreenWall_OnEvent(self, event, ...)
             
             if opcode == 'C' and sender ~= gwPlayerName and container ~= gwContainerId then
 
-                GwScanMessage(message);
+                if gwFlagBabel then
+                    GwScanMessage(message);
+                end
+                
                 GwReplicateMessage('GUILD', sender, container, language, flags,
                         message, counter, guid);
         
@@ -1076,7 +1088,9 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
-        GwScanMessage(message);
+        if gwFlagBabel then
+            GwScanMessage(message);
+        end
         if sender == gwPlayerName then
             GwSendConfederationMsg('chat', message);        
         end
