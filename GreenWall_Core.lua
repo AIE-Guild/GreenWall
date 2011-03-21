@@ -570,11 +570,9 @@ local function GwSendConfederationMsg(type, message)
         return;
     end
     
-    -- TESTING
     if gwFlagBabel then
         local _, month, day = CalendarGetDate();
-        -- if month == 4 and day == 1 then
-        if true then
+        if month == 4 and day == 1 then
             local timeDiff = time() - gwTimerBabel;
             if timeDiff < gwWindowBabel then
                 message = GwFormatMessage(message);
