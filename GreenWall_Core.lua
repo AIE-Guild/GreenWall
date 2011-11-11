@@ -237,7 +237,8 @@ local function GwNewChannelTable(name, password)
         name = name,
         password = password,
         number = 0,
-        flagOwner = nil,
+        dirty = false,
+        flagOwner = false,
         flagHandoff = false,
         stats = {
             sconn = 0,
@@ -487,6 +488,7 @@ local function GwJoinChannel(chan)
         --
         JoinTemporaryChannel(chan.name, chan.password);
         chan.number = GetChannelName(chan.name);
+        chan.dirty = false;
         
         if chan.number == 0 then
 
@@ -558,27 +560,23 @@ local function GwPrepComms()
 end
 
 
---- Parse confederation configuration and connect to the common channel.
-local function GwRefreshComms()
+--- Parse the guild information page to gather configuration information.
+-- @param chan Channel control table to update.
+-- @return True if successful, false otherwise.
+local function GwGetGuildInfoConfig(chan)
 
-    if gwFlagChatBlock then
-        GwDebug(2, 'Deferring comms refresh, General not yet joined.');
-        return;
-    end
+    GwDebug(2, 'parsing Guild Info.');
 
     local info = GetGuildInfoText();
-    
+    local update = false;
+        
     if info == '' then
 
         GwDebug(2, 'Guild Info not yet available.');
-        
-    else    
+        return false;
     
-        local config     = '';
-        local channel    = nil;
-        local password    = nil;
-        local container    = nil;
-        
+    else    
+
         -- Make sure we know which co-guild we are in.
         if gwGuildName == nil or gwGuildName == '' then
             gwGuildName = GetGuildInfo('Player');
@@ -586,7 +584,7 @@ local function GwRefreshComms()
                 return;
             end
         end
-        
+    
         -- We will rebuild the list of peer container guilds
         wipe(gwPeerTable);
 
@@ -599,19 +597,28 @@ local function GwRefreshComms()
             
                 if vector[1] == 'c' then
                 
-                    config      = buffer;
-                    channel     = vector[2];
-                    password    = vector[3];
-                    GwDebug(2, format('channel: %s, password: %s', channel, password));
-                
+                    if vector[2] ~= chan.name then
+                        GwDebug(2, "foo");
+                        chan.name = vector[2];
+                        chan.dirty = true;
+                    end
+                        
+                    if vector[3] ~= chan.password then
+                        GwDebug(2, "bar");
+                        chan.password = vector[3];
+                        chan.dirty = true;
+                    end
+                                        
+                    GwDebug(2, format('channel: %s, password: %s', chan.name, chan.password));
+
                 elseif vector[1] == 'o' then
                 
                     local optlist = { strsplit(',', gsub(vector[2], '%s+', '')) };
-                    
+                
                     for i, opt in ipairs(optlist) do
-                        
+                    
                         local k, v = strsplit('=', opt);
-                        
+                    
                         k = strlower(k);
                         v = strlower(v);
                         
@@ -637,8 +644,8 @@ local function GwRefreshComms()
                 elseif vector[1] == 'p' then
         
                     if vector[2] == gwGuildName then
-                        container = vector[3];
-                        GwDebug(2, format('container: %s (%s)', gwGuildName, container));
+                        gwContainerId = vector[3];
+                        GwDebug(2, format('container: %s (%s)', gwGuildName, gwContainerId));
                     else 
                         gwPeerTable[vector[3]] = vector[2];
                         GwDebug(2, format('peer: %s (%s)', vector[2], vector[3]));
@@ -648,31 +655,35 @@ local function GwRefreshComms()
         
             end
     
-        end    
-        
-        --
-        -- Update the top-level variables
-        --
-        local confUpdate = false;
-        if config ~= gwConfigString then
-            gwConfigString     = config;
-            confUpdate = true;
-            GwWrite('Configuration updated.');
         end
-        gwCommonChannel.name        = channel;
-        gwCommonChannel.password    = password;
-        gwContainerId               = container;
+            
+        GwWrite('Configuration updated.');
+            
+    end
         
-        --
-        -- Reconnect if necessary
-        --
-        if not GwIsConnected(gwCommonChannel) or confUpdate then
-            GwDebug(2, 'client not connected.');
-            GwJoinChannel(gwCommonChannel);
-        else
-            GwDebug(2, 'client already connected.');
-        end
+    return true;
+        
+end
 
+
+--- Parse confederation configuration and connect to the common channel.
+local function GwRefreshComms()
+
+    GwDebug(2, 'refreshing communication channels.');
+
+    if gwFlagChatBlock then
+        GwDebug(2, 'Deferring comms refresh, General not yet joined.');
+        return;
+    end
+
+    --
+    -- Reconnect if necessary
+    --
+    if gwCommonChannel.dirty or not GwIsConnected(gwCommonChannel) then
+        GwDebug(2, 'client not connected.');
+        GwJoinChannel(gwCommonChannel);
+    else
+        GwDebug(2, 'client already connected.');
     end
 
 end
@@ -1044,7 +1055,7 @@ function GreenWall_OnEvent(self, event, ...)
             if action == 'YOU_JOINED' then
                 GwDebug(2, 'General joined, unblocking reconnect.');
                 gwFlagChatBlock = false;
-                GwPrepComms();
+                -- GwPrepComms();
             end
                 
         end
@@ -1143,10 +1154,10 @@ function GreenWall_OnEvent(self, event, ...)
         if gwRosterUpdate then
             gwGuildName = GetGuildInfo('Player');
             if gwGuildName then
-                GwRefreshComms();
-                if gwConfigString then
+                if GwGetGuildInfoConfig(gwCommonChannel) then
                     gwRosterUpdate = false;
                 end
+                GwRefreshComms();
             end
         end
 
