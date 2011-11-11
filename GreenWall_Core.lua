@@ -73,6 +73,10 @@ local gwUsage = [[
         -- Echo achievements from other co-guilds.
   tag
         -- Show co-guild identifier in messages.
+  ochat
+        -- Enable officer chat bridging.
+  ochan <name> <password>
+        -- Specify the officer channel name and password.
   debug <level>
         -- Set debugging level to integer <level>.
  
@@ -237,9 +241,10 @@ local function GwNewChannelTable(name, password)
         name = name,
         password = password,
         number = 0,
+        static = false;
         dirty = false,
-        flagOwner = false,
-        flagHandoff = false,
+        owner = false,
+        handoff = false,
         stats = {
             sconn = 0,
             fconn = 0,
@@ -739,6 +744,24 @@ local function GwSlashCmd(message, editbox)
             GwWrite(format('Debugging level is %d', GreenWall.debugLevel));
         end
     
+    elseif command == 'ochat' then
+    
+        if GreenWall.ochat then
+            GreenWall.ochat = false;
+            GwWrite('officer chat turned OFF.');
+        else
+            GreenWall.ochat = true;
+            GwWrite('officer chat turned ON.');
+        end
+        
+    elseif command == 'ochan' then
+    
+        local ochan, opass = argstr:match('^(%S+)%s+(%S+)%s*$');
+        gwOfficerChannel.name = oname;
+        gwOfficerChannel.password = opass;
+        gwOfficerChannel.static = true;
+        GwWrite(format('Set officer chat channel to %s, password set to %s.', ochan, opass));
+    
     elseif command == 'reload' then
     
         GwForceReload();
@@ -973,7 +996,7 @@ function GreenWall_OnEvent(self, event, ...)
                     if gwFlagOwner then
                         -- Verify the claim
                         if GwIsOfficer(sender) then
-                            if gwCommonChannel.flagOwner then
+                            if gwCommonChannel.owner then
                                 GwDebug(1, format('Granting owner status to $s.', sender));
                                 SetChannelOwner(gwCommonChannel.name, sender);
                             end
@@ -1002,7 +1025,7 @@ function GreenWall_OnEvent(self, event, ...)
             --
             -- One of us?
             -- 
-            if gwCommonChannel.flagOwner and (gwOptChanKick or gwOptChanBan) then
+            if gwCommonChannel.owner and (gwOptChanKick or gwOptChanBan) then
                 
                 local guild = GetGuildInfo(name);
                 
@@ -1076,7 +1099,7 @@ function GreenWall_OnEvent(self, event, ...)
 
                 if target == gwPlayerName then
 
-                    gwCommonChannel.flagOwner = true;
+                    gwCommonChannel.owner = true;
                 
                     --[[
                     if not GwIsOfficer() then
@@ -1091,7 +1114,7 @@ function GreenWall_OnEvent(self, event, ...)
 
                 else
                 
-                    gwCommonChannel.flagOwner = false;
+                    gwCommonChannel.owner = false;
 
                 end
             
