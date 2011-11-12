@@ -63,7 +63,7 @@
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannelRoles">GwChannelRoles</a>&nbsp;(name)</td>
+	<td class="name" nowrap><a href="#GwChannelRoles">GwChannelRoles</a>&nbsp;(chan, name)</td>
 	<td class="summary">Finds channel roles for a player.</td>
 	</tr>
 
@@ -83,12 +83,22 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#GwGetGuildInfoConfig">GwGetGuildInfoConfig</a>&nbsp;(chan)</td>
+	<td class="summary">Parse the guild information page to gather configuration information.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwGetOfficerNoteConfig">GwGetOfficerNoteConfig</a>&nbsp;(chan)</td>
+	<td class="summary">Parse the officer note of the guild leader to gather configuration information.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#GwInitializeConfig">GwInitializeConfig</a>&nbsp;()</td>
 	<td class="summary">Reset all confederation configuration.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwIsConnected">GwIsConnected</a>&nbsp;()</td>
+	<td class="name" nowrap><a href="#GwIsConnected">GwIsConnected</a>&nbsp;(chan)</td>
 	<td class="summary">Check if a connection exists to the common chat.</td>
 	</tr>
 
@@ -108,13 +118,18 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwJoinChannel">GwJoinChannel</a>&nbsp;()</td>
+	<td class="name" nowrap><a href="#GwJoinChannel">GwJoinChannel</a>&nbsp;(chan)</td>
 	<td class="summary">Join the shared confederation channel.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwLeaveChannel">GwLeaveChannel</a>&nbsp;()</td>
-	<td class="summary">Leave the shared confederation channel.</td>
+	<td class="name" nowrap><a href="#GwLeaveChannel">GwLeaveChannel</a>&nbsp;(chan)</td>
+	<td class="summary">Leave a shared confederation channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwNewChannelTable">GwNewChannelTable</a>&nbsp;(name, password)</td>
+	<td class="summary">Create a new channel control data structure.</td>
 	</tr>
 
 	<tr>
@@ -128,7 +143,7 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwSendConfederationMsg">GwSendConfederationMsg</a>&nbsp;(type, message)</td>
+	<td class="name" nowrap><a href="#GwSendConfederationMsg">GwSendConfederationMsg</a>&nbsp;(chan, type, message)</td>
 	<td class="summary">Sends an encoded message to the rest of the confederation on the shared channel.</td>
 	</tr>
 
@@ -160,13 +175,17 @@
 
 
 
-<dt><a name="GwChannelRoles"></a><strong>GwChannelRoles</strong>&nbsp;(name)</dt>
+<dt><a name="GwChannelRoles"></a><strong>GwChannelRoles</strong>&nbsp;(chan, name)</dt>
 <dd>
 Finds channel roles for a player.
 
 
 <h3>Parameters</h3>
 <ul>
+	
+	<li>
+	  chan: Control table for the channel.
+	</li>
 	
 	<li>
 	  name: Name of the player to check.
@@ -268,6 +287,64 @@ Send a configuration reload request to the rest of the confederation.
 
 
 
+<dt><a name="GwGetGuildInfoConfig"></a><strong>GwGetGuildInfoConfig</strong>&nbsp;(chan)</dt>
+<dd>
+Parse the guild information page to gather configuration information.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  chan: Channel control table to update.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+True if successful, false otherwise.
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwGetOfficerNoteConfig"></a><strong>GwGetOfficerNoteConfig</strong>&nbsp;(chan)</dt>
+<dd>
+Parse the officer note of the guild leader to gather configuration information.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  chan: Channel control table to update.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+True if successful, false otherwise.
+
+
+
+</dd>
+
+
+
+
 <dt><a name="GwInitializeConfig"></a><strong>GwInitializeConfig</strong>&nbsp;()</dt>
 <dd>
 Reset all confederation configuration.
@@ -285,10 +362,19 @@ Reset all confederation configuration.
 
 
 
-<dt><a name="GwIsConnected"></a><strong>GwIsConnected</strong>&nbsp;()</dt>
+<dt><a name="GwIsConnected"></a><strong>GwIsConnected</strong>&nbsp;(chan)</dt>
 <dd>
 Check if a connection exists to the common chat.
 
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  chan: A channel control table.
+	</li>
+	
+</ul>
 
 
 
@@ -392,10 +478,19 @@ True if the target guild is a peer co-guild, false otherwise.
 
 
 
-<dt><a name="GwJoinChannel"></a><strong>GwJoinChannel</strong>&nbsp;()</dt>
+<dt><a name="GwJoinChannel"></a><strong>GwJoinChannel</strong>&nbsp;(chan)</dt>
 <dd>
-Join the shared confederation channel. Configuration globals must be populated before this is called.
+Join the shared confederation channel.
 
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  chan: the channel control block.
+	</li>
+	
+</ul>
 
 
 
@@ -412,15 +507,57 @@ Integer channel number, 0 on failure.
 
 
 
-<dt><a name="GwLeaveChannel"></a><strong>GwLeaveChannel</strong>&nbsp;()</dt>
+<dt><a name="GwLeaveChannel"></a><strong>GwLeaveChannel</strong>&nbsp;(chan)</dt>
 <dd>
-Leave the shared confederation channel.
+Leave a shared confederation channel.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  chan: The channel control table.
+	</li>
+	
+</ul>
 
 
 
 
 
 
+
+
+</dd>
+
+
+
+
+<dt><a name="GwNewChannelTable"></a><strong>GwNewChannelTable</strong>&nbsp;(name, password)</dt>
+<dd>
+Create a new channel control data structure.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  name: The channel name.
+	</li>
+	
+	<li>
+	  password: The channel password.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+Channel control table.
 
 
 
@@ -463,13 +600,17 @@ Parse confederation configuration and connect to the common channel.
 
 
 
-<dt><a name="GwSendConfederationMsg"></a><strong>GwSendConfederationMsg</strong>&nbsp;(type, message)</dt>
+<dt><a name="GwSendConfederationMsg"></a><strong>GwSendConfederationMsg</strong>&nbsp;(chan, type, message)</dt>
 <dd>
 Sends an encoded message to the rest of the confederation on the shared channel.
 
 
 <h3>Parameters</h3>
 <ul>
+	
+	<li>
+	  chan: The channel control table.
+	</li>
 	
 	<li>
 	  type: The message type.
