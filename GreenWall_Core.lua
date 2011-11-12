@@ -708,8 +708,12 @@ local function GwGetOfficerNoteConfig(chan)
     else
         -- update the channel control table
         chan.name, chan.password = config:match('GW:a:([%w_]+):([%w_]*)');
-        GwDebug(2, format('channel: %s, password: %s', chan.name, chan.password));
-        return true;        
+        if chan.name ~= nil then
+            GwDebug(2, format('channel: %s, password: %s', chan.name, chan.password));
+            return true;
+        else
+            return false;
+        end        
     end
     
 end
@@ -1033,7 +1037,7 @@ function GreenWall_OnEvent(self, event, ...)
             
             end
         
-        elseif chanNum == gwCommonChannel.number then
+        elseif chanNum == gwOfficerChannel.number then
         
             GwDebug(3, format('Rx<%d, %s>: %s', chanNum, sender, payload));
             
