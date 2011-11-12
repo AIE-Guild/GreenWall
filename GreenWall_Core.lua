@@ -87,7 +87,7 @@ local gwUsage = [[
 --
 
 local gwPlayerName      = UnitName('Player');
-local gwGuildName       = GetGuildInfo('Player'); 
+local gwGuildName       = nil;  -- wait until guild info is retrieved. 
 local gwPlayerLanguage  = GetDefaultLanguage('Player');
 
 
@@ -105,11 +105,11 @@ local gwOfficerChannel 	= {};
 -- State variables
 --
 
-local gwConfigString    = '';
+local gwAddonLoaded     = false;
+local gwRosterLoaded    = false;
+local gwIsInGuild       = nil; -- Assume nothing.
 local gwFlagChatBlock   = true;
 local gwStateSendWho    = 0;
-local gwAddonLoaded     = false;
-local gwRosterUpdate    = false;
 
 
 --
@@ -253,18 +253,6 @@ local function GwNewChannelTable(name, password)
         }
     }
     return tab;
-end
-
-
---- Reset all confederation configuration.
-local function GwInitializeConfig()
-    gwConfigString  = '';
-    gwContainerId   = nil;
-    gwPeerTable     = {};
-    gwCommonChannel = GwNewChannelTable();
-    gwOfficerChannel = GwNewChannelTable();
-    gwStateSendWho  = 0;
-    gwRosterUpdate  = false;
 end
 
 
@@ -556,13 +544,13 @@ local function GwPrepComms()
     
     GwDebug(2, 'Initiating reconnect, querying guild roster.');
     
-    if not GwIsConnected(gwCommonChannel) then
-        GwInitializeConfig();
-        if IsInGuild() then
-            GuildRoster();
-            gwRosterUpdate = true;
-        end
-    end
+    gwContainerId   = nil;
+    gwPeerTable     = {};
+    gwCommonChannel = GwNewChannelTable();
+    gwOfficerChannel = GwNewChannelTable();
+
+    gwRosterLoaded = false;
+    GuildRoster();
     
 end
 
@@ -588,7 +576,10 @@ local function GwGetGuildInfoConfig(chan)
         if gwGuildName == nil or gwGuildName == '' then
             gwGuildName = GetGuildInfo('Player');
             if gwGuildName == nil then
-                return;
+                GwDebug(2, 'co-guild unavailable.');
+                return false;
+            else
+                GwDebug(2, format('co-guild is %s.', gwGuildName));
             end
         end
     
@@ -664,7 +655,7 @@ local function GwGetGuildInfoConfig(chan)
     
         end
             
-        GwWrite('Configuration updated.');
+        GwDebug(1, 'Configuration updated.');
             
     end
         
@@ -1181,14 +1172,14 @@ function GreenWall_OnEvent(self, event, ...)
             
             if action == 'YOU_LEFT' then
                 gwCommonChannel.stats.disco = gwCommonChannel.stats.disco + 1;
-                GwPrepComms();
+                GwRefreshComms();
             end
         
         elseif number == gwOfficerChannel.number then
             
             if action == 'YOU_LEFT' then
                 gwOfficerChannel.stats.disco = gwOfficerChannel.stats.disco + 1;
-                GwPrepComms();
+                GwRefreshComms();
             end
         
         elseif type == 1 then
@@ -1196,7 +1187,6 @@ function GreenWall_OnEvent(self, event, ...)
             if action == 'YOU_JOINED' then
                 GwDebug(2, 'General joined, unblocking reconnect.');
                 gwFlagChatBlock = false;
-                -- GwPrepComms();
             end
                 
         end
@@ -1292,15 +1282,38 @@ function GreenWall_OnEvent(self, event, ...)
         
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
-        if gwRosterUpdate then
+        -- GetGuildInfo() should return correct data if this trap is raised.
+        if not gwRosterLoaded then
             gwGuildName = GetGuildInfo('Player');
-            if gwGuildName then
-                if GwGetGuildInfoConfig(gwCommonChannel) and GwGetOfficerNoteConfig(gwOfficerChannel) then
-                    gwRosterUpdate = false;
+            if gwGuildName == nil then
+                if gwIsInGuild == true then
+                    -- We have left the guild.
+                    GwDebug(1, 'guild quit detected.');
+                    if  GwIsConnected(gwCommonChannel) then
+                        GwLeaveChannel(gwCommonChannel);
+                    end
+                    if  GwIsConnected(gwOfficerChannel) then
+                        GwLeaveChannel(gwOfficerChannel);
+                    end
+                    gwIsInGuild = false;
                 end
-                GwRefreshComms();
+                GwDebug(1, 'not in a co-guild.');
+            else
+                if gwIsInGuild == false then
+                    -- We have joined the guild.
+                    GwDebug(1, 'guild join detected.');
+                end
+                GwDebug(1, format('co-guild is %s.', gwGuildName));
             end
+            gwRosterLoaded = true;
         end
+        
+        -- Update the configuration frequently.
+        GwGetGuildInfoConfig(gwCommonChannel);
+        if GreenWall.ochat then
+            GwGetOfficerNoteConfig(gwOfficerChannel);
+        end
+        GwRefreshComms();
 
     elseif event == 'PLAYER_ENTERING_WORLD' then
     
@@ -1311,15 +1324,9 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'PLAYER_GUILD_UPDATE' then
     
-        if not IsInGuild() then
-            -- Drop comms on quit or boot
-            if  GwIsConnected(gwCommonChannel) then
-                GwLeaveChannel(gwCommonChannel);
-            end
-        else
-            -- Start the connection process otherwise
-            GwPrepComms();
-        end
+        -- Details of the event will be determined once we get the updated roster info.
+        gwRosterLoaded = false;
+        GuildRoster();
         
     elseif event == 'PLAYER_LOGIN' then
 
