@@ -83,6 +83,16 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#GwGetGuildInfoConfig">GwGetGuildInfoConfig</a>&nbsp;(chan)</td>
+	<td class="summary">Parse the guild information page to gather configuration information.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwGetOfficerNoteConfig">GwGetOfficerNoteConfig</a>&nbsp;(chan)</td>
+	<td class="summary">Parse the officer note of the guild leader to gather configuration information.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#GwInitializeConfig">GwInitializeConfig</a>&nbsp;()</td>
 	<td class="summary">Reset all confederation configuration.</td>
 	</tr>
@@ -269,6 +279,64 @@ Send a configuration reload request to the rest of the confederation.
 
 
 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwGetGuildInfoConfig"></a><strong>GwGetGuildInfoConfig</strong>&nbsp;(chan)</dt>
+<dd>
+Parse the guild information page to gather configuration information.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  chan: Channel control table to update.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+True if successful, false otherwise.
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwGetOfficerNoteConfig"></a><strong>GwGetOfficerNoteConfig</strong>&nbsp;(chan)</dt>
+<dd>
+Parse the officer note of the guild leader to gather configuration information.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  chan: Channel control table to update.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+True if successful, false otherwise.
 
 
 

@@ -508,7 +508,7 @@ local function GwJoinChannel(chan)
         else
         
             GwDebug(1, format('joined channel %s (%d)', chan.name, chan.number));
-            GwWrite('Connected to confederation.');
+            GwWrite(format('Connected to confederation on channel %d.', chan.number));
             
             chan.stats.sconn = chan.stats.sconn + 1;
             
@@ -677,6 +677,11 @@ end
 -- @param chan Channel control table to update.
 -- @return True if successful, false otherwise.
 local function GwGetOfficerNoteConfig(chan)
+
+    -- Avoid pointless work if we're not an officer
+    if not GwIsOfficer() then
+        return false;
+    end
 
     -- Allow static configuration to override dynamic configuration
     if chan.static then
