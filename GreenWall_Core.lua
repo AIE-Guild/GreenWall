@@ -245,6 +245,7 @@ local function GwNewChannelTable(name, password)
         dirty = false,
         owner = false,
         handoff = false,
+        queue = {},
         stats = {
             sconn = 0,
             fconn = 0,
@@ -382,17 +383,26 @@ end
 --- Sends an encoded message to the rest of the confederation on the shared channel.
 -- @param chan The channel control table.
 -- @param type The message type.
--- @field chat Broadcast as a chat message.
--- @field achievement Broadcast as a chat message.
--- @field notice Informational, out-of-band message.
--- @field request Out-of-band request.
+-- Accepted values are: chat, achievement, broadcast, notice, and request.
 -- @param message Text of the message.
-local function GwSendConfederationMsg(chan, type, message)
+-- @param sync (optional) Boolean specifying whether to suppress queuing of messages.  Default is false. 
+local function GwSendConfederationMsg(chan, type, message, sync)
 
-    GwDebug(5, format('conf_msg type=%s, message=%s', type, message));
+    if sync == nil then
+        sync = false;
+        GwDebug(5, format('conf_msg type=%s, async, message=%s', type, message));
+    else
+        GwDebug(5, format('conf_msg type=%s, sync, message=%s', type, message));
+    end
 
-    local opcode;
-    
+    -- queue messages id not connected
+    if not GwIsConnected(chan) and not sync then
+        tinsert(chan.queue, { type, message });
+        GwDebug(2, format('queued %s message: %s', type, message));
+        return;
+    end
+
+    local opcode;    
     if type == nil then
         GwDebug(2, 'missing arguments to GwSendConfederationMsg().');
         return;
@@ -400,6 +410,8 @@ local function GwSendConfederationMsg(chan, type, message)
         opcode = 'C';
     elseif type == 'achievement' then
         opcode = 'A';
+    elseif type == 'broadcast' then
+        opcode = 'B';
     elseif type == 'notice' then
         opcode = 'N';
     elseif type == 'request' then
@@ -460,6 +472,27 @@ local function GwSendContainerMsg(type, message)
 end
 
 
+--- Encode a broadcast message.
+-- @param action The action type.
+-- @param target The target of the action (optional).
+-- @param arg Additional data (optional).
+-- @return An encoded string.
+local function GwEncodeBroadcast(action, target, arg)
+    return strjoin("\030", action, target, arg);
+end
+
+
+--- Decode a broadcast message.
+-- @param string An encoded string.
+-- @return The action type.
+-- @return The target of the action (optional).
+-- @return Additional data (optional).
+local function GwDecodeBroadcast(string)
+    local elem = { strsplit("\030", string) };
+    return elem[1], elem[2], elem[3];
+end
+
+
 --- Leave a shared confederation channel.
 -- @param chan The channel control table.
 local function GwLeaveChannel(chan)
@@ -474,7 +507,7 @@ end
 
 --- Join the shared confederation channel.
 -- @param chan the channel control block.
--- @return Integer channel number, 0 on failure.
+-- @return True if connection success, false otherwise.
 local function GwJoinChannel(chan)
 
     if chan.name then
@@ -491,7 +524,7 @@ local function GwJoinChannel(chan)
             
             chan.stats.fconn = chan.stats.fconn + 1;
             
-            return 0;
+            return false;
 
         else
         
@@ -528,13 +561,31 @@ local function GwJoinChannel(chan)
             if GwIsOfficer() then
                 GwSendContainerMsg('response', 'officer');
             end
-        
+            
         end
         
     end
     
-    return chan.number;
+    return true;
     
+end
+
+
+--- Drain a channel's message queue.
+-- @param chan Channel control table.
+-- @return Number of messages flushed.
+local function GwFlushChannel(chan)
+    count = 0;
+    while true do
+        rec = tremove(chan.queue, 1);
+        if rec == nil then
+            break;
+        else
+            GwSendConfederationMsg(chan, rec[1], rec[2], true);
+            count = count + 1;
+        end
+    end
+    return count;
 end
 
 
@@ -721,11 +772,13 @@ local function GwRefreshComms()
     end
 
     --
-    -- Reconnect if necessary
+    -- Connect if necessary
     --
     if gwCommonChannel.dirty or not GwIsConnected(gwCommonChannel) then
         GwDebug(2, 'client not connected to common channel.');
-        GwJoinChannel(gwCommonChannel);
+        if GwJoinChannel(gwCommonChannel) then
+            GwFlushChannel(gwCommonChannel);
+        end
     else
         GwDebug(2, 'client already connected to common channel.');
     end
@@ -733,7 +786,9 @@ local function GwRefreshComms()
     if gwOfficerChannel.dirty or not GwIsConnected(gwOfficerChannel) then
         if GreenWall.ochat then
             GwDebug(2, 'client not connected to officer channel.');
-            GwJoinChannel(gwOfficerChannel);
+            if GwJoinChannel(gwOfficerChannel) then
+                GwFlushChannel(gwOfficerChannel);
+            end
         end
     else
         if GreenWall.ochat then
@@ -1289,6 +1344,7 @@ function GreenWall_OnEvent(self, event, ...)
                 if gwIsInGuild == true then
                     -- We have left the guild.
                     GwDebug(1, 'guild quit detected.');
+                    GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('leave'));
                     if  GwIsConnected(gwCommonChannel) then
                         GwLeaveChannel(gwCommonChannel);
                     end
@@ -1302,6 +1358,7 @@ function GreenWall_OnEvent(self, event, ...)
                 if gwIsInGuild == false then
                     -- We have joined the guild.
                     GwDebug(1, 'guild join detected.');
+                    GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('join'));
                 end
                 GwDebug(1, format('co-guild is %s.', gwGuildName));
             end

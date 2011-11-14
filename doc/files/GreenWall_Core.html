@@ -73,8 +73,23 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#GwDecodeBroadcast">GwDecodeBroadcast</a>&nbsp;(string)</td>
+	<td class="summary">Decode a broadcast message.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwEncodeBroadcast">GwEncodeBroadcast</a>&nbsp;(action, target, arg)</td>
+	<td class="summary">Encode a broadcast message.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#GwError">GwError</a>&nbsp;(msg)</td>
 	<td class="summary">Write an error message to the default chat frame.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwFlushChannel">GwFlushChannel</a>&nbsp;(chan)</td>
+	<td class="summary">Drain a channel's message queue.</td>
 	</tr>
 
 	<tr>
@@ -90,11 +105,6 @@
 	<tr>
 	<td class="name" nowrap><a href="#GwGetOfficerNoteConfig">GwGetOfficerNoteConfig</a>&nbsp;(chan)</td>
 	<td class="summary">Parse the officer note of the guild leader to gather configuration information.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#GwInitializeConfig">GwInitializeConfig</a>&nbsp;()</td>
-	<td class="summary">Reset all confederation configuration.</td>
 	</tr>
 
 	<tr>
@@ -143,7 +153,7 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwSendConfederationMsg">GwSendConfederationMsg</a>&nbsp;(chan, type, message)</td>
+	<td class="name" nowrap><a href="#GwSendConfederationMsg">GwSendConfederationMsg</a>&nbsp;(chan, type, message, sync)</td>
 	<td class="summary">Sends an encoded message to the rest of the confederation on the shared channel.</td>
 	</tr>
 
@@ -244,6 +254,80 @@ Write a debugging message to the default chat frame with a detail level. Message
 
 
 
+<dt><a name="GwDecodeBroadcast"></a><strong>GwDecodeBroadcast</strong>&nbsp;(string)</dt>
+<dd>
+Decode a broadcast message.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  string: An encoded string.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>The action type.
+	
+	<li>The target of the action (optional).
+	
+	<li>Additional data (optional).
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwEncodeBroadcast"></a><strong>GwEncodeBroadcast</strong>&nbsp;(action, target, arg)</dt>
+<dd>
+Encode a broadcast message.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  action: The action type.
+	</li>
+	
+	<li>
+	  target: The target of the action (optional).
+	</li>
+	
+	<li>
+	  arg: Additional data (optional).
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+An encoded string.
+
+
+
+</dd>
+
+
+
+
 <dt><a name="GwError"></a><strong>GwError</strong>&nbsp;(msg)</dt>
 <dd>
 Write an error message to the default chat frame.
@@ -262,6 +346,35 @@ Write an error message to the default chat frame.
 
 
 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwFlushChannel"></a><strong>GwFlushChannel</strong>&nbsp;(chan)</dt>
+<dd>
+Drain a channel's message queue.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  chan: Channel control table.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+Number of messages flushed.
 
 
 
@@ -337,23 +450,6 @@ Parse the officer note of the guild leader to gather configuration information.
 
 <h3>Return value:</h3>
 True if successful, false otherwise.
-
-
-
-</dd>
-
-
-
-
-<dt><a name="GwInitializeConfig"></a><strong>GwInitializeConfig</strong>&nbsp;()</dt>
-<dd>
-Reset all confederation configuration.
-
-
-
-
-
-
 
 
 
@@ -498,7 +594,7 @@ Join the shared confederation channel.
 
 
 <h3>Return value:</h3>
-Integer channel number, 0 on failure.
+True if connection success, false otherwise.
 
 
 
@@ -600,7 +696,7 @@ Parse confederation configuration and connect to the common channel.
 
 
 
-<dt><a name="GwSendConfederationMsg"></a><strong>GwSendConfederationMsg</strong>&nbsp;(chan, type, message)</dt>
+<dt><a name="GwSendConfederationMsg"></a><strong>GwSendConfederationMsg</strong>&nbsp;(chan, type, message, sync)</dt>
 <dd>
 Sends an encoded message to the rest of the confederation on the shared channel.
 
@@ -613,11 +709,15 @@ Sends an encoded message to the rest of the confederation on the shared channel.
 	</li>
 	
 	<li>
-	  type: The message type.
+	  type: The message type. Accepted values are: chat, achievement, broadcast, notice, and request.
 	</li>
 	
 	<li>
 	  message: Text of the message.
+	</li>
+	
+	<li>
+	  sync: (optional) Boolean specifying whether to suppress queuing of messages.  Default is false.
 	</li>
 	
 </ul>
