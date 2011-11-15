@@ -51,6 +51,18 @@ Global Variables
 
 local gwVersion = GetAddOnMetadata('GreenWall', 'Version');
 
+local gwDefaults = {
+    tag             = { default=false,  desc="co-guild tagging" },
+    achievements    = { default=false,  desc="co-guild achievement announcements" },
+    roster          = { default=true,   desc="co-guild roster announcements" },
+    rank            = { default=false,  desc="co-guild rank announcements" },
+    debug           = { default=0,      desc="debugging level" },
+    verbose         = { default=false,  desc="verbose debugging" },
+    log             = { default=false,  desc="event logging" },
+    logsize         = { default=2048,   desc="maximum log buffer size" },
+    ochat           = { default=false,  desc="officer chat bridging" },
+};
+
 local gwUsage = [[
  
   Usage:
@@ -70,7 +82,11 @@ local gwUsage = [[
   refresh
         -- Repair communications link.
   achievements
-        -- Echo achievements from other co-guilds.
+        -- Toggle display of confederation achievements.
+  roster
+        -- Toggle display of confederation join and leave messages.
+  rank
+        -- Toggle display of confederation promotion and demotion messages.
   tag
         -- Show co-guild identifier in messages.
   ochat
@@ -79,9 +95,15 @@ local gwUsage = [[
         -- Specify the officer channel name and password.
   debug <level>
         -- Set debugging level to integer <level>.
+  verbose
+        -- Toggle the display of debugging output in the chat window.
+  log
+        -- Toggle output logging to the GreenWall.lua file.
+  logsize <length>
+        -- Specify the maximum number of log entries to keep.
  
 ]];
-
+        
 --
 -- Player variables
 --
@@ -152,21 +174,36 @@ Convenience Functions
 
 --]]-----------------------------------------------------------------------
 
+--- Add a message to the log file
+-- @param msg A string to write to the log.
+-- @param level (optional) The log level of the message.  Defaults to 0.
+local function GwLog(msg, level)
+    if GreenWall ~= nil and GreenWall.log and GreenWallLog ~= nil then
+        local ts = date('%Y-%m-%d %H:%M:%S');
+        if level == nil then
+            level = 0;
+        end
+        tinsert(GreenWallLog, format('%s (%d) -- %s', ts, level, msg));
+        while # GreenWallLog > GreenWall.logsize do
+            tremove(GreenWallLog, 1);
+        end
+    end
+end
+
+
 --- Write a message to the default chat frame.
 -- @param msg The message to send.
 local function GwWrite(msg)
-
     DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r ' .. msg);
-
+    GwLog(msg);
 end
 
 
 --- Write an error message to the default chat frame.
 -- @param msg The error message to send.
 local function GwError(msg)
-
     DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r |cffff6000[ERROR] ' .. msg);
-
+    GwLog('[ERROR] ' .. msg);
 end
 
 
@@ -177,9 +214,11 @@ end
 local function GwDebug(level, msg)
 
     if GreenWall ~= nil then
-        if level <= GreenWall.debugLevel then
-            DEFAULT_CHAT_FRAME:AddMessage(
-                    format('|cffabd473GreenWall:|r |cff778899[DEBUG/%d] %s|r', level, msg));
+        if level <= GreenWall.debug then
+            GwLog(format('[DEBUG/%d] %s', level, msg));
+            if GreenWall.verbose then
+                DEFAULT_CHAT_FRAME:AddMessage(format('|cffabd473GreenWall:|r |cff778899[DEBUG/%d] %s|r', level, msg));
+            end
         end
     end
     
@@ -816,6 +855,43 @@ Slash Command Handler
 
 --]]-----------------------------------------------------------------------
 
+local function GwCmdConfig(key, val)
+    if key == nil then
+        return false;
+    else
+        if gwDefaults[key] ~= nil then
+            local default = gwDefaults[key]['default'];
+            local desc = gwDefaults[key]['desc']; 
+            if type(default) == 'boolean' then
+                if val == nil then
+                    if GreenWall[key] then
+                        GwWrite(desc .. ' turned ON.');
+                    else
+                        GwWrite(desc .. ' turned OFF.');
+                    end
+                elseif val == 'on' then
+                    GwWrite(desc .. ' turned ON.');
+                elseif val == 'off' then
+                    GwWrite(desc .. ' turned OFF.');
+                else
+                    GwError(format('invalid argument for %s: %s', desc, val));
+                end
+            elseif type(default) == 'number' then
+                if val == nil then
+                    if GreenWall[key] then
+                        GwWrite(format('%s set to %d.', desc, GreenWall[key]));
+                    end
+                elseif type(val) == 'number' then
+                    GreenWall[key] = val;
+                else
+                    GwError(format('invalid argument for %s: %s', desc, val));
+                end
+            end
+        end
+    end
+end
+
+
 local function GwSlashCmd(message, editbox)
 
     --
@@ -836,20 +912,73 @@ local function GwSlashCmd(message, editbox)
     
         if GreenWall.achievements then
             GreenWall.achievements = false;
-            GwWrite('co-guild achievements turned OFF.');
+            GwWrite('co-guild achievement announcements turned OFF.');
         else
             GreenWall.achievements = true;
-            GwWrite('co-guild achievements turned ON.');
+            GwWrite('co-guild achievements announcements turned ON.');
+        end
+    
+    elseif command == 'roster' then
+    
+        if GreenWall.roster then
+            GreenWall.roster = false;
+            GwWrite('co-guild roster announcements turned OFF.');
+        else
+            GreenWall.roster = true;
+            GwWrite('co-guild roster announcements turned ON.');
+        end
+    
+    elseif command == 'rank' then
+    
+        if GreenWall.rank then
+            GreenWall.rank = false;
+            GwWrite('co-guild rank announcements turned OFF.');
+        else
+            GreenWall.rank = true;
+            GwWrite('co-guild rank announcements turned ON.');
         end
     
     elseif command == 'debug' then
     
         local level = argstr:match('^(%d+)%s*$');
         if level ~= nil then
-            GreenWall.debugLevel = level + 0; -- Lua typing stinks, gotta coerce an integer.
-            GwWrite(format('Set debugging level to %d.', GreenWall.debugLevel));
+            GreenWall.debug = level + 0; -- Lua typing stinks, gotta coerce an integer.
+            GwWrite(format('Set debugging level to %d.', GreenWall.debug));
         else
-            GwWrite(format('Debugging level is %d', GreenWall.debugLevel));
+            GwWrite(format('Debugging level is %d', GreenWall.debug));
+        end
+    
+    elseif command == 'verbose' then
+    
+        if GreenWall.verbose then
+            GreenWall.verbose = false;
+            GwWrite('verbose debugging turned OFF.');
+        else
+            GreenWall.verbose = true;
+            GwWrite('verbose debugging turned ON.');
+        end
+    
+    elseif command == 'log' then
+    
+        if GreenWall.log then
+            GreenWall.log = false;
+            GwWrite('logging turned OFF.');
+        else
+            GreenWall.log = true;
+            GwWrite('logging turned ON.');
+        end
+    
+    elseif command == 'logsize' then
+    
+        local size = argstr:match('^(%d+)%s*$');
+        if level ~= nil then
+            GreenWall.logsize = size + 0; -- Lua typing stinks, gotta coerce an integer.
+            GwWrite(format('Set log buffer size to %d.', GreenWall.logsize));
+            while # GreenWallLog > GreenWall.logsize do
+                tremove(GreenWallLog, 1);
+            end
+        else
+            GwWrite(format('Log buffer size is %d', GreenWall.logsize));
         end
     
     elseif command == 'ochat' then
@@ -1002,32 +1131,17 @@ function GreenWall_OnEvent(self, event, ...)
         -- Initialize the saved variables
         --
         if GreenWall == nil then
-            GreenWall = {
-                version         = gwVersion,
-                debugLevel      = 0,
-                achievements    = false,
-                tag             = false
-            };
+            GreenWall = {};
+            for k, p in pairs(gwDefaults) do
+                if GreenWall[k] == nil then
+                    GreenWall[k] = p['default'];
+                end
+            end
         end
-
-        --
-        -- Remedial configuration
-        --
         GreenWall.version = gwVersion;
-        if GreenWall.debugLevel == nil then
-            GreenWall.debugLevel = 0;
-        end
-        
-        if GreenWall.achievements == nil then
-            GreenWall.achievements = false;
-        end
 
-        if GreenWall.tag == nil then
-            GreenWall.tag = false;
-        end
-        
-        if GreenWall.ochat == nil then
-            GreenWall.ochat = false;
+        if GreenWallLog == nil then
+            GreenWallLog = {};
         end
 
         --
