@@ -132,8 +132,6 @@ local gwRosterLoaded    = false;
 local gwIsInGuild       = nil; -- Assume nothing.
 local gwFlagChatBlock   = true;
 local gwStateSendWho    = 0;
-local gwGIHashValue     = '';
-local gwONHashValue     = '';
 
 
 --
@@ -380,10 +378,9 @@ local function GwReplicateMessage(target, sender, container, language, flags,
     elseif target == 'OFFICER' then
         event = 'CHAT_MSG_OFFICER';
     elseif target == 'GUILD_ACHIEVEMENT' then
-        if not GreenWall.achievements then
-            return;
-        end
         event = 'CHAT_MSG_GUILD_ACHIEVEMENT';
+    elseif target == 'SYSTEM' then
+        event = 'CHAT_MSG_SYSTEM';
     else
         GwError('invalid target channel: ' .. target);
         return;
@@ -1135,9 +1132,36 @@ function GreenWall_OnEvent(self, event, ...)
         
             elseif opcode == 'A' and sender ~= gwPlayerName and container ~= gwContainerId then
 
-                GwReplicateMessage('GUILD_ACHIEVEMENT', sender, container, language,
-                        flags, message, counter, guid);
+                if GreenWall.achievements then
+                    GwReplicateMessage('GUILD_ACHIEVEMENT', sender, container, language, flags, message, counter, guid);
+                end
 
+            elseif opcode == 'B' and sender ~= gwPlayerName and container ~= gwContainerId then
+            
+                local action, target, arg = GwDecodeBroadcast(message);
+                
+                if action == 'join' then
+                    if GreenWall.roster then
+                        GwReplicateMessage('SYSTEM', sender, container, language, flags, 
+                                format(ERR_GUILD_JOIN_S, sender), counter, guid);
+                    end
+                elseif action == 'leave' then
+                    if GreenWall.roster then
+                        GwReplicateMessage('SYSTEM', sender, container, language, flags, 
+                                format(ERR_GUILD_LEAVE_S, sender), counter, guid);
+                    end
+                elseif action == 'promote' then
+                    if GreenWall.rank then
+                        GwReplicateMessage('SYSTEM', sender, container, language, flags, 
+                                format(ERR_GUILD_PROMOTE_SSS, sender, target, arg), counter, guid);
+                    end
+                elseif action == 'demote' then
+                    if GreenWall.rank then
+                        GwReplicateMessage('SYSTEM', sender, container, language, flags, 
+                                format(ERR_GUILD_DEMOTE_SSS, sender, target, arg), counter, guid);
+                    end
+                end                    
+            
             elseif opcode == 'R' then
             
                 --
