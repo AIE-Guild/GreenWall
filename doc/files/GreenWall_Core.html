@@ -68,6 +68,11 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#GwCmdConfig">GwCmdConfig</a>&nbsp;(key, val)</td>
+	<td class="summary">Update or display the value of a user configuration variable.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#GwDebug">GwDebug</a>&nbsp;(level, msg)</td>
 	<td class="summary">Write a debugging message to the default chat frame with a detail level.</td>
 	</tr>
@@ -135,6 +140,11 @@
 	<tr>
 	<td class="name" nowrap><a href="#GwLeaveChannel">GwLeaveChannel</a>&nbsp;(chan)</td>
 	<td class="summary">Leave a shared confederation channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwLog">GwLog</a>&nbsp;(msg, level)</td>
+	<td class="summary">Add a message to the log file </td>
 	</tr>
 
 	<tr>
@@ -216,6 +226,39 @@ Finds channel roles for a player.
 	<li>True if target is a channel moderator, false otherwise.
 	
 </ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwCmdConfig"></a><strong>GwCmdConfig</strong>&nbsp;(key, val)</dt>
+<dd>
+Update or display the value of a user configuration variable.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  key: The name of the variable.
+	</li>
+	
+	<li>
+	  val: The variable value.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+True if the key matches a variable name, false otherwise.
 
 
 
@@ -613,6 +656,36 @@ Leave a shared confederation channel.
 	
 	<li>
 	  chan: The channel control table.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwLog"></a><strong>GwLog</strong>&nbsp;(msg, level)</dt>
+<dd>
+Add a message to the log file
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  msg: A string to write to the log.
+	</li>
+	
+	<li>
+	  level: (optional) The log level of the message.  Defaults to 0.
 	</li>
 	
 </ul>
