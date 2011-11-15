@@ -150,7 +150,7 @@ local gwOptChanBan      = false;
 local gwTimeOutChatBlock    = 30;
 local gwTimeStampChatBlock  = 0;
 
--- Holddown for reload requests
+-- Hold-down for reload requests
 local gwHoldIntReload   = 180;
 local gwHoldTimeReload  = 0;
 
@@ -177,13 +177,10 @@ Convenience Functions
 --- Add a message to the log file
 -- @param msg A string to write to the log.
 -- @param level (optional) The log level of the message.  Defaults to 0.
-local function GwLog(msg, level)
+local function GwLog(msg)
     if GreenWall ~= nil and GreenWall.log and GreenWallLog ~= nil then
         local ts = date('%Y-%m-%d %H:%M:%S');
-        if level == nil then
-            level = 0;
-        end
-        tinsert(GreenWallLog, format('%s (%d) -- %s', ts, level, msg));
+        tinsert(GreenWallLog, format('%s -- %s', ts, msg));
         while # GreenWallLog > GreenWall.logsize do
             tremove(GreenWallLog, 1);
         end
@@ -855,6 +852,10 @@ Slash Command Handler
 
 --]]-----------------------------------------------------------------------
 
+--- Update or display the value of a user configuration variable.
+-- @param key The name of the variable.
+-- @param val The variable value.
+-- @return True if the key matches a variable name, false otherwise.
 local function GwCmdConfig(key, val)
     if key == nil then
         return false;
@@ -863,7 +864,7 @@ local function GwCmdConfig(key, val)
             local default = gwDefaults[key]['default'];
             local desc = gwDefaults[key]['desc']; 
             if type(default) == 'boolean' then
-                if val == nil then
+                if val == nil or val == '' then
                     if GreenWall[key] then
                         GwWrite(desc .. ' turned ON.');
                     else
@@ -876,19 +877,23 @@ local function GwCmdConfig(key, val)
                 else
                     GwError(format('invalid argument for %s: %s', desc, val));
                 end
+                return true;
             elseif type(default) == 'number' then
-                if val == nil then
+                if val == nil or val == '' then
                     if GreenWall[key] then
                         GwWrite(format('%s set to %d.', desc, GreenWall[key]));
                     end
-                elseif type(val) == 'number' then
-                    GreenWall[key] = val;
+                elseif val:match('^%d+$') then
+                    GreenWall[key] = val + 0;
+                    GwWrite(format('%s set to %d.', desc, GreenWall[key]));
                 else
                     GwError(format('invalid argument for %s: %s', desc, val));
                 end
+                return true;
             end
         end
     end
+    return false;
 end
 
 
@@ -897,7 +902,7 @@ local function GwSlashCmd(message, editbox)
     --
     -- Parse the command
     --
-    local command, argstr = message:match('^(%S*)%s*(.*)');
+    local command, argstr = message:match('^(%S*)%s*(%S*)%s*');
     command = command:lower();
     
     GwDebug(4, format('command: %s, args: %s', command, argstr));
@@ -908,90 +913,15 @@ local function GwSlashCmd(message, editbox)
             GwWrite(line);
         end
     
-    elseif command == 'achievements' then
+    elseif GwCmdConfig(command, argstr) then
     
-        if GreenWall.achievements then
-            GreenWall.achievements = false;
-            GwWrite('co-guild achievement announcements turned OFF.');
-        else
-            GreenWall.achievements = true;
-            GwWrite('co-guild achievements announcements turned ON.');
-        end
-    
-    elseif command == 'roster' then
-    
-        if GreenWall.roster then
-            GreenWall.roster = false;
-            GwWrite('co-guild roster announcements turned OFF.');
-        else
-            GreenWall.roster = true;
-            GwWrite('co-guild roster announcements turned ON.');
-        end
-    
-    elseif command == 'rank' then
-    
-        if GreenWall.rank then
-            GreenWall.rank = false;
-            GwWrite('co-guild rank announcements turned OFF.');
-        else
-            GreenWall.rank = true;
-            GwWrite('co-guild rank announcements turned ON.');
-        end
-    
-    elseif command == 'debug' then
-    
-        local level = argstr:match('^(%d+)%s*$');
-        if level ~= nil then
-            GreenWall.debug = level + 0; -- Lua typing stinks, gotta coerce an integer.
-            GwWrite(format('Set debugging level to %d.', GreenWall.debug));
-        else
-            GwWrite(format('Debugging level is %d', GreenWall.debug));
-        end
-    
-    elseif command == 'verbose' then
-    
-        if GreenWall.verbose then
-            GreenWall.verbose = false;
-            GwWrite('verbose debugging turned OFF.');
-        else
-            GreenWall.verbose = true;
-            GwWrite('verbose debugging turned ON.');
-        end
-    
-    elseif command == 'log' then
-    
-        if GreenWall.log then
-            GreenWall.log = false;
-            GwWrite('logging turned OFF.');
-        else
-            GreenWall.log = true;
-            GwWrite('logging turned ON.');
-        end
-    
-    elseif command == 'logsize' then
-    
-        local size = argstr:match('^(%d+)%s*$');
-        if level ~= nil then
-            GreenWall.logsize = size + 0; -- Lua typing stinks, gotta coerce an integer.
-            GwWrite(format('Set log buffer size to %d.', GreenWall.logsize));
+        -- Some special handling here
+        if command == 'logsize' then
             while # GreenWallLog > GreenWall.logsize do
                 tremove(GreenWallLog, 1);
             end
-        else
-            GwWrite(format('Log buffer size is %d', GreenWall.logsize));
         end
     
-    elseif command == 'ochat' then
-    
-        if GreenWall.ochat then
-            GreenWall.ochat = false;
-            GwWrite('officer chat turned OFF.');
-        else
-            GreenWall.ochat = true;
-            GwWrite('officer chat turned ON.');
-        end
-        GwRefreshComms();
-        
     elseif command == 'ochan' then
     
         local ochan, opass = argstr:match('^(%S+)%s+(%S+)%s*$');
@@ -1052,16 +982,6 @@ local function GwSlashCmd(message, editbox)
             GwWrite(format('officer: %d sconn, %d fconn, %d leave, %d disco', 
                     gwOfficerChannel.stats.sconn, gwOfficerChannel.stats.fconn,
                     gwOfficerChannel.stats.leave, gwOfficerChannel.stats.disco));
-        end
-    
-    elseif command == 'tag' then
-    
-        if GreenWall.tag then
-            GreenWall.tag = false;
-            GwWrite('co-guild tagging turned OFF.');
-        else
-            GreenWall.tag = true;
-            GwWrite('co-guild tagging turned ON.');
         end
     
     elseif command == 'version' then
