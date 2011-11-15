@@ -132,6 +132,8 @@ local gwRosterLoaded    = false;
 local gwIsInGuild       = nil; -- Assume nothing.
 local gwFlagChatBlock   = true;
 local gwStateSendWho    = 0;
+local gwGIHashValue     = '';
+local gwONHashValue     = '';
 
 
 --
@@ -221,6 +223,21 @@ local function GwDebug(level, msg)
     
 end
 
+
+--- Mikk's 32-bit string hash.  See http://www.wowwiki.com/StringHash .
+-- @param text The string to hash.
+-- @return The 32-bit hash value.
+local function GwStringHash(text)
+    local counter = 1
+    local len = string.len(text)
+    for i = 1, len, 3 do 
+        counter = math.fmod(counter*8161, 4294967279) +  -- 2^32 - 17: Prime!
+                (string.byte(text,i)*16776193) +
+                ((string.byte(text,i+1) or (len-i+256))*8372226) +
+                ((string.byte(text,i+2) or (len-i+256))*3932164)
+    end
+    return math.fmod(counter, 4294967291) -- 2^32 - 5: Prime (and different from the prime in the loop)
+end
 
 --- Check if a connection exists to the common chat.
 -- @param chan A channel control table.
@@ -514,7 +531,11 @@ end
 -- @param arg Additional data (optional).
 -- @return An encoded string.
 local function GwEncodeBroadcast(action, target, arg)
-    return strjoin("\030", action, target, arg);
+
+    return strjoin(':', 
+            (action == nil and '' or action), 
+            (target == nil and '' or target), 
+            (arg == nil and '' or arg));
 end
 
 
@@ -524,7 +545,7 @@ end
 -- @return The target of the action (optional).
 -- @return Additional data (optional).
 local function GwDecodeBroadcast(string)
-    local elem = { strsplit("\030", string) };
+    local elem = { strsplit(':', string) };
     return elem[1], elem[2], elem[3];
 end
 
@@ -650,7 +671,13 @@ local function GwGetGuildInfoConfig(chan)
     GwDebug(2, 'parsing Guild Info.');
 
     local info = GetGuildInfoText();
-    local update = false;
+    
+    hash = GwStringHash(info);
+    if hash == gwGIHashValue then
+        return true;
+    else
+        gwGIHashValue = hash;
+    end
         
     if info == '' then
 
@@ -784,6 +811,15 @@ local function GwGetOfficerNoteConfig(chan)
     if leader == 0 then
         return false;
     else
+
+        -- Check for changes    
+        hash = GwStringHash(config);
+        if hash == gwONHashValue then
+            return true;
+        else
+            gwONHashValue = hash;
+        end
+        
         -- update the channel control table
         chan.name, chan.password = config:match('GW:a:([%w_]+):([%w_]*)');
         if chan.name ~= nil then
@@ -871,8 +907,10 @@ local function GwCmdConfig(key, val)
                         GwWrite(desc .. ' turned OFF.');
                     end
                 elseif val == 'on' then
+                    GreenWall[key] = true;
                     GwWrite(desc .. ' turned ON.');
                 elseif val == 'off' then
+                    GreenWall[key] = false;
                     GwWrite(desc .. ' turned OFF.');
                 else
                     GwError(format('invalid argument for %s: %s', desc, val));
@@ -1325,44 +1363,58 @@ function GreenWall_OnEvent(self, event, ...)
         
         GwDebug(5, format('system message: %s', message));
         
-        local name = string.match(message, '%[(.+)%]');
-        local guild = string.match(message, '<(.+)>');
+        local ppat = format(ERR_GUILD_PROMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
+        local dpat = format(ERR_GUILD_DEMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
+        
+        if message:match(ppat) then
+            
+            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('promote', message:match(ppat)));
+        
+        elseif message:match(dpat) then
+            
+            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('demote', message:match(dpat)));
+        
+        else
+        
+            local name = string.match(message, '%[(.+)%]');
+            local guild = string.match(message, '<(.+)>');
 
-        if name ~= nil then
+            if name ~= nil then
 
-            if guild == nil then
-                GwDebug(5, format('found %s in no guild', name));
-            else
-                GwDebug(5, format('found %s in guild %s', name, guild));
-            end
-
-            if tContains(gwGuildCheck, name) then
-
-                --
-                -- Boot if an intruder
-                --
-                if guild == nil or not GwIsContainer(guild) then
-                    if gwOptChanKick then
-                        if gwOptChanBan then
-                            ChannelBan(gwCommonChannel.name, name);
-                        end
-                        ChannelKick(gwCommonChannel.name, name);
-                        GwSendConfederationMsg(gwCommonChannel, 'notice', 
-                                format('removed %s (%s), not in a co-guild.', name, guild));
-                        GwDebug(1,
-                                format('removed %s (%s), not in a co-guild.', name, guild));
-                    end
+                if guild == nil then
+                    GwDebug(5, format('found %s in no guild', name));
+                else
+                    GwDebug(5, format('found %s in guild %s', name, guild));
                 end
 
-                --
-                -- Clean up the table
-                --
-                local i = 1;
-                while gwGuildCheck[i] do
-                    if name == gwGuildCheck[i] then
-                        tremove(gwGuildCheck, i);
-                        break;
+                if tContains(gwGuildCheck, name) then
+
+                    --
+                    -- Boot if an intruder
+                    --
+                    if guild == nil or not GwIsContainer(guild) then
+                        if gwOptChanKick then
+                            if gwOptChanBan then
+                                ChannelBan(gwCommonChannel.name, name);
+                            end
+                            ChannelKick(gwCommonChannel.name, name);
+                            GwSendConfederationMsg(gwCommonChannel, 'notice', 
+                                    format('removed %s (%s), not in a co-guild.', name, guild));
+                            GwDebug(1, format('removed %s (%s), not in a co-guild.', name, guild));
+                        end
                     end
+
+                    --
+                    -- Clean up the table
+                    --
+                    local i = 1;
+                    while gwGuildCheck[i] do
+                        if name == gwGuildCheck[i] then
+                            tremove(gwGuildCheck, i);
+                            break;
+                        end
+                    end
+
                 end
 
             end
