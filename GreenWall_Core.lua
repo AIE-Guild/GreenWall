@@ -126,8 +126,6 @@ local gwOfficerChannel 	= {};
 --
 
 local gwAddonLoaded     = false;
-local gwRosterLoaded    = false;
-local gwIsInGuild       = nil; -- Assume nothing.
 local gwFlagChatBlock   = true;
 local gwStateSendWho    = 0;
 
@@ -149,9 +147,8 @@ local gwChatBlockTimeout    = 30;
 local gwChatBlockTimestamp  = 0;
 
 -- Configuration hold-down
-local gwConfigHoldInt   = 600;
+local gwConfigHoldInt   = 300;
 local gwConfigHoldTime  = 0;
-local gwConfigForce     = false;
 
 -- Hold-down for reload requests
 local gwReloadHoldInt   = 180;
@@ -230,6 +227,9 @@ end
 -- @param text The string to hash.
 -- @return The 32-bit hash value.
 local function GwStringHash(text)
+    if text == nil then
+        text = '';
+    end
     local counter = 1
     local len = string.len(text)
     for i = 1, len, 3 do 
@@ -449,9 +449,11 @@ local function GwSendConfederationMsg(chan, type, message, sync)
     end
 
     -- queue messages id not connected
-    if not GwIsConnected(chan) and not sync then
-        tinsert(chan.queue, { type, message });
-        GwDebug(2, format('coguild_msg: queued %s message: %s', type, message));
+    if not GwIsConnected(chan) then
+        if not sync then 
+            tinsert(chan.queue, { type, message });
+            GwDebug(2, format('coguild_msg: queued %s message: %s', type, message));
+        end
         return;
     end
 
@@ -478,11 +480,6 @@ local function GwSendConfederationMsg(chan, type, message, sync)
     
     if message == nil then
         message = '';
-    end
-    
-    if gwContainerId == nil then
-        GwDebug(2, 'coguild_msg: container ID not yet known, skipping.');
-        return;
     end
     
     local payload = strsub(strjoin('#', opcode, gwContainerId, '', message), 1, 255);
@@ -531,11 +528,7 @@ end
 -- @param arg Additional data (optional).
 -- @return An encoded string.
 local function GwEncodeBroadcast(action, target, arg)
-
-    return strjoin(':', 
-            (action == nil and '' or action), 
-            (target == nil and '' or target), 
-            (arg == nil and '' or arg));
+    return strjoin(':', tostring(action), tostring(target), tostring(arg));
 end
 
 
@@ -554,8 +547,9 @@ end
 -- @param chan The channel control table.
 local function GwLeaveChannel(chan)
 
-    LeaveChannelByName(chan.name);
-    GwDebug(1, format('chan_leave: name=[%08x], number=%d', GwStringHash(chan.name), chan.number));
+    local id, name = GetChannelName(chan.number);
+    GwDebug(1, format('chan_leave: name=[%08x], number=%d', GwStringHash(name), chan.number));
+    LeaveChannelByName(name);
     chan.number = 0;
     chan.stats.leave = chan.stats.leave + 1;
 
@@ -632,6 +626,8 @@ end
 -- @param chan Channel control table.
 -- @return Number of messages flushed.
 local function GwFlushChannel(chan)
+    GwDebug(2, format('chan_flush: draining channel queue: name=[%08x], number=%d', 
+            GwStringHash(chan.name), chan.number));
     count = 0;
     while true do
         rec = tremove(chan.queue, 1);
@@ -657,7 +653,6 @@ local function GwPrepComms()
     gwCommonChannel = GwNewChannelTable();
     gwOfficerChannel = GwNewChannelTable();
 
-    gwRosterLoaded = false;
     GuildRoster();
     
 end
@@ -828,27 +823,36 @@ local function GwRefreshComms()
     --
     -- Connect if necessary
     --
-    if gwCommonChannel.dirty or not GwIsConnected(gwCommonChannel) then
-        GwDebug(2, 'refresh_comms: client not connected to common channel.');
+    if gwCommonChannel.dirty then
+        GwDebug(2, 'refresh_comms: common channel dirty flag set.');
+        if GwIsConnected(gwCommonChannel) then
+            GwLeaveChannel(gwCommonChannel);
+        end
+        gwCommonChannel.dirty = false;
+    end
+    
+    if not GwIsConnected(gwCommonChannel) then
         if GwJoinChannel(gwCommonChannel) then
             GwFlushChannel(gwCommonChannel);
         end
-    else
-        GwDebug(2, 'refresh_comms: client already connected to common channel.');
     end
 
-    if gwOfficerChannel.dirty or not GwIsConnected(gwOfficerChannel) then
-        if GreenWall.ochat then
-            GwDebug(2, 'refresh_comms: client not connected to officer channel.');
+    if GreenWall.ochat then
+        if gwOfficerChannel.dirty then
+            GwDebug(2, 'refresh_comms: common channel dirty flag set.');
+            if GwIsConnected(gwOfficerChannel) then
+                GwLeaveChannel(gwOfficerChannel);
+            end
+            gwOfficerChannel.dirty = false;
+        end
+    
+        if not GwIsConnected(gwOfficerChannel) then
             if GwJoinChannel(gwOfficerChannel) then
                 GwFlushChannel(gwOfficerChannel);
             end
         end
     else
-        if GreenWall.ochat then
-            GwDebug(2, 'refresh_comms: client already connected to officer channel.');
-        else
-            GwDebug(2, 'refresh_comms: disconnecting client from officer channel.');
+        if GwIsConnected(gwOfficerChannel) then
             GwLeaveChannel(gwOfficerChannel);
         end
     end
@@ -940,6 +944,9 @@ local function GwSlashCmd(message, editbox)
             while # GreenWallLog > GreenWall.logsize do
                 tremove(GreenWallLog, 1);
             end
+        elseif command == 'ochat' then
+            GwGetOfficerNoteConfig(gwOfficerChannel);
+            GwRefreshComms();
         end
     
     elseif command == 'reload' then
@@ -1063,10 +1070,10 @@ function GreenWall_OnEvent(self, event, ...)
         --
         if GreenWall == nil then
             GreenWall = {};
-            for k, p in pairs(gwDefaults) do
-                if GreenWall[k] == nil then
-                    GreenWall[k] = p['default'];
-                end
+        end
+        for k, p in pairs(gwDefaults) do
+            if GreenWall[k] == nil then
+                GreenWall[k] = p['default'];
             end
         end
         GreenWall.version = gwVersion;
@@ -1148,9 +1155,10 @@ function GreenWall_OnEvent(self, event, ...)
                     GwWrite(format('Received configuration reload request from %s.', sender));
                     if diff >= gwReloadHoldInt then
                         GwDebug(2, 'on_event: initiating reload.');
-                        GuildRoster();
                         gwReloadHoldTime = time();
-                        gwConfigForce = true;
+                        gwCommonChannel.configured = false;
+                        gwOfficerChannel.configured = false;
+                        GuildRoster();
                     end
                 end
             
@@ -1363,10 +1371,32 @@ function GreenWall_OnEvent(self, event, ...)
         
         GwDebug(5, format('on_event: system message: %s', message));
         
+        local jpat = format(ERR_GUILD_JOIN_S, gwPlayerName);
+        local lpat = format(ERR_GUILD_LEAVE_S, gwPlayerName);
         local ppat = format(ERR_GUILD_PROMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
         local dpat = format(ERR_GUILD_DEMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
         
-        if message:match(ppat) then
+        if message:match(jpat) then
+
+            -- We have joined the guild.
+            GwDebug(1, 'on_event: guild join detected.');
+            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('join'));
+
+        elseif message:match(lpat) then
+        
+            -- We have left the guild.
+            GwDebug(1, 'on_event: guild quit detected.');
+            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('leave'));
+            if GwIsConnected(gwCommonChannel) then
+                GwLeaveChannel(gwCommonChannel);
+                gwCommonChannel = GwNewChannelTable();
+            end
+            if GwIsConnected(gwOfficerChannel) then
+                GwLeaveChannel(gwOfficerChannel);
+                gwOfficerChannel = GwNewChannelTable();
+            end
+
+        elseif message:match(ppat) then
             
             GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('promote', message:match(ppat)));
         
@@ -1423,53 +1453,30 @@ function GreenWall_OnEvent(self, event, ...)
         
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
-        -- GetGuildInfo() should return correct data if this trap is raised.
-        if not gwRosterLoaded then
-            gwGuildName = GetGuildInfo('Player');
-            if gwGuildName == nil then
-                if gwIsInGuild == true then
-                    -- We have left the guild.
-                    GwDebug(1, 'on_event: guild quit detected.');
-                    GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('leave'));
-                    if  GwIsConnected(gwCommonChannel) then
-                        GwLeaveChannel(gwCommonChannel);
-                    end
-                    if  GwIsConnected(gwOfficerChannel) then
-                        GwLeaveChannel(gwOfficerChannel);
-                    end
-                    gwIsInGuild = false;
-                end
-                GwDebug(1, 'on_event: not in a co-guild.');
-            else
-                if gwIsInGuild == false then
-                    -- We have joined the guild.
-                    GwDebug(1, 'on_event: guild join detected.');
-                    GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('join'));
-                end
-                GwDebug(1, format('on_event: co-guild is <%s>.', gwGuildName));
-            end
-            gwRosterLoaded = true;
-        end
-        
-        -- Update the configuration
+        gwGuildName = GetGuildInfo('Player');
+
         local timestamp = time();
+        local holdtime = timestamp - gwConfigHoldTime;
+        GwDebug(5, format('config_reload: common_conf=%s, officer_conf=%s, holdtime=%d, holdint=%d',
+                tostring(gwCommonChannel.configured), tostring(gwOfficerChannel.configured), holdtime, gwConfigHoldInt));
 
-        GwDebug(5, format('config_reload: common_conf=%s, officer_conf=%s, force=%s, time=%d, holdtime=%d, holdint=%d',
-                tostring(gwCommonChannel.configured), tostring(gwOfficerChannel.configured), 
-                tostring(gwConfigForce), timestamp, gwConfigHoldTime, gwConfigHoldInt));
-
+        -- Update the configuration
         if not gwCommonChannel.configured then
             GwGetGuildInfoConfig(gwCommonChannel);
-        elseif GreenWall.ochat then
+        end
+        
+        if GreenWall.ochat then
             if not gwOfficerChannel.configured then
                 GwGetOfficerNoteConfig(gwOfficerChannel);
             end
-        elseif gwConfigForce or (timestamp - gwConfigHoldTime >= gwConfigHoldInt) then
+        end
+        
+        -- Periodic check for updated configuration.
+        if holdtime >= gwConfigHoldInt then
             GwGetGuildInfoConfig(gwCommonChannel);
             if GreenWall.ochat then
                 GwGetOfficerNoteConfig(gwOfficerChannel);
             end
-            gwConfigForce = false;
             gwConfigHoldTime = timestamp;
             GwRefreshComms();
         end
@@ -1483,8 +1490,7 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'PLAYER_GUILD_UPDATE' then
     
-        -- Details of the event will be determined once we get the updated roster info.
-        gwRosterLoaded = false;
+        -- Query the guild info.
         GuildRoster();
         
     elseif event == 'PLAYER_LOGIN' then
