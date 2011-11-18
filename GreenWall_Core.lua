@@ -701,9 +701,15 @@ local function GwGetGuildInfoConfig(chan)
             
                 if vector[1] == 'c' then
                 
-                    chan.name = vector[2];
-                    chan.password = vector[3];
-                    chan.dirty = true;
+                    if chan.name ~= vector[2] then
+                        chan.name = vector[2];
+                        chan.dirty = true;
+                    end
+                    
+                    if chan.password ~= vector[3] then
+                        chan.password = vector[3];
+                        chan.dirty = true;
+                    end
                         
                     GwDebug(2, format('guild_info: channel=[%08x], password=[%08x]', 
                             GwStringHash(chan.name), GwStringHash(chan.password)));
@@ -957,23 +963,22 @@ local function GwSlashCmd(message, editbox)
     elseif command == 'status' then
     
         GwWrite('container=' .. tostring(gwContainerId));
-        GwWrite(format('common: chan=[%08x], num=%d, pass=[%08x], connected=%s, owner=%s',
+        GwWrite(format('common: chan=[%08x], num=%d, pass=[%08x], connected=%s',
                 GwStringHash(gwCommonChannel.name), 
                 tostring(gwCommonChannel.number), 
                 GwStringHash(gwCommonChannel.password),
-                tostring(GwIsConnected(gwCommonChannel)),
-                tostring(gwCommonChannel.owner)
+                tostring(GwIsConnected(gwCommonChannel))
             ));
         if GreenWall.ochat then
-            GwWrite(format('officer: chan=[%08x], num=%d, pass=[%08x], connected=%s, owner=%s',
+            GwWrite(format('officer: chan=[%08x], num=%d, pass=[%08x], connected=%s',
                     GwStringHash(gwOfficerChannel.name), 
                     tostring(gwOfficerChannel.number), 
                     GwStringHash(gwOfficerChannel.password),
-                    tostring(GwIsConnected(gwOfficerChannel)),
-                    tostring(gwOfficerChannel.owner)
+                    tostring(GwIsConnected(gwOfficerChannel))
                 ));
         end
         
+        GwWrite(format('hold_down=%d/%d', (time() - gwConfigHoldTime), gwConfigHoldInt));
         -- GwWrite('chan_kick=' .. tostring(gwOptKick));
         -- GwWrite('chan_ban=' .. tostring(gwOptBan));
         
@@ -1128,6 +1133,11 @@ function GreenWall_OnEvent(self, event, ...)
                         GwReplicateMessage('SYSTEM', sender, container, language, flags, 
                                 format(ERR_GUILD_LEAVE_S, sender), counter, guid);
                     end
+                elseif action == 'remove' then
+                    if GreenWall.rank then
+                        GwReplicateMessage('SYSTEM', sender, container, language, flags, 
+                                format(ERR_GUILD_REMOVE_SS, target, sender), counter, guid);
+                    end
                 elseif action == 'promote' then
                     if GreenWall.rank then
                         GwReplicateMessage('SYSTEM', sender, container, language, flags, 
@@ -1280,6 +1290,7 @@ function GreenWall_OnEvent(self, event, ...)
         
         local jpat = format(ERR_GUILD_JOIN_S, gwPlayerName);
         local lpat = format(ERR_GUILD_LEAVE_S, gwPlayerName);
+        local rpat = format(ERR_GUILD_REMOVE_SS, '(.+)', gwPlayerName);
         local ppat = format(ERR_GUILD_PROMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
         local dpat = format(ERR_GUILD_DEMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
         
@@ -1303,6 +1314,10 @@ function GreenWall_OnEvent(self, event, ...)
                 gwOfficerChannel = GwNewChannelTable();
             end
 
+        elseif message:match(rpat) then
+            
+            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('remove', message:match(rpat)));
+        
         elseif message:match(ppat) then
             
             GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('promote', message:match(ppat)));
