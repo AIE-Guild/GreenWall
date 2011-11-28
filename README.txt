@@ -21,6 +21,9 @@ but the management interface (or lack of one in GreenWall's case) is very
 different.
 
 
+http://wow.curse.com/downloads/wow-addons/details/crossguildchat_lk.aspx
+
+
 * If I'm a member of Alea Iacta Est, do I need to run it?
 
 No, you don't. But guild chat will be very, very frustrating for you if
