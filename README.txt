@@ -52,6 +52,12 @@ run pre-release code.
 
 ------------------------------------------------------------------------------
 
+* Prerequisites:
+
+    * You must have fewer than 10 custom channels configured in-game.  
+      You can see a listing of the custom channels by opening the "Social" window (bound to the "O" key) and selecting the "Chat" tab.
+    * You must be able to edit the Guild Information tab to configure GreenWall for the co-guild members.
+
 
 * Installation
 
