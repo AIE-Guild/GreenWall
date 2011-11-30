@@ -581,7 +581,7 @@ local function GwJoinChannel(chan)
 
         else
         
-            GwDebug(1, format('chan_join: name=[%08x], number=%d', GwStringHash(chan.name), chan.number));
+            GwDebug(2, format('chan_join: name=[%08x], number=%d', GwStringHash(chan.name), chan.number));
             GwWrite(format('Connected to confederation on channel %d.', chan.number));
             
             chan.stats.sconn = chan.stats.sconn + 1;
@@ -988,8 +988,15 @@ local function GwSlashCmd(message, editbox)
     
         GwWrite('version='      .. gwVersion);
         GwWrite('min_version='  .. gwOptMinVersion);
-        GwWrite('achievements=' .. tostring(GreenWall.achievements));
+        
         GwWrite('tag='          .. tostring(GreenWall.tag));
+        GwWrite('achievements=' .. tostring(GreenWall.achievements));
+        GwWrite('roster='       .. tostring(GreenWall.roster));
+        GwWrite('rank='         .. tostring(GreenWall.rank));
+        GwWrite('debug='        .. tostring(GreenWall.debug));
+        GwWrite('verbose='      .. tostring(GreenWall.verbose));
+        GwWrite('log='          .. tostring(GreenWall.log));
+        GwWrite('logsize='      .. tostring(GreenWall.logsize));
     
     elseif command == 'stats' then
     
