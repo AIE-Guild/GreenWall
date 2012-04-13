@@ -52,7 +52,7 @@ Global Variables
 local gwVersion = GetAddOnMetadata('GreenWall', 'Version');
 
 local gwDefaults = {
-    tag             = { default=false,  desc="co-guild tagging" },
+    tag             = { default=true,   desc="co-guild tagging" },
     achievements    = { default=false,  desc="co-guild achievement announcements" },
     roster          = { default=true,   desc="co-guild roster announcements" },
     rank            = { default=false,  desc="co-guild rank announcements" },
@@ -272,8 +272,12 @@ local function GwIsOfficer(target)
     end
     _, _, rank = GetGuildInfo(target);
     
-    GuildControlSetRank(rank);
-    _, _, ochat = GuildControlGetRankFlags();
+    if rank == 0 then
+        ochat = true
+    else
+        GuildControlSetRank(rank);
+        _, _, ochat = GuildControlGetRankFlags();
+    end
     
     if ochat then
         GwDebug(5, format('is_officer: %s is rank %d and can see ochat', target, rank));

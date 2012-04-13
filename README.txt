@@ -141,7 +141,7 @@ certian aspects of its behavior to suit your tastes.
 
     achievements [ on | off ]
         Show achievements from other co-guilds. 
-        Default: on 
+        Default: off 
 
     roster [ on | off ]
         Show guild join and leave messages from other co-guilds. 
