@@ -407,7 +407,7 @@ local function GwReplicateMessage(target, sender, container, language, flags,
                     
                 local frame = 'ChatFrame' .. i;
                 if _G[frame] then
-                    GwDebug(3, format('Tx<%s/%s, *, %s>: %s', frame, target, sender, message));
+                    GwDebug(3, format('Cp<%s/%s, *, %s>: %s', frame, target, sender, message));
                     
                     ChatFrame_MessageEventHandler(
                             _G[frame], 
@@ -495,7 +495,7 @@ local function GwSendConfederationMsg(chan, type, message, sync)
     end
     
     local payload = strsub(strjoin('#', opcode, gwContainerId, '', message), 1, 255);
-    GwDebug(3, format('Tx<%d, *, %s>: %s', chan.number, gwPlayerName, payload));
+    GwDebug(3, format('Tx<%d, %s>: %s', chan.number, gwPlayerName, payload));
     SendChatMessage(payload , "CHANNEL", nil, chan.number); 
 
 end
