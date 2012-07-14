@@ -4,7 +4,7 @@
 
     $HeadURL$
 
-    Copyright (c) 2010, 2011; Mark Rogaski.
+    Copyright (c) 2010-2012; Mark Rogaski.
 
     All rights reserved.
 
@@ -480,6 +480,14 @@ local function GwSendConfederationMsg(chan, type, message, sync)
     else
         GwDebug(2, format('coguild_msg: unknown message type: %s', type));
         return;
+    end
+    
+    local coguild;
+    if gwContainerId == nil then
+        GwDebug(2, format('coguild_msg: missing container ID.');
+        coguild = '-';
+    else
+        coguild = gwContainerId;
     end
     
     if message == nil then
@@ -1342,7 +1350,13 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
         gwGuildName = GetGuildInfo('Player');
-
+        if gwGuildName == nil then
+            GwDebug(2, 'guild_info: co-guild unavailable.');
+            return false;
+        else
+            GwDebug(2, format('guild_info: co-guild is %s.', gwGuildName));
+        end
+            
         local timestamp = time();
         local holdtime = timestamp - gwConfigHoldTime;
         GwDebug(5, format('config_reload: common_conf=%s, officer_conf=%s, holdtime=%d, holdint=%d',

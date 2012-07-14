@@ -5,7 +5,7 @@ $Id$
 User Documentation for GreenWall
 
 
-Copyright (c) 2010, 2011; Mark Rogaski.
+Copyright (c) 2010-2012; Mark Rogaski.
 See LICENSE.txt for licensing and copyright information.
 
 ------------------------------------------------------------------------------
