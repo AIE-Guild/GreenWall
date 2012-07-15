@@ -223,22 +223,36 @@ local function GwDebug(level, msg)
 end
 
 
---- Mikk's 32-bit string hash.  See http://www.wowwiki.com/StringHash .
--- @param text The string to hash.
--- @return The 32-bit hash value.
-local function GwStringHash(text)
+--- CRC-16-CCITT
+-- @param str The string to hash.
+-- @return The CRC hash.
+local function GwStringHash(str)
+
     if text == nil then
         text = '';
     end
-    local counter = 1
-    local len = string.len(text)
-    for i = 1, len, 3 do 
-        counter = math.fmod(counter*8161, 4294967279) +  -- 2^32 - 17: Prime!
-                (string.byte(text,i)*16776193) +
-                ((string.byte(text,i+1) or (len-i+256))*8372226) +
-                ((string.byte(text,i+2) or (len-i+256))*3932164)
+    
+    local crc = 0xffff;
+    
+    for i = 1, #str do
+    
+        c = str:byte(i);
+        crc = bit.bxor(crc, c);
+
+        for j = 1, 8 do
+
+            local k = bit.band(crc, 1);
+            crc = bit.rshift(crc, 1);
+
+            if k ~= 0 then
+                crc = bit.bxor(crc, 0x8408);
+            end
+
+        end
+
     end
-    return math.fmod(counter, 4294967291) -- 2^32 - 5: Prime (and different from the prime in the loop)
+    
+    return crc;
 end
 
 --- Check if a connection exists to the common chat.
@@ -248,7 +262,7 @@ local function GwIsConnected(chan)
 
     if chan.name then
         chan.number = GetChannelName(chan.name);
-        GwDebug(5, format('conn_check: chan_name=[%08x], chan_id=%d', GwStringHash(chan.name), chan.number));
+        GwDebug(5, format('conn_check: chan_name=<<%04X>>, chan_id=%d', GwStringHash(chan.name), chan.number));
         if chan.number ~= 0 then
             return true;
         end
@@ -484,7 +498,7 @@ local function GwSendConfederationMsg(chan, type, message, sync)
     
     local coguild;
     if gwContainerId == nil then
-        GwDebug(2, format('coguild_msg: missing container ID.');
+        GwDebug(2, format('coguild_msg: missing container ID.'));
         coguild = '-';
     else
         coguild = gwContainerId;
@@ -561,7 +575,7 @@ local function GwLeaveChannel(chan)
 
     local id, name = GetChannelName(chan.number);
     if name then
-        GwDebug(1, format('chan_leave: name=[%08x], number=%d', GwStringHash(name), chan.number));
+        GwDebug(1, format('chan_leave: name=<<%04X>>, number=%d', GwStringHash(name), chan.number));
         LeaveChannelByName(name);
         chan.number = 0;
         chan.stats.leave = chan.stats.leave + 1;
@@ -593,7 +607,7 @@ local function GwJoinChannel(chan)
 
         else
         
-            GwDebug(2, format('chan_join: name=[%08x], number=%d', GwStringHash(chan.name), chan.number));
+            GwDebug(2, format('chan_join: name=<<%04X>>, number=%d', GwStringHash(chan.name), chan.number));
             GwWrite(format('Connected to confederation on channel %d.', chan.number));
             
             chan.stats.sconn = chan.stats.sconn + 1;
@@ -612,7 +626,7 @@ local function GwJoinChannel(chan)
                     if v == chan.name then
                         local frame = format('ChatFrame%d', i);
                         if _G[frame] then
-                            GwDebug(2, format('chan_join: hiding channel: name=[%08x], number=%d, frame=%s', 
+                            GwDebug(2, format('chan_join: hiding channel: name=<<%04X>>, number=%d, frame=%s', 
                                     GwStringHash(chan.name), chan.number, frame));
                             ChatFrame_RemoveChannel(frame, chan.name);
                         end
@@ -642,7 +656,7 @@ end
 -- @param chan Channel control table.
 -- @return Number of messages flushed.
 local function GwFlushChannel(chan)
-    GwDebug(2, format('chan_flush: draining channel queue: name=[%08x], number=%d', 
+    GwDebug(2, format('chan_flush: draining channel queue: name=<<%04X>>, number=%d', 
             GwStringHash(chan.name), chan.number));
     count = 0;
     while true do
@@ -723,7 +737,7 @@ local function GwGetGuildInfoConfig(chan)
                         chan.dirty = true;
                     end
                         
-                    GwDebug(2, format('guild_info: channel=[%08x], password=[%08x]', 
+                    GwDebug(2, format('guild_info: channel=<<%04X>>, password=<<%04X>>', 
                             GwStringHash(chan.name), GwStringHash(chan.password)));
 
                 elseif vector[1] == 'o' then
@@ -815,7 +829,7 @@ local function GwGetOfficerNoteConfig(chan)
         chan.name, chan.password = config:match('GW:a:([%w_]+):([%w_]*)');
         if chan.name ~= nil then
             chan.configured = true;
-            GwDebug(2, format('officer_note: channel=[%08x], password=[%08x]', 
+            GwDebug(2, format('officer_note: channel=<<%04X>>, password=<<%04X>>', 
                     GwStringHash(chan.name), GwStringHash(chan.password)));
             return true;
         else
@@ -975,14 +989,14 @@ local function GwSlashCmd(message, editbox)
     elseif command == 'status' then
     
         GwWrite('container=' .. tostring(gwContainerId));
-        GwWrite(format('common: chan=[%08x], num=%d, pass=[%08x], connected=%s',
+        GwWrite(format('common: chan=<<%04X>>, num=%d, pass=<<%04X>>, connected=%s',
                 GwStringHash(gwCommonChannel.name), 
                 tostring(gwCommonChannel.number), 
                 GwStringHash(gwCommonChannel.password),
                 tostring(GwIsConnected(gwCommonChannel))
             ));
         if GreenWall.ochat then
-            GwWrite(format('officer: chan=[%08x], num=%d, pass=[%08x], connected=%s',
+            GwWrite(format('officer: chan=<<%04X>>, num=%d, pass=<<%04X>>, connected=%s',
                     GwStringHash(gwOfficerChannel.name), 
                     tostring(gwOfficerChannel.number), 
                     GwStringHash(gwOfficerChannel.password),
