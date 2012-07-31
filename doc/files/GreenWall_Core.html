@@ -173,8 +173,8 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwStringHash">GwStringHash</a>&nbsp;(text)</td>
-	<td class="summary">Mikk's 32-bit string hash.</td>
+	<td class="name" nowrap><a href="#GwStringHash">GwStringHash</a>&nbsp;(str)</td>
+	<td class="summary">CRC-16-CCITT </td>
 	</tr>
 
 	<tr>
@@ -842,16 +842,16 @@ Sends an encoded message to the rest of the same container on the add-on channel
 
 
 
-<dt><a name="GwStringHash"></a><strong>GwStringHash</strong>&nbsp;(text)</dt>
+<dt><a name="GwStringHash"></a><strong>GwStringHash</strong>&nbsp;(str)</dt>
 <dd>
-Mikk's 32-bit string hash.  See http://www.wowwiki.com/StringHash .
+CRC-16-CCITT
 
 
 <h3>Parameters</h3>
 <ul>
 	
 	<li>
-	  text: The string to hash.
+	  str: The string to hash.
 	</li>
 	
 </ul>
@@ -862,7 +862,7 @@ Mikk's 32-bit string hash.  See http://www.wowwiki.com/StringHash .
 
 
 <h3>Return value:</h3>
-The 32-bit hash value.
+The CRC hash.
 
 
 

@@ -436,7 +436,7 @@ local function GwReplicateMessage(target, sender, container, language, flags,
                             0, 
                             '', 
                             0, 
-                            counter, 
+                            0, 
                             guid
                         );
                 end
@@ -1137,7 +1137,7 @@ function GreenWall_OnEvent(self, event, ...)
                 
         if chanNum == gwCommonChannel.number then
         
-            GwDebug(3, format('Rx<%d, %s>: %s', chanNum, sender, payload));
+            GwDebug(3, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
             
             local opcode, container, _, message = payload:match('^(%a)#(%w+)#([^#]*)#(.*)');
             
@@ -1204,7 +1204,7 @@ function GreenWall_OnEvent(self, event, ...)
         
         elseif chanNum == gwOfficerChannel.number then
         
-            GwDebug(3, format('Rx<%d, %s>: %s', chanNum, sender, payload));
+            GwDebug(3, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
             
             local opcode, container, _, message = payload:match('^(%a)#(%w+)#([^#]*)#(.*)');
             
