@@ -49,6 +49,11 @@ Global Variables
 -- Add-on metadata
 --
 
+--
+-- Kludge to avoid the MoP glyph bug
+--
+local _;
+
 local gwVersion = GetAddOnMetadata('GreenWall', 'Version');
 
 local gwDefaults = {
@@ -410,11 +415,13 @@ local function GwReplicateMessage(target, sender, container, language, flags,
     if GreenWall.tag then
         message = format('<%s> %s', container, message);
     end
-        
+    
+    local i;    
     for i = 1, NUM_CHAT_WINDOWS do
 
         gwFrameTable = { GetChatWindowMessages(i) }
         
+        local v;
         for _, v in ipairs(gwFrameTable) do
                         
             if v == target then
@@ -811,6 +818,8 @@ local function GwGetOfficerNoteConfig(chan)
     local leader = 0;
     local config = '';
 
+    local name;
+    local rank;
     for i = 1, n do
         name, _, rank, _, _, _, _, note = GetGuildRosterInfo(i);
         if rank == 0 then
