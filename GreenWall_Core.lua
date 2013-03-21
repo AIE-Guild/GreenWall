@@ -702,7 +702,8 @@ local function GwGetGuildInfoConfig(chan)
 
     GwDebug(2, 'guild_info: parsing guild information.');
 
-    local info = GetGuildInfoText();
+    local info = GetGuildInfoText();    -- Guild information text.
+    local xlat = {};                    -- Translation table for string substitution.
     
     if info == '' then
 
@@ -724,8 +725,9 @@ local function GwGetGuildInfoConfig(chan)
     
         -- We will rebuild the list of peer container guilds
         wipe(gwPeerTable);
+        wipe(xlat);
 
-        for buffer in gmatch(info, 'GW:([^\n]+)') do
+        for buffer in gmatch(info, 'GW:?(%l:[^\n]*)') do
         
             if buffer ~= nil then
                         
@@ -734,6 +736,9 @@ local function GwGetGuildInfoConfig(chan)
             
                 if vector[1] == 'c' then
                 
+                    -- Common Channel:
+                    -- This specifies the custom chat channel to use for all general confederation bridging.
+                    
                     if chan.name ~= vector[2] then
                         chan.name = vector[2];
                         chan.dirty = true;
@@ -747,7 +752,76 @@ local function GwGetGuildInfoConfig(chan)
                     GwDebug(2, format('guild_info: channel=<<%04X>>, password=<<%04X>>', 
                             GwStringHash(chan.name), GwStringHash(chan.password)));
 
+                elseif vector[1] == 'p' then
+        
+                    -- Peer Co-Guild:
+                    -- You must specify one of these directives for each co-guild in the confederation, including the co-guild you are configuring.
+                    
+                    local cog_name, cog_id, count;
+                    
+                    cog_name, count = string.gsub(vector[2], '%$(%a)', function(a) return xlat[a] end);
+                    if count > 0 then
+                        GwDebug(4, format('guild_info: parser co-guild name substitution "%s" => "%s"', vector[2], cog_name));
+                    end
+                    
+                    cog_id, count   = string.gsub(vector[3], '%$(%a)', function(a) return xlat[a] end);
+                    if count > 0 then
+                        GwDebug(4, format('guild_info: parser co-guild ID substitution "%s" => "%s"', vector[3], cog_id));
+                    end
+                    
+                    if cog_name == gwGuildName then
+                        gwContainerId = cog_id;
+                        GwDebug(2, format('guild_info: container=%s (%s)', gwGuildName, gwContainerId));
+                    else 
+                        gwPeerTable[cog_id] = cog_name;
+                        GwDebug(2, format('guild_info: peer=%s (%s)', cog_name, cog_id));
+                    end
+                    
+                elseif vector[1] == 's' then
+                
+                    -- Substitution Variable:
+                    -- This specifies a variable that will can be used in the peer co-guild directives to reduce the size of the configuration.
+                           
+                    local key = vector[3];
+                    local val = vector[2];            
+                    if string.len(key) == 1 then
+                        if key ~= nil then
+                            xlat[key] = val;
+                            GwDebug(4, format('guild_info: parser substitution rule added, "$%s" := "%s"', key, val));
+                        end
+                    else
+                        GwDebug(4, format('guild_info: invalid parser substitution variable name, "$%s"', key))
+                    end
+                                        
+                elseif vector[1] == 'v' then
+                
+                    -- Minimum Version:
+                    -- The minimum version of GreenWall that the guild management wishes to allow members to use.
+                    
+                    if strmatch(vector[2], '^%d+%.%d+%.%d+%w*$') then
+                        gwOptMinVersion = vector[2];
+                        GwDebug(2, format('guild_info: minimum version is %s', gwOptMinVersion));
+                    end
+                    
+                elseif vector[1] == 'd' then
+                
+                    -- Channel Defense:
+                    -- This option specifies the type of channel defense hat should be employed. This feature is currently unimplemented.
+                    
+                    if vector[2] == 'k' then
+                        gwOptChanKick = true;
+                        GwDebug(2, 'guild_info: channel defense mode is kick.');
+                    elseif vector[2] == 'kb' then
+                        gwOptChanBan = true;
+                        GwDebug(2, 'guild_info: channel defense mode is kick/ban.');
+                    else
+                        GwDebug(2, 'guild_info: channel defense mode is disabled.');
+                    end
+                                                                     
                 elseif vector[1] == 'o' then
+                
+                    -- Option List:
+                    -- This is the old, deprecated, format for specifying configuration options.
                 
                     local optlist = { strsplit(',', gsub(vector[2], '%s+', '')) };
                 
@@ -771,22 +845,12 @@ local function GwGetGuildInfoConfig(chan)
                                 gwOptChanBan = true;
                                 GwDebug(2, 'guild_info: channel defense mode is kick/ban.');
                             else
-                                GwDebug(2, 'guild_info: channel defense mode is none.');
+                                GwDebug(2, 'guild_info: channel defense mode is disabled.');
                             end
                         end
                         
                     end
                                     
-                elseif vector[1] == 'p' then
-        
-                    if vector[2] == gwGuildName then
-                        gwContainerId = vector[3];
-                        GwDebug(2, format('guild_info: container=%s (%s)', gwGuildName, gwContainerId));
-                    else 
-                        gwPeerTable[vector[3]] = vector[2];
-                        GwDebug(2, format('guild_info: peer=%s (%s)', vector[2], vector[3]));
-                    end
-                    
                 end
         
             end
