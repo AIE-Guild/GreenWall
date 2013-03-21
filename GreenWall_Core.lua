@@ -233,8 +233,8 @@ end
 -- @return The CRC hash.
 local function GwStringHash(str)
 
-    if text == nil then
-        text = '';
+    if str == nil then
+        str = '';
     end
     
     local crc = 0xffff;
