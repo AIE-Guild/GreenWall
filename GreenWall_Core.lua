@@ -323,6 +323,7 @@ local function GwNewChannelTable(name, password)
         owner = false,
         handoff = false,
         queue = {},
+        tx_hash = 0,
         stats = {
             sconn = 0,
             fconn = 0,
@@ -515,9 +516,15 @@ local function GwSendConfederationMsg(chan, type, message, sync)
         message = '';
     end
     
+    -- Format the message.
     local payload = strsub(strjoin('#', opcode, gwContainerId, '', message), 1, 255);
+    
+    -- Send the message.
     GwDebug(3, format('Tx<%d, %s>: %s', chan.number, gwPlayerName, payload));
     SendChatMessage(payload , "CHANNEL", nil, chan.number); 
+
+    -- Record the hash of the outbound message.
+    chan.tx_hash = GwStringHash(payload);
 
 end
 
@@ -1207,87 +1214,110 @@ function GreenWall_OnEvent(self, event, ...)
     
         local payload, sender, language, _, _, flags, _, 
                 chanNum, _, _, counter, guid = select(1, ...);
-                
-        if chanNum == gwCommonChannel.number then
         
-            GwDebug(3, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
-            
+        GwDebug(3, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
+        
+        if chanNum == gwCommonChannel.number or chanNum == gwOfficerChannel.number then
+        
             local opcode, container, _, message = strsplit('#', payload, 4);
             
-            if opcode == 'C' and sender ~= gwPlayerName and container ~= gwContainerId then
-
-                GwReplicateMessage('GUILD', sender, container, language, flags,
-                        message, counter, guid);
-        
-            elseif opcode == 'A' and sender ~= gwPlayerName and container ~= gwContainerId then
-
-                if GreenWall.achievements then
-                    GwReplicateMessage('GUILD_ACHIEVEMENT', sender, container, language, flags, message, counter, guid);
-                end
-
-            elseif opcode == 'B' and sender ~= gwPlayerName and container ~= gwContainerId then
+            if opcode == nil or container == nil or message == nil then
             
-                local action, target, arg = GwDecodeBroadcast(message);
+                GwDebug(3, 'rx_validation: invalid message format.');
                 
-                if action == 'join' then
-                    if GreenWall.roster then
-                        GwReplicateMessage('SYSTEM', sender, container, language, flags, 
-                                format(ERR_GUILD_JOIN_S, sender), counter, guid);
-                    end
-                elseif action == 'leave' then
-                    if GreenWall.roster then
-                        GwReplicateMessage('SYSTEM', sender, container, language, flags, 
-                                format(ERR_GUILD_LEAVE_S, sender), counter, guid);
-                    end
-                elseif action == 'remove' then
-                    if GreenWall.rank then
-                        GwReplicateMessage('SYSTEM', sender, container, language, flags, 
-                                format(ERR_GUILD_REMOVE_SS, target, sender), counter, guid);
-                    end
-                elseif action == 'promote' then
-                    if GreenWall.rank then
-                        GwReplicateMessage('SYSTEM', sender, container, language, flags, 
-                                format(ERR_GUILD_PROMOTE_SSS, sender, target, arg), counter, guid);
-                    end
-                elseif action == 'demote' then
-                    if GreenWall.rank then
-                        GwReplicateMessage('SYSTEM', sender, container, language, flags, 
-                                format(ERR_GUILD_DEMOTE_SSS, sender, target, arg), counter, guid);
-                    end
-                end                    
+            else
             
-            elseif opcode == 'R' then
-            
-                --
-                -- Incoming request
-                --
-                if message:match('^reload(%w.*)?$') then 
-                    local diff = time() - gwReloadHoldTime;
-                    GwWrite(format('Received configuration reload request from %s.', sender));
-                    if diff >= gwReloadHoldInt then
-                        GwDebug(2, 'on_event: initiating reload.');
-                        gwReloadHoldTime = time();
-                        gwCommonChannel.configured = false;
-                        gwOfficerChannel.configured = false;
-                        GuildRoster();
+                if opcode == 'R' then
+                
+                    --
+                    -- Incoming request
+                    --
+                    if message:match('^reload(%w.*)?$') then 
+                        local diff = time() - gwReloadHoldTime;
+                        GwWrite(format('Received configuration reload request from %s.', sender));
+                        if diff >= gwReloadHoldInt then
+                            GwDebug(2, 'on_event: initiating reload.');
+                            gwReloadHoldTime = time();
+                            gwCommonChannel.configured = false;
+                            gwOfficerChannel.configured = false;
+                            GuildRoster();
+                        end
                     end
+        
+                elseif sender ~= gwPlayerName and container ~= gwContainerId then
+                
+                    if opcode == 'C' then
+        
+                        if chanNum == gwCommonChannel.number then
+                            GwReplicateMessage('GUILD', sender, container, language, flags, message, counter, guid);
+                        elseif chanNum == gwOfficerChannel.number then
+                            GwReplicateMessage('OFFICER', sender, container, language, flags, message, counter, guid);
+                        end
+                        
+                    elseif opcode == 'A' then
+        
+                        if GreenWall.achievements then
+                            GwReplicateMessage('GUILD_ACHIEVEMENT', sender, container, language, flags, message, counter, guid);
+                        end
+        
+                    elseif opcode == 'B' then
+                
+                        local action, target, arg = GwDecodeBroadcast(message);
+                    
+                        if action == 'join' then
+                            if GreenWall.roster then
+                                GwReplicateMessage('SYSTEM', sender, container, language, flags, 
+                                        format(ERR_GUILD_JOIN_S, sender), counter, guid);
+                            end
+                        elseif action == 'leave' then
+                            if GreenWall.roster then
+                                GwReplicateMessage('SYSTEM', sender, container, language, flags, 
+                                        format(ERR_GUILD_LEAVE_S, sender), counter, guid);
+                            end
+                        elseif action == 'remove' then
+                            if GreenWall.rank then
+                                GwReplicateMessage('SYSTEM', sender, container, language, flags, 
+                                        format(ERR_GUILD_REMOVE_SS, target, sender), counter, guid);
+                            end
+                        elseif action == 'promote' then
+                            if GreenWall.rank then
+                                GwReplicateMessage('SYSTEM', sender, container, language, flags, 
+                                        format(ERR_GUILD_PROMOTE_SSS, sender, target, arg), counter, guid);
+                            end
+                        elseif action == 'demote' then
+                            if GreenWall.rank then
+                                GwReplicateMessage('SYSTEM', sender, container, language, flags, 
+                                        format(ERR_GUILD_DEMOTE_SSS, sender, target, arg), counter, guid);
+                            end
+                        end                                
+                
+                    end
+                    
                 end
-            
+                
             end
-        
-        elseif chanNum == gwOfficerChannel.number then
-        
-            GwDebug(3, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
             
-            local opcode, container, _, message = payload:match('^(%a)#(%w+)#([^#]*)#(.*)');
+            --
+            -- Check for corruption of outbound messages on the shared channels (e.g. modification by Identity).
+            --
+            if sender == gwPlayerName then                
             
-            if opcode == 'C' and sender ~= gwPlayerName and container ~= gwContainerId then
-
-                GwReplicateMessage('OFFICER', sender, container, language, flags,
-                        message, counter, guid);
-        
+                local tx_hash = 0;
+                if chanNum == gwCommonChannel.number then
+                    tx_hash = gwCommonChannel.tx_hash;
+                elseif chanNum == gwOfficerChannel.number then
+                    tx_hash = gwOfficerChannel.tx_hash;
+                end
+                
+                rx_hash = GwStringHash(payload);
+                
+                GwDebug(4, format('rx_validate: tx_hash = 0x%04X, rx_hash = 0x%04X', tx_hash, rx_hash));
+                if tx_hash ~= rx_hash then
+                    GwError(format('Message failed due to channel corruption. Please disable add-ons that might modify messages on channel %d.', chanNum));
+                end
+    
             end
-        
+             
         end
         
     elseif event == 'CHAT_MSG_GUILD' then
