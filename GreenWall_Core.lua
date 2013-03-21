@@ -1212,7 +1212,7 @@ function GreenWall_OnEvent(self, event, ...)
         
             GwDebug(3, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
             
-            local opcode, container, _, message = payload:match('^(%a)#(%w+)#([^#]*)#(.*)');
+            local opcode, container, _, message = strsplit('#', payload, 4);
             
             if opcode == 'C' and sender ~= gwPlayerName and container ~= gwContainerId then
 
