@@ -598,6 +598,22 @@ local function GwLeaveChannel(chan)
 end
 
 
+--- Leave a shared confederation channel and clear current configuration.
+-- @param chan The channel control table.
+local function GwAbandonChannel(chan)
+
+    local id, name = GetChannelName(chan.number);
+    if name then
+        GwDebug(1, format('chan_abandon: name=<<%04X>>, number=%d', GwStringHash(name), chan.number));
+        chan.name = '';
+        chan.password = '';
+        LeaveChannelByName(name);
+        chan.number = 0;
+        chan.stats.leave = chan.stats.leave + 1;
+    end
+
+end 
+
 --- Join the shared confederation channel.
 -- @param chan the channel control block.
 -- @return True if connection success, false otherwise.
@@ -1425,7 +1441,8 @@ function GreenWall_OnEvent(self, event, ...)
         GwDebug(5, format('on_event: system message: %s', message));
         
         local jpat = format(ERR_GUILD_JOIN_S, gwPlayerName);
-        local lpat = format(ERR_GUILD_LEAVE_S, gwPlayerName);
+        local qpat = format(ERR_GUILD_LEAVE_RESULT);
+        local kpat = format(ERR_GUILD_REMOVE_SS, gwPlayerName, '(.+)');
         local rpat = format(ERR_GUILD_REMOVE_SS, '(.+)', gwPlayerName);
         local ppat = format(ERR_GUILD_PROMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
         local dpat = format(ERR_GUILD_DEMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
@@ -1436,17 +1453,17 @@ function GreenWall_OnEvent(self, event, ...)
             GwDebug(1, 'on_event: guild join detected.');
             GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('join'));
 
-        elseif message:match(lpat) then
+        elseif message:match(qpat) or message:match(kpat) then
         
             -- We have left the guild.
             GwDebug(1, 'on_event: guild quit detected.');
             GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('leave'));
             if GwIsConnected(gwCommonChannel) then
-                GwLeaveChannel(gwCommonChannel);
+                GwAbandonChannel(gwCommonChannel);
                 gwCommonChannel = GwNewChannelTable();
             end
             if GwIsConnected(gwOfficerChannel) then
-                GwLeaveChannel(gwOfficerChannel);
+                GwAbandonChannel(gwOfficerChannel);
                 gwOfficerChannel = GwNewChannelTable();
             end
 
