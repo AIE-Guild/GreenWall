@@ -323,7 +323,7 @@ local function GwNewChannelTable(name, password)
         owner = false,
         handoff = false,
         queue = {},
-        tx_hash = 0,
+        tx_hash = {},
         stats = {
             sconn = 0,
             fconn = 0,
@@ -523,8 +523,13 @@ local function GwSendConfederationMsg(chan, type, message, sync)
     GwDebug(3, format('Tx<%d, %s>: %s', chan.number, gwPlayerName, payload));
     SendChatMessage(payload , "CHANNEL", nil, chan.number); 
 
-    -- Record the hash of the outbound message.
-    chan.tx_hash = GwStringHash(payload);
+    -- Record the hash of the outbound message for integrity checking, keeping a count of collisions.  
+    local hash = GwStringHash(payload);
+    if chan.tx_hash[hash] == nil then
+        chan.tx_hash[hash] = 1;
+    else
+        chan.tx_hash[hash] = chan.tx_hash[hash] + 1;
+    end
 
 end
 
@@ -1318,18 +1323,29 @@ function GreenWall_OnEvent(self, event, ...)
             --
             if sender == gwPlayerName then                
             
-                local tx_hash = 0;
+                local tx_hash = nil;
                 if chanNum == gwCommonChannel.number then
                     tx_hash = gwCommonChannel.tx_hash;
                 elseif chanNum == gwOfficerChannel.number then
                     tx_hash = gwOfficerChannel.tx_hash;
                 end
                 
-                rx_hash = GwStringHash(payload);
-                
-                GwDebug(4, format('rx_validate: tx_hash = 0x%04X, rx_hash = 0x%04X', tx_hash, rx_hash));
-                if tx_hash ~= rx_hash then
-                    GwError(format('Message failed due to channel corruption. Please disable add-ons that might modify messages on channel %d.', chanNum));
+                if tx_hash ~= nil then
+                    
+                    local hash = GwStringHash(payload);
+                    
+                    -- Search the sent message hash table for a match.
+                    if tx_hash[hash] == nil or tx_hash[hash] <= 0 then
+                        GwDebug(4, format('rx_validate: tx_hash[0x%04X] not found', hash));
+                        GwError(format('Message corruption detected.  Please disable add-ons that might modify messages on channel %d.', chanNum));
+                    else
+                        GwDebug(4, format('rx_validate: tx_hash[0x%04X] == %d', hash, tx_hash[hash]));
+                        tx_hash[hash] = tx_hash[hash] - 1;
+                        if tx_hash[hash] <= 0 then
+                            tx_hash[hash] = nil;
+                        end
+                    end
+                    
                 end
     
             end
