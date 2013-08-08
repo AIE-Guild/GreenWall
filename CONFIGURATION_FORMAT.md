@@ -3,9 +3,6 @@ Guild Configuration Format
 ==========================
 
 
-----------
-
-
 This page documents the ugly details of GreenWall's configuration.  Unless you have a large confederation and need to minimize the size of your configuration or you are trying to do something fancy, you probably want to read the Guild Quickstart guide (GUILD_QUICKSTART.md) instead.
 
 All configuration for general guild chat is stored in the "Guild Information" field in the "Guild" window (`J`).  The block of configuration text will be read by GreenWall on the member machines.  The benefit of this approach is that a member can join and use GreenWall without having to perform any special configuration.
@@ -148,6 +145,3 @@ Arguments:
 
 The value associated with the key  `mv` will be interpreted as the *minimum version* and value associated with the key `cd` will be interpreted as the *channel defense* setting.
 
-
-
-----------

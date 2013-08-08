@@ -1,10 +1,6 @@
 --[[-----------------------------------------------------------------------
 
-    $Id$
-
-    $HeadURL$
-
-    Copyright (c) 2010-2012; Mark Rogaski.
+    Copyright (c) 2010-2013; Mark Rogaski.
 
     All rights reserved.
 
@@ -323,7 +319,7 @@ local function GwNewChannelTable(name, password)
         owner = false,
         handoff = false,
         queue = {},
-        tx_hash = 0,
+        tx_hash = {},
         stats = {
             sconn = 0,
             fconn = 0,
@@ -523,8 +519,13 @@ local function GwSendConfederationMsg(chan, type, message, sync)
     GwDebug(3, format('Tx<%d, %s>: %s', chan.number, gwPlayerName, payload));
     SendChatMessage(payload , "CHANNEL", nil, chan.number); 
 
-    -- Record the hash of the outbound message.
-    chan.tx_hash = GwStringHash(payload);
+    -- Record the hash of the outbound message for integrity checking, keeping a count of collisions.  
+    local hash = GwStringHash(payload);
+    if chan.tx_hash[hash] == nil then
+        chan.tx_hash[hash] = 1;
+    else
+        chan.tx_hash[hash] = chan.tx_hash[hash] + 1;
+    end
 
 end
 
@@ -1318,18 +1319,29 @@ function GreenWall_OnEvent(self, event, ...)
             --
             if sender == gwPlayerName then                
             
-                local tx_hash = 0;
+                local tx_hash = nil;
                 if chanNum == gwCommonChannel.number then
                     tx_hash = gwCommonChannel.tx_hash;
                 elseif chanNum == gwOfficerChannel.number then
                     tx_hash = gwOfficerChannel.tx_hash;
                 end
                 
-                rx_hash = GwStringHash(payload);
-                
-                GwDebug(4, format('rx_validate: tx_hash = 0x%04X, rx_hash = 0x%04X', tx_hash, rx_hash));
-                if tx_hash ~= rx_hash then
-                    GwError(format('Message failed due to channel corruption. Please disable add-ons that might modify messages on channel %d.', chanNum));
+                if tx_hash ~= nil then
+                    
+                    local hash = GwStringHash(payload);
+                    
+                    -- Search the sent message hash table for a match.
+                    if tx_hash[hash] == nil or tx_hash[hash] <= 0 then
+                        GwDebug(4, format('rx_validate: tx_hash[0x%04X] not found', hash));
+                        GwError(format('Message corruption detected.  Please disable add-ons that might modify messages on channel %d.', chanNum));
+                    else
+                        GwDebug(4, format('rx_validate: tx_hash[0x%04X] == %d', hash, tx_hash[hash]));
+                        tx_hash[hash] = tx_hash[hash] - 1;
+                        if tx_hash[hash] <= 0 then
+                            tx_hash[hash] = nil;
+                        end
+                    end
+                    
                 end
     
             end
@@ -1441,7 +1453,8 @@ function GreenWall_OnEvent(self, event, ...)
         GwDebug(5, format('on_event: system message: %s', message));
         
         local jpat = format(ERR_GUILD_JOIN_S, gwPlayerName);
-        local qpat = format(ERR_GUILD_LEAVE_RESULT);
+        local lpat = format(ERR_GUILD_LEAVE_S, gwPlayerName);
+        local qpat = format(ERR_GUILD_QUIT_S, gwPlayerName);
         local kpat = format(ERR_GUILD_REMOVE_SS, gwPlayerName, '(.+)');
         local rpat = format(ERR_GUILD_REMOVE_SS, '(.+)', gwPlayerName);
         local ppat = format(ERR_GUILD_PROMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
@@ -1453,7 +1466,7 @@ function GreenWall_OnEvent(self, event, ...)
             GwDebug(1, 'on_event: guild join detected.');
             GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('join'));
 
-        elseif message:match(qpat) or message:match(kpat) then
+        elseif message:match(lpat) or message:match(qpat) or message:match(kpat) then
         
             -- We have left the guild.
             GwDebug(1, 'on_event: guild quit detected.');
