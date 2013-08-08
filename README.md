@@ -1,12 +1,5 @@
 # User Documentation for GreenWall #
 
-----------
-
-Copyright (c) 2010-2013; Mark Rogaski.
-See LICENSE.md for licensing and copyright information.
-
-----------
-
 
 ## Frequently Asked Questions ##
 
@@ -34,6 +27,7 @@ No, you don't. But guild chat will be very, very frustrating for you if you don'
 The latest version is available at the following locations.
 
 [https://github.com/AIE-Guild/GreenWall/releases](https://github.com/AIE-Guild/GreenWall/releases)
+
 [http://wow.curse.com/downloads/wow-addons/details/greenwall.aspx](http://wow.curse.com/downloads/wow-addons/details/greenwall.aspx)
 
 It is also mirrored in WoWMatrix, but we make no guarantees about how frequently WoWMatrix updates or the integrity of the files that it provides.
@@ -174,8 +168,4 @@ refresh
 
 version
 > Print the installed version of GreenWall. 
-
-
-----------
-
 
