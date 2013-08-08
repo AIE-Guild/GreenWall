@@ -3,14 +3,6 @@ Guild Quickstart for GreenWall
 ==============================
 
 
-----------
-
-Copyright (c) 2010-2013; Mark Rogaski.
-
-See LICENSE.md for licensing and copyright information.
-
-----------
-
 Contents
 --------
 
@@ -107,6 +99,3 @@ By default, officer chat bridging is disabled in the client.  To participate acr
 
     GWa:secretSquirrels:rosebud
 
-
-
-----------
