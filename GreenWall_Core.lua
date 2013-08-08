@@ -1,10 +1,6 @@
 --[[-----------------------------------------------------------------------
 
-    $Id$
-
-    $HeadURL$
-
-    Copyright (c) 2010-2012; Mark Rogaski.
+    Copyright (c) 2010-2013; Mark Rogaski.
 
     All rights reserved.
 
@@ -1457,7 +1453,8 @@ function GreenWall_OnEvent(self, event, ...)
         GwDebug(5, format('on_event: system message: %s', message));
         
         local jpat = format(ERR_GUILD_JOIN_S, gwPlayerName);
-        local qpat = format(ERR_GUILD_LEAVE_RESULT);
+        local lpat = format(ERR_GUILD_LEAVE_S, gwPlayerName);
+        local qpat = format(ERR_GUILD_QUIT_S, gwPlayerName);
         local kpat = format(ERR_GUILD_REMOVE_SS, gwPlayerName, '(.+)');
         local rpat = format(ERR_GUILD_REMOVE_SS, '(.+)', gwPlayerName);
         local ppat = format(ERR_GUILD_PROMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
@@ -1469,7 +1466,7 @@ function GreenWall_OnEvent(self, event, ...)
             GwDebug(1, 'on_event: guild join detected.');
             GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('join'));
 
-        elseif message:match(qpat) or message:match(kpat) then
+        elseif message:match(lpat) or message:match(qpat) or message:match(kpat) then
         
             -- We have left the guild.
             GwDebug(1, 'on_event: guild quit detected.');
