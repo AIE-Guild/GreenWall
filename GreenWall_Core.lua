@@ -923,7 +923,7 @@ local function GwGetOfficerNoteConfig(chan)
     else
 
         -- update the channel control table
-        chan.name, chan.password = config:match('GW:a:([%w_]+):([%w_]*)');
+        chan.name, chan.password = config:match('GW:?a:([%w_]+):([%w_]*)');
         if chan.name ~= nil then
             chan.configured = true;
             GwDebug(2, format('officer_note: channel=<<%04X>>, password=<<%04X>>', 
