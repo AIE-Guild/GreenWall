@@ -1167,7 +1167,8 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHANNEL_UI_UPDATE');
     self:RegisterEvent('CHAT_MSG_ADDON');
     self:RegisterEvent('CHAT_MSG_CHANNEL');
-    -- self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN');
+    self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN');
+    self:RegisterEvent('CHAT_MSG_CHANNEL_LEAVE');
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE');
     -- self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE_USER');
     self:RegisterEvent('CHAT_MSG_GUILD');
@@ -1412,7 +1413,33 @@ function GreenWall_OnEvent(self, event, ...)
             
         end
         
-    elseif  event == 'CHANNEL_UI_UPDATE' then
+    elseif event == 'CHAT_MSG_CHANNEL_JOIN' then
+    
+        local _, player, _, _, _, _, _, number = select(1, ...);
+        
+        GwDebug(5, format('on_event: event=%s, channel=%s, player=%s', event, number, player));
+                
+        local guild = GetGuildInfo(player);
+        if guild == nil then
+            GwDebug(5, format('player_info: %s not in a guild', player));
+        else
+            GwDebug(5, format('player_info: %s is in <%s>', player, guild));
+        end
+    
+    elseif event == 'CHAT_MSG_CHANNEL_LEAVE' then
+    
+        local _, player, _, _, _, _, _, number = select(1, ...);
+        
+        GwDebug(5, format('on_event: event=%s, channel=%s, player=%s', event, number, player));
+                
+        local guild = GetGuildInfo(player);
+        if guild == nil then
+            GwDebug(5, format('player_info: %s not in a guild', player));
+        else
+            GwDebug(5, format('player_info: %s is in <%s>', player, guild));
+        end
+        
+    elseif event == 'CHANNEL_UI_UPDATE' then
     
         if gwGuildName ~= nil then
             GwRefreshComms();
