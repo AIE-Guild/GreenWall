@@ -85,7 +85,7 @@ local gwUsage = [[
   achievements <on|off>
         -- Toggle display of confederation achievements.
   roster <on|off>
-        -- Toggle display of confederation join and leave messages.
+        -- Toggle display of confederation online, offline, join, and leave messages.
   rank <on|off>
         -- Toggle display of confederation promotion and demotion messages.
   tag <on|off>
@@ -129,6 +129,14 @@ local gwOfficerChannel 	= {};
 local gwAddonLoaded     = false;
 local gwFlagChatBlock   = true;
 local gwStateSendWho    = 0;
+
+
+--
+-- Cache tables
+--
+
+local gwComemberCache   = {};
+local gwComemberTimeout = 180;
 
 
 --
@@ -409,7 +417,11 @@ local function GwReplicateMessage(target, sender, container, language, flags,
         return;
     end
     
-    if GreenWall.tag then
+    if sender == nil then
+        sender = '*';
+    end
+    
+    if GreenWall.tag and container ~= nil then
         message = format('<%s> %s', container, message);
     end
     
@@ -1167,9 +1179,9 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHANNEL_UI_UPDATE');
     self:RegisterEvent('CHAT_MSG_ADDON');
     self:RegisterEvent('CHAT_MSG_CHANNEL');
-    -- self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN');
+    self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN');
+    self:RegisterEvent('CHAT_MSG_CHANNEL_LEAVE');
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE');
-    -- self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE_USER');
     self:RegisterEvent('CHAT_MSG_GUILD');
     self:RegisterEvent('CHAT_MSG_OFFICER');
     self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT');
@@ -1226,6 +1238,7 @@ function GreenWall_OnEvent(self, event, ...)
         return;  -- early exit
     end
 
+    local timestamp = time();
 
     if event == 'CHAT_MSG_CHANNEL' then
     
@@ -1250,11 +1263,11 @@ function GreenWall_OnEvent(self, event, ...)
                     -- Incoming request
                     --
                     if message:match('^reload(%w.*)?$') then 
-                        local diff = time() - gwReloadHoldTime;
+                        local diff = timestamp - gwReloadHoldTime;
                         GwWrite(format('Received configuration reload request from %s.', sender));
                         if diff >= gwReloadHoldInt then
                             GwDebug(2, 'on_event: initiating reload.');
-                            gwReloadHoldTime = time();
+                            gwReloadHoldTime = timestamp;
                             gwCommonChannel.configured = false;
                             gwOfficerChannel.configured = false;
                             GuildRoster();
@@ -1412,7 +1425,39 @@ function GreenWall_OnEvent(self, event, ...)
             
         end
         
-    elseif  event == 'CHANNEL_UI_UPDATE' then
+    elseif event == 'CHAT_MSG_CHANNEL_JOIN' then
+    
+        local _, player, _, _, _, _, _, number = select(1, ...);
+        GwDebug(5, format('chan_join: channel=%s, player=%s', number, player));
+        
+        if number == gwCommonChannel.number then
+            if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
+                if gwComemberCache[player] then
+                    GwDebug(5, format('comember_cache: hit %s', player));
+                else
+                    GwDebug(5, format('comember_cache: miss %s', player));
+                    GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_ONLINE_SS, player, player), nil, nil);
+                end
+            end
+        end
+    
+    elseif event == 'CHAT_MSG_CHANNEL_LEAVE' then
+    
+        local _, player, _, _, _, _, _, number = select(1, ...);
+        GwDebug(5, format('chan_leave: channel=%s, player=%s', number, player));
+        
+        if number == gwCommonChannel.number then
+            if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
+                if gwComemberCache[player] then
+                    GwDebug(5, format('comember_cache: hit %s', player));
+                else
+                    GwDebug(5, format('comember_cache: miss %s', player));
+                    GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_OFFLINE_S, player), nil, nil);
+                end
+            end
+        end
+                        
+    elseif event == 'CHANNEL_UI_UPDATE' then
     
         if gwGuildName ~= nil then
             GwRefreshComms();
@@ -1452,21 +1497,37 @@ function GreenWall_OnEvent(self, event, ...)
         
         GwDebug(5, format('on_event: system message: %s', message));
         
-        local jpat = format(ERR_GUILD_JOIN_S, gwPlayerName);
-        local lpat = format(ERR_GUILD_LEAVE_S, gwPlayerName);
-        local qpat = format(ERR_GUILD_QUIT_S, gwPlayerName);
-        local kpat = format(ERR_GUILD_REMOVE_SS, gwPlayerName, '(.+)');
-        local rpat = format(ERR_GUILD_REMOVE_SS, '(.+)', gwPlayerName);
-        local ppat = format(ERR_GUILD_PROMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
-        local dpat = format(ERR_GUILD_DEMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
+        local pat_online = string.gsub(format(ERR_FRIEND_ONLINE_SS, '(.+)', '(.+)'), '%[', '%%[');
+        local pat_offline = format(ERR_FRIEND_OFFLINE_S, '(.+)')
+        local pat_join = format(ERR_GUILD_JOIN_S, gwPlayerName);
+        local pat_leave = format(ERR_GUILD_LEAVE_S, gwPlayerName);
+        local pat_quit = format(ERR_GUILD_QUIT_S, gwPlayerName);
+        local pat_removed = format(ERR_GUILD_REMOVE_SS, gwPlayerName, '(.+)');
+        local pat_kick = format(ERR_GUILD_REMOVE_SS, '(.+)', gwPlayerName);
+        local pat_promote = format(ERR_GUILD_PROMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
+        local pat_demote = format(ERR_GUILD_DEMOTE_SSS, gwPlayerName, '(.+)', '(.+)'); 
         
-        if message:match(jpat) then
+        if message:match(pat_online) then
+        
+            local _, player = message:match(pat_online);
+            GwDebug(2, format('player_status: player %s online', player));
+            gwComemberCache[player] = timestamp;
+            GwDebug(5, format('comember_cache: added %s', player));
+        
+        elseif message:match(pat_offline) then
+        
+            local player = message:match(pat_offline);
+            GwDebug(2, format('player_status: player %s offline', player));
+            gwComemberCache[player] = timestamp;
+            GwDebug(5, format('comember_cache: added %s', player));
+        
+        elseif message:match(pat_join) then
 
             -- We have joined the guild.
             GwDebug(1, 'on_event: guild join detected.');
             GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('join'));
 
-        elseif message:match(lpat) or message:match(qpat) or message:match(kpat) then
+        elseif message:match(pat_leave) or message:match(pat_quit) or message:match(pat_removed) then
         
             -- We have left the guild.
             GwDebug(1, 'on_event: guild quit detected.');
@@ -1480,20 +1541,20 @@ function GreenWall_OnEvent(self, event, ...)
                 gwOfficerChannel = GwNewChannelTable();
             end
 
-        elseif message:match(rpat) then
+        elseif message:match(pat_kick) then
             
-            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('remove', message:match(rpat)));
+            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('remove', message:match(pat_kick)));
         
-        elseif message:match(ppat) then
+        elseif message:match(pat_promote) then
             
-            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('promote', message:match(ppat)));
+            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('promote', message:match(pat_promote)));
         
-        elseif message:match(dpat) then
+        elseif message:match(pat_demote) then
             
-            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('demote', message:match(dpat)));
+            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('demote', message:match(pat_demote)));
         
         end
-        
+
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
         gwGuildName = GetGuildInfo('Player');
@@ -1504,7 +1565,6 @@ function GreenWall_OnEvent(self, event, ...)
             GwDebug(2, format('guild_info: co-guild is %s.', gwGuildName));
         end
             
-        local timestamp = time();
         local holdtime = timestamp - gwConfigHoldTime;
         GwDebug(5, format('config_reload: common_conf=%s, officer_conf=%s, holdtime=%d, holdint=%d',
                 tostring(gwCommonChannel.configured), tostring(gwOfficerChannel.configured), holdtime, gwConfigHoldInt));
@@ -1552,7 +1612,7 @@ function GreenWall_OnEvent(self, event, ...)
         gwFlagChatBlock = true;
         
         -- Timer in case player has left General at some point
-        gwChatBlockTimestamp = time() + gwChatBlockTimeout;
+        gwChatBlockTimestamp = timestamp + gwChatBlockTimeout;
     
     end
 
@@ -1561,14 +1621,25 @@ function GreenWall_OnEvent(self, event, ...)
     --
     
     if gwFlagChatBlock then
-        if gwChatBlockTimestamp <= time() then
+        if gwChatBlockTimestamp <= timestamp then
             -- Give up
             GwDebug(2, 'on_event: reconnect deferral timeout expired.');
             gwFlagChatBlock = false;
             GwRefreshComms();
         end
     end
-
+    
+    --
+    -- Prune co-member cache.
+    --
+    local index, value;
+    for index, value in pairs(gwComemberCache) do
+        if timestamp > gwComemberCache[index] + gwComemberTimeout then
+            gwComemberCache[index] = nil;
+            GwDebug(5, format('comember_cache: deleted %s', index));
+        end
+    end
+        
 end
 
 
