@@ -85,7 +85,7 @@ local gwUsage = [[
   achievements <on|off>
         -- Toggle display of confederation achievements.
   roster <on|off>
-        -- Toggle display of confederation join and leave messages.
+        -- Toggle display of confederation online, offline, join, and leave messages.
   rank <on|off>
         -- Toggle display of confederation promotion and demotion messages.
   tag <on|off>
@@ -1431,7 +1431,7 @@ function GreenWall_OnEvent(self, event, ...)
         GwDebug(5, format('chan_join: channel=%s, player=%s', number, player));
         
         if number == gwCommonChannel.number then
-            if GetCVar('guildMemberNotify') == '1' then
+            if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
                 if gwComemberCache[player] then
                     GwDebug(5, format('comember_cache: hit %s', player));
                 else
@@ -1447,7 +1447,7 @@ function GreenWall_OnEvent(self, event, ...)
         GwDebug(5, format('chan_leave: channel=%s, player=%s', number, player));
         
         if number == gwCommonChannel.number then
-            if GetCVar('guildMemberNotify') == '1' then
+            if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
                 if gwComemberCache[player] then
                     GwDebug(5, format('comember_cache: hit %s', player));
                 else
