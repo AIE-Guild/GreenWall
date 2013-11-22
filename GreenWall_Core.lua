@@ -1191,6 +1191,44 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('PLAYER_GUILD_UPDATE');
     self:RegisterEvent('PLAYER_LOGIN');
     
+    --
+    -- Add a tab to the Interface Options panel.
+    --
+    self.name = 'GreenWall ' .. gwVersion;
+    self.refresh = function (self) return; end;
+    self.okay = function (self) return; end;
+    self.cancel = function (self) return; end;
+    self.default = function (self) return; end;
+    InterfaceOptions_AddCategory(self);
+        
+end
+
+
+--- Initialize options to default values.
+-- @param soft If true, set only undefined options to the default values.
+local function GwSetDefaults(soft)
+
+    if soft == nil then
+        soft = false;
+    else
+        soft = true;
+    end
+
+    if GreenWall == nil then
+        GreenWall = {};
+    end
+
+    for k, p in pairs(gwDefaults) do
+        if not soft or GreenWall[k] == nil then
+            GreenWall[k] = p['default'];
+        end
+    end
+    GreenWall.version = gwVersion;
+
+    if GreenWallLog == nil then
+        GreenWallLog = {};
+    end
+
 end
 
 
@@ -1210,19 +1248,7 @@ function GreenWall_OnEvent(self, event, ...)
         --
         -- Initialize the saved variables
         --
-        if GreenWall == nil then
-            GreenWall = {};
-        end
-        for k, p in pairs(gwDefaults) do
-            if GreenWall[k] == nil then
-                GreenWall[k] = p['default'];
-            end
-        end
-        GreenWall.version = gwVersion;
-
-        if GreenWallLog == nil then
-            GreenWallLog = {};
-        end
+        GwSetDefaults(true);
 
         --
         -- Thundercats are go!
