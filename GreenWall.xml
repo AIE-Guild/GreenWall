@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (c) 2010-2013; Mark Rogaski.
+    Copyright (c) 2010-2014; Mark Rogaski.
 
     All rights reserved.
 
@@ -42,7 +42,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
         <Scripts>
             <OnLoad>GreenWall_OnLoad(self);</OnLoad>
             <OnEvent>GreenWall_OnEvent(self, event, ...);</OnEvent>
-        </Scripts>
+            <OnShow>GreenWallInterfaceFrame_OnShow(self);</OnShow></Scripts>
         <Layers>
             <Layer level="OVERLAY">
                 <FontString name="$parentTitle" text="GreenWall" inherits="GameFontNormalLarge" justifyH="LEFT" justifyV="TOP">
@@ -73,5 +73,97 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                 </FontString>
             </Layer>
         </Layers>
+        <Frames>
+        	<CheckButton name="$parentOptionTag" inherits="InterfaceOptionsCheckButtonTemplate">
+        		<Anchors>
+        			<Anchor point="TOPLEFT" relativeTo="$parentSubText"
+        				relativePoint="BOTTOMLEFT">
+        				<Offset>
+        					<AbsDimension x="-2" y="-8"></AbsDimension></Offset>
+        			</Anchor>
+        		</Anchors>
+        		<Scripts>
+        			<OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Tags");</OnLoad>
+        	    </Scripts>
+        	</CheckButton>
+            <CheckButton name="$parentOptionAchievements" inherits="InterfaceOptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentOptionTag"
+                        relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-8"></AbsDimension></Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Achievement Announcements");</OnLoad>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentOptionRoster" inherits="InterfaceOptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentOptionAchievements"
+                        relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-8"></AbsDimension></Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Roster Announcements");</OnLoad>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentOptionRank" inherits="InterfaceOptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRoster"
+                        relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-8"></AbsDimension></Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Rank Announcements");</OnLoad>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentOptionOfficerChat" inherits="InterfaceOptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRank"
+                        relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-8"></AbsDimension></Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>getglobal(self:GetName().."Text"):SetText("Bridge Officer Chat");</OnLoad>
+                </Scripts>
+            </CheckButton>
+            <Frame name="$parentOptionDebug" inherits="UIDropDownMenuTemplate" enableMouse="true">
+            	<Anchors>
+            		<Anchor point="TOPLEFT"
+            			relativeTo="$parentOptionOfficerChat" relativePoint="BOTTOMLEFT">
+            			<Offset>
+            				<AbsDimension x="0" y="-40"></AbsDimension></Offset>
+            		</Anchor></Anchors>
+            	<Layers>
+            		<Layer level="BACKGROUND">
+            			<FontString name="$parentLabel"
+            				inherits="GameFontHighlight" text="Debugging Level">
+            				<Anchors>
+            					<Anchor point="BOTTOMLEFT"
+            						relativePoint="TOPLEFT">
+            						<Offset>
+            							<AbsDimension x="0" y="4"></AbsDimension></Offset>
+            					</Anchor></Anchors>
+            			</FontString></Layer></Layers>
+            	<Scripts>
+            	   <OnLoad>self.type = CONTROLTYPE_DROPDOWN;</OnLoad>
+                   <OnEnter>
+                       if ( not self.isDisabled ) then
+                           GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+                           <!-- GameTooltip:SetText(self.tooltip, nil, nil, nil, nil, 1); -->
+                       end
+                   </OnEnter>
+                   <OnEvent function="InterfaceOptionsCameraPanelStyleDropDown_OnEvent"/>
+                   <OnLeave function="GameTooltip_Hide"/>
+                </Scripts>
+            </Frame>
+        </Frames>
     </Frame>
 </Ui>

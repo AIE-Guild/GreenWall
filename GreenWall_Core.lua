@@ -1,6 +1,6 @@
 --[[-----------------------------------------------------------------------
 
-    Copyright (c) 2010-2013; Mark Rogaski.
+    Copyright (c) 2010-2014; Mark Rogaski.
 
     All rights reserved.
 
@@ -1001,6 +1001,36 @@ local function GwForceReload()
     if GwIsConnected(gwCommonChannel) then
         GwSendConfederationMsg(gwCommonChannel, 'request', 'reload');
     end 
+end
+
+
+--[[-----------------------------------------------------------------------
+
+UI Handlers
+
+--]]-----------------------------------------------------------------------
+
+function GreenWallInterfaceFrame_OnShow(self)
+    if (not gwAddonLoaded) then
+        -- Configuration not loaded.
+        self:Hide();
+        return;
+    end
+    
+    -- Populate interface panel.
+    getglobal(self:GetName().."OptionTag"):SetChecked(GreenWall.tag)
+    getglobal(self:GetName().."OptionAchievements"):SetChecked(GreenWall.achievements)
+    getglobal(self:GetName().."OptionRoster"):SetChecked(GreenWall.roster)
+    getglobal(self:GetName().."OptionRank"):SetChecked(GreenWall.rank)
+    if (GwIsOfficer()) then
+        getglobal(self:GetName().."OptionOfficerChat"):SetChecked(GreenWall.ochat)
+        getglobal(self:GetName().."OptionOfficerChatText"):SetTextColor(1, 1, 1)
+        getglobal(self:GetName().."OptionOfficerChat"):Enable();
+    else
+        getglobal(self:GetName().."OptionOfficerChat"):SetChecked(false)
+        getglobal(self:GetName().."OptionOfficerChatText"):SetTextColor(.5, .5, .5)
+        getglobal(self:GetName().."OptionOfficerChat"):Disable();
+    end
 end
 
 
