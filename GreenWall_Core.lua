@@ -1033,6 +1033,24 @@ function GreenWallInterfaceFrame_OnShow(self)
     end
 end
 
+function GreenWallInterfaceFrame_SaveUpdates(self)
+    GreenWall.tag = getglobal(self:GetName().."OptionTag"):GetChecked() and true or false;
+    GreenWall.achievements = getglobal(self:GetName().."OptionAchievements"):GetChecked() and true or false;
+    GreenWall.roster = getglobal(self:GetName().."OptionRoster"):GetChecked() and true or false;
+    GreenWall.rank = getglobal(self:GetName().."OptionRank"):GetChecked() and true or false;
+    if (GwIsOfficer()) then
+        GreenWall.ochat = getglobal(self:GetName().."OptionOfficerChat"):GetChecked() and true or false;
+    end    
+end
+
+function GreenWallInterfaceFrame_SetDefaults(self)
+    GreenWall.tag = gwDefaults['tag']['default'];
+    GreenWall.achievements = gwDefaults['achievements']['default'];
+    GreenWall.roster = gwDefaults['roster']['default'];
+    GreenWall.rank = gwDefaults['rank']['default'];
+    GreenWall.ochat = gwDefaults['ochat']['default'];
+end
+
 
 --[[-----------------------------------------------------------------------
 
@@ -1225,10 +1243,10 @@ function GreenWall_OnLoad(self)
     -- Add a tab to the Interface Options panel.
     --
     self.name = 'GreenWall ' .. gwVersion;
-    self.refresh = function (self) return; end;
-    self.okay = function (self) return; end;
+    self.refresh = function (self) GreenWallInterfaceFrame_OnShow(self); end;
+    self.okay = function (self) GreenWallInterfaceFrame_SaveUpdates(self); end;
     self.cancel = function (self) return; end;
-    self.default = function (self) return; end;
+    self.default = function (self) GreenWallInterfaceFrame_SetDefaults(self); end;
     InterfaceOptions_AddCategory(self);
         
 end

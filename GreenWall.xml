@@ -37,133 +37,109 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
-    <Script file="GreenWall_Core.lua"/>
-    <Frame name="GreenWallCoreFrame">
-        <Scripts>
-            <OnLoad>GreenWall_OnLoad(self);</OnLoad>
-            <OnEvent>GreenWall_OnEvent(self, event, ...);</OnEvent>
-            <OnShow>GreenWallInterfaceFrame_OnShow(self);</OnShow></Scripts>
-        <Layers>
-            <Layer level="OVERLAY">
-                <FontString name="$parentTitle" text="GreenWall" inherits="GameFontNormalLarge" justifyH="LEFT" justifyV="TOP">
-                    <Anchors>
-                        <Anchor point="TOPLEFT">
-                            <Offset>
-                                <AbsDimension x="16" y="-16"/>
-                            </Offset>
-                        </Anchor>
-                    </Anchors>
-                </FontString>
-                <FontString name="$parentSubText" text="These options affect the communications between co-guilds in a GreenWall confederation.  However, you do not need to configure anything to use GreenWall." inherits="GameFontHighlightSmall" nonspacewrap="true" maxLines="3" justifyH="LEFT" justifyV="TOP">
-                    <Size>
-                        <AbsDimension y="32" x="0"/>
-                    </Size>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativeTo="$parentTitle" relativePoint="BOTTOMLEFT">
-                            <Offset>
-                                <AbsDimension x="0" y="-8"/>
-                            </Offset>
-                        </Anchor>
-                        <Anchor point="RIGHT">
-                            <Offset>
-                                <AbsDimension x="-32" y="0"/>
-                            </Offset>
-                        </Anchor>
-                    </Anchors>
-                </FontString>
-            </Layer>
-        </Layers>
-        <Frames>
-        	<CheckButton name="$parentOptionTag" inherits="InterfaceOptionsCheckButtonTemplate">
-        		<Anchors>
-        			<Anchor point="TOPLEFT" relativeTo="$parentSubText"
+	<Script file="GreenWall_Core.lua"/>
+	<Frame name="GreenWallInterfaceFrame">
+		<Scripts>
+			<OnLoad>GreenWall_OnLoad(self);</OnLoad>
+			<OnEvent>GreenWall_OnEvent(self, event, ...);</OnEvent>
+			<OnShow>GreenWallInterfaceFrame_OnShow(self);</OnShow>
+		</Scripts>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentTitle" text="GreenWall" inherits="GameFontNormalLarge" justifyH="LEFT" justifyV="TOP">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="16" y="-16"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentSubText" text="These options affect the communications between co-guilds in a GreenWall confederation.  However, you do not need to configure anything to use GreenWall." inherits="GameFontHighlightSmall" nonspacewrap="true" maxLines="3" justifyH="LEFT" justifyV="TOP">
+					<Size>
+						<AbsDimension y="32" x="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTitle" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-8"/>
+							</Offset>
+						</Anchor>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="-32" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="$parentOptionTag" inherits="InterfaceOptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSubText"
         				relativePoint="BOTTOMLEFT">
-        				<Offset>
-        					<AbsDimension x="-2" y="-8"></AbsDimension></Offset>
-        			</Anchor>
-        		</Anchors>
-        		<Scripts>
-        			<OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Tags");</OnLoad>
-        	    </Scripts>
-        	</CheckButton>
-            <CheckButton name="$parentOptionAchievements" inherits="InterfaceOptionsCheckButtonTemplate">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionTag"
+						<Offset>
+							<AbsDimension x="-2" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Tags");</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentOptionAchievements" inherits="InterfaceOptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentOptionTag"
                         relativePoint="BOTTOMLEFT">
-                        <Offset>
-                            <AbsDimension x="0" y="-8"></AbsDimension></Offset>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Achievement Announcements");</OnLoad>
-                </Scripts>
-            </CheckButton>
-            <CheckButton name="$parentOptionRoster" inherits="InterfaceOptionsCheckButtonTemplate">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionAchievements"
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Achievement Announcements");</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentOptionRoster" inherits="InterfaceOptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentOptionAchievements"
                         relativePoint="BOTTOMLEFT">
-                        <Offset>
-                            <AbsDimension x="0" y="-8"></AbsDimension></Offset>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Roster Announcements");</OnLoad>
-                </Scripts>
-            </CheckButton>
-            <CheckButton name="$parentOptionRank" inherits="InterfaceOptionsCheckButtonTemplate">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRoster"
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Roster Announcements");</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentOptionRank" inherits="InterfaceOptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentOptionRoster"
                         relativePoint="BOTTOMLEFT">
-                        <Offset>
-                            <AbsDimension x="0" y="-8"></AbsDimension></Offset>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Rank Announcements");</OnLoad>
-                </Scripts>
-            </CheckButton>
-            <CheckButton name="$parentOptionOfficerChat" inherits="InterfaceOptionsCheckButtonTemplate">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRank"
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Rank Announcements");</OnLoad>
+				</Scripts>
+			</CheckButton>
+			<CheckButton name="$parentOptionOfficerChat" inherits="InterfaceOptionsCheckButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentOptionRank"
                         relativePoint="BOTTOMLEFT">
-                        <Offset>
-                            <AbsDimension x="0" y="-8"></AbsDimension></Offset>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnLoad>getglobal(self:GetName().."Text"):SetText("Bridge Officer Chat");</OnLoad>
-                </Scripts>
-            </CheckButton>
-            <Frame name="$parentOptionDebug" inherits="UIDropDownMenuTemplate" enableMouse="true">
-            	<Anchors>
-            		<Anchor point="TOPLEFT"
-            			relativeTo="$parentOptionOfficerChat" relativePoint="BOTTOMLEFT">
-            			<Offset>
-            				<AbsDimension x="0" y="-40"></AbsDimension></Offset>
-            		</Anchor></Anchors>
-            	<Layers>
-            		<Layer level="BACKGROUND">
-            			<FontString name="$parentLabel"
-            				inherits="GameFontHighlight" text="Debugging Level">
-            				<Anchors>
-            					<Anchor point="BOTTOMLEFT"
-            						relativePoint="TOPLEFT">
-            						<Offset>
-            							<AbsDimension x="0" y="4"></AbsDimension></Offset>
-            					</Anchor></Anchors>
-            			</FontString></Layer></Layers>
-            	<Scripts>
-            	   <OnLoad>self.type = CONTROLTYPE_DROPDOWN;</OnLoad>
-                   <OnEnter>
-                       if ( not self.isDisabled ) then
-                           GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
-                           <!-- GameTooltip:SetText(self.tooltip, nil, nil, nil, nil, 1); -->
-                       end
-                   </OnEnter>
-                   <OnEvent function="InterfaceOptionsCameraPanelStyleDropDown_OnEvent"/>
-                   <OnLeave function="GameTooltip_Hide"/>
-                </Scripts>
-            </Frame>
-        </Frames>
-    </Frame>
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>getglobal(self:GetName().."Text"):SetText("Bridge Officer Chat");</OnLoad>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+	</Frame>
 </Ui>
