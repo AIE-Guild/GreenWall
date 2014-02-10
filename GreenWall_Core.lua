@@ -1006,6 +1006,54 @@ end
 
 --[[-----------------------------------------------------------------------
 
+UI Handlers
+
+--]]-----------------------------------------------------------------------
+
+function GreenWallInterfaceFrame_OnShow(self)
+    if (not gwAddonLoaded) then
+        -- Configuration not loaded.
+        self:Hide();
+        return;
+    end
+    
+    -- Populate interface panel.
+    getglobal(self:GetName().."OptionTag"):SetChecked(GreenWall.tag)
+    getglobal(self:GetName().."OptionAchievements"):SetChecked(GreenWall.achievements)
+    getglobal(self:GetName().."OptionRoster"):SetChecked(GreenWall.roster)
+    getglobal(self:GetName().."OptionRank"):SetChecked(GreenWall.rank)
+    if (GwIsOfficer()) then
+        getglobal(self:GetName().."OptionOfficerChat"):SetChecked(GreenWall.ochat)
+        getglobal(self:GetName().."OptionOfficerChatText"):SetTextColor(1, 1, 1)
+        getglobal(self:GetName().."OptionOfficerChat"):Enable();
+    else
+        getglobal(self:GetName().."OptionOfficerChat"):SetChecked(false)
+        getglobal(self:GetName().."OptionOfficerChatText"):SetTextColor(.5, .5, .5)
+        getglobal(self:GetName().."OptionOfficerChat"):Disable();
+    end
+end
+
+function GreenWallInterfaceFrame_SaveUpdates(self)
+    GreenWall.tag = getglobal(self:GetName().."OptionTag"):GetChecked() and true or false;
+    GreenWall.achievements = getglobal(self:GetName().."OptionAchievements"):GetChecked() and true or false;
+    GreenWall.roster = getglobal(self:GetName().."OptionRoster"):GetChecked() and true or false;
+    GreenWall.rank = getglobal(self:GetName().."OptionRank"):GetChecked() and true or false;
+    if (GwIsOfficer()) then
+        GreenWall.ochat = getglobal(self:GetName().."OptionOfficerChat"):GetChecked() and true or false;
+    end    
+end
+
+function GreenWallInterfaceFrame_SetDefaults(self)
+    GreenWall.tag = gwDefaults['tag']['default'];
+    GreenWall.achievements = gwDefaults['achievements']['default'];
+    GreenWall.roster = gwDefaults['roster']['default'];
+    GreenWall.rank = gwDefaults['rank']['default'];
+    GreenWall.ochat = gwDefaults['ochat']['default'];
+end
+
+
+--[[-----------------------------------------------------------------------
+
 Slash Command Handler
 
 --]]-----------------------------------------------------------------------
@@ -1191,6 +1239,44 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('PLAYER_GUILD_UPDATE');
     self:RegisterEvent('PLAYER_LOGIN');
     
+    --
+    -- Add a tab to the Interface Options panel.
+    --
+    self.name = 'GreenWall ' .. gwVersion;
+    self.refresh = function (self) GreenWallInterfaceFrame_OnShow(self); end;
+    self.okay = function (self) GreenWallInterfaceFrame_SaveUpdates(self); end;
+    self.cancel = function (self) return; end;
+    self.default = function (self) GreenWallInterfaceFrame_SetDefaults(self); end;
+    InterfaceOptions_AddCategory(self);
+        
+end
+
+
+--- Initialize options to default values.
+-- @param soft If true, set only undefined options to the default values.
+local function GwSetDefaults(soft)
+
+    if soft == nil then
+        soft = false;
+    else
+        soft = true;
+    end
+
+    if GreenWall == nil then
+        GreenWall = {};
+    end
+
+    for k, p in pairs(gwDefaults) do
+        if not soft or GreenWall[k] == nil then
+            GreenWall[k] = p['default'];
+        end
+    end
+    GreenWall.version = gwVersion;
+
+    if GreenWallLog == nil then
+        GreenWallLog = {};
+    end
+
 end
 
 
@@ -1210,19 +1296,7 @@ function GreenWall_OnEvent(self, event, ...)
         --
         -- Initialize the saved variables
         --
-        if GreenWall == nil then
-            GreenWall = {};
-        end
-        for k, p in pairs(gwDefaults) do
-            if GreenWall[k] == nil then
-                GreenWall[k] = p['default'];
-            end
-        end
-        GreenWall.version = gwVersion;
-
-        if GreenWallLog == nil then
-            GreenWallLog = {};
-        end
+        GwSetDefaults(true);
 
         --
         -- Thundercats are go!
