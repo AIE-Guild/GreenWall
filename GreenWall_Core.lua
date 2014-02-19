@@ -107,7 +107,7 @@ local gwUsage = [[
 -- Player variables
 --
 
-local gwPlayerName      = UnitName('Player');
+local gwPlayerName      = UnitName('player') .. '-' .. GetRealmName():gsub("%s+", "");
 local gwGuildName       = nil;  -- wait until guild info is retrieved. 
 local gwPlayerLanguage  = GetDefaultLanguage('Player');
 
@@ -1320,6 +1320,7 @@ function GreenWall_OnEvent(self, event, ...)
                 chanNum, _, _, counter, guid = select(1, ...);
         
         GwDebug(3, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
+        GwDebug(5, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
         
         if chanNum == gwCommonChannel.number or chanNum == gwOfficerChannel.number then
         
@@ -1438,6 +1439,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
+        GwDebug(5, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName then
             GwSendConfederationMsg(gwCommonChannel, 'chat', message);        
         end
@@ -1445,6 +1447,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_OFFICER' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
+        GwDebug(5, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName and GreenWall.ochat then
             GwSendConfederationMsg(gwOfficerChannel, 'chat', message);        
         end
@@ -1452,6 +1455,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
     
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...);
+        GwDebug(5, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName then
             GwSendConfederationMsg(gwCommonChannel, 'achievement', message);
         end
@@ -1462,8 +1466,8 @@ function GreenWall_OnEvent(self, event, ...)
         
         GwDebug(5, format('on_event: event=%s, prefix=%s, sender=%s, dist=%s, message=%s',
                 event, prefix, sender, dist, message));
-        
         GwDebug(3, format('Rx<ADDON(%s), %s>: %s', prefix, sender, message));
+        GwDebug(5, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
         
         if prefix == 'GreenWall' and dist == 'GUILD' and sender ~= gwPlayerName then
         

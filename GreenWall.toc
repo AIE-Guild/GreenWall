@@ -8,6 +8,6 @@
 ## DefaultState: enabled
 ## SavedVariablesPerCharacter: GreenWall,GreenWallLog
 ## X-Category: Guild
-## X-Date: 01/20/2014
+## X-Date: 02/18/2014
 
 GreenWall.xml
