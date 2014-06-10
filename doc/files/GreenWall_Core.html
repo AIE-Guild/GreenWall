@@ -118,6 +118,16 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#GwGlobalName">GwGlobalName</a>&nbsp;(name, realm)</td>
+	<td class="summary">Format name for cross-realm addressing.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwGuildName">GwGuildName</a>&nbsp;(target)</td>
+	<td class="summary">Get the player's fully-qualified guild name.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#GwIsConnected">GwIsConnected</a>&nbsp;(chan)</td>
 	<td class="summary">Check if a connection exists to the common chat.</td>
 	</tr>
@@ -175,6 +185,11 @@
 	<tr>
 	<td class="name" nowrap><a href="#GwSendContainerMsg">GwSendContainerMsg</a>&nbsp;(type, message)</td>
 	<td class="summary">Sends an encoded message to the rest of the same container on the add-on channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwSetDefaults">GwSetDefaults</a>&nbsp;(soft)</td>
+	<td class="summary">Initialize options to default values.</td>
 	</tr>
 
 	<tr>
@@ -537,6 +552,68 @@ True if successful, false otherwise.
 
 
 
+<dt><a name="GwGlobalName"></a><strong>GwGlobalName</strong>&nbsp;(name, realm)</dt>
+<dd>
+Format name for cross-realm addressing.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  name: Character name or guild name.
+	</li>
+	
+	<li>
+	  realm: Name of the realm.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+A formatted cross-realm address.
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwGuildName"></a><strong>GwGuildName</strong>&nbsp;(target)</dt>
+<dd>
+Get the player's fully-qualified guild name.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  target: (optional) unit ID, default is 'Player'.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+A qualified guild name or nil if the player is not in a guild.
+
+
+
+</dd>
+
+
+
+
 <dt><a name="GwIsConnected"></a><strong>GwIsConnected</strong>&nbsp;(chan)</dt>
 <dd>
 Check if a connection exists to the common chat.
@@ -857,6 +934,32 @@ Sends an encoded message to the rest of the same container on the add-on channel
 	
 	<li>
 	  message: Text of the message.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwSetDefaults"></a><strong>GwSetDefaults</strong>&nbsp;(soft)</dt>
+<dd>
+Initialize options to default values.
+
+
+<h3>Parameters</h3>
+<ul>
+	
+	<li>
+	  soft: If true, set only undefined options to the default values.
 	</li>
 	
 </ul>
