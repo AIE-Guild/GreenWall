@@ -120,9 +120,11 @@ local gwUsage = [[
 -- Player variables
 --
 
-local gwPlayerName      = UnitName('player') .. '-' .. GetRealmName():gsub("%s+", "");
-local gwGuildName       = nil;  -- wait until guild info is retrieved. 
-local gwPlayerLanguage  = GetDefaultLanguage('Player');
+local gwRealmName       = GetRealmName()
+local gwPlayerShortName = UnitName('player')
+local gwPlayerName      = gwPlayerShortName .. '-' .. gwRealmName:gsub("%s+", "")
+local gwGuildName       = nil  -- wait until guild info is retrieved. 
+local gwPlayerLanguage  = GetDefaultLanguage('Player')
 
 
 --
@@ -242,6 +244,42 @@ local function GwDebug(level, msg)
         end
     end
     
+end
+
+
+--- Format name for cross-realm addressing.
+-- @param name Character name or guild name.
+-- @param realm Name of the realm.
+-- @return A formatted cross-realm address.
+local function GwGlobalName(name, realm)
+
+    -- Pass formatted names without modification.
+    if name:match('.+-%a+$') then
+        return name
+    end
+
+    -- Use local realm as the default.
+    if realm == nil then
+        realm = gwRealmName
+    end
+
+    return name .. '-' .. realm:gsub("%s+", "")
+
+end
+
+
+--- Get the player's fully-qualified guild name.
+-- @param target (optional) unit ID, default is 'Player'.
+-- @return A qualified guild name or nil if the player is not in a guild.
+local function GwGuildName(target)
+    if target == nil then
+        target = 'Player'
+    end
+    local name = GetGuildInfo(target)
+    if name == nil then
+        return
+    end
+    return GwGlobalName(name)
 end
 
 
@@ -763,12 +801,12 @@ local function GwGetGuildInfoConfig(chan)
 
         -- Make sure we know which co-guild we are in.
         if gwGuildName == nil or gwGuildName == '' then
-            gwGuildName = GetGuildInfo('Player');
+            gwGuildName = GwGuildName()
             if gwGuildName == nil then
-                GwDebug(D_ERROR, 'guild_info: co-guild unavailable.');
-                return false;
+                GwDebug(D_ERROR, 'guild_info: co-guild unavailable.')
+                return false
             else
-                GwDebug(D_INFO, format('guild_info: co-guild is %s.', gwGuildName));
+                GwDebug(D_INFO, format('guild_info: co-guild is %s.', gwGuildName))
             end
         end
     
@@ -808,9 +846,10 @@ local function GwGetGuildInfoConfig(chan)
                     
                     local cog_name, cog_id, count;
                     
-                    cog_name, count = string.gsub(vector[2], '%$(%a)', function(a) return xlat[a] end);
+                    cog_name, count = string.gsub(vector[2], '%$(%a)', function(a) return xlat[a] end)
+                    cog_name = GwGlobalName(cog_name)
                     if count > 0 then
-                        GwDebug(D_INFO, format('guild_info: parser co-guild name substitution "%s" => "%s"', vector[2], cog_name));
+                        GwDebug(D_INFO, format('guild_info: parser co-guild name substitution "%s" => "%s"', vector[2], cog_name))
                     end
                     
                     cog_id, count   = string.gsub(vector[3], '%$(%a)', function(a) return xlat[a] end);
@@ -1317,6 +1356,9 @@ function GreenWall_OnEvent(self, event, ...)
         gwAddonLoaded = true;
         GwWrite(format('v%s loaded.', gwVersion));
         
+        GwDebug(D_DEBUG, format('init: name=%s, short_name=%s, realm=%s', 
+                gwPlayerName, gwPlayerShortName, gwRealmName))
+        
     end            
         
     if gwAddonLoaded then
@@ -1648,12 +1690,12 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
-        gwGuildName = GetGuildInfo('Player');
+        gwGuildName = GwGuildName()
         if gwGuildName == nil then
-            GwDebug(D_NOTICE, 'guild_info: co-guild unavailable.');
-            return false;
+            GwDebug(D_NOTICE, 'guild_info: co-guild unavailable.')
+            return false
         else
-            GwDebug(D_DEBUG, format('guild_info: co-guild is %s.', gwGuildName));
+            GwDebug(D_DEBUG, format('guild_info: co-guild is %s.', gwGuildName))
         end
             
         local holdtime = timestamp - gwConfigHoldTime;
