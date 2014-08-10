@@ -766,6 +766,80 @@ local function GwPrepComms()
 end
 
 
+--- Parse the confederation configuration information.
+-- @param text Text containing the confederation configuration
+-- @return A table containing the parsed configuration.
+local function GwParseConfig(text)
+
+    local config = {}
+    local var    = {}
+    local seen   = {}
+    
+    for op, buffer in gmatch(text, 'GW(%l)="([^"]*)"') do
+        local args = { strsplit('|', buffer) }
+        if seen[op] then
+            GwError(format("ignored duplicate directive in configuration: GW%s", op))
+        else
+            seen[op] = true
+            if op == "c" then
+                config.conf_name    = args[1]
+                config.cont_tag     = args[2]
+                config.gchan_name   = args[3]
+                config.gchan_pass   = args[4]
+            elseif op == "e" then
+                config.gchan_key    = args[1]
+                config.gchan_cipher = args[2]
+            elseif op == "a" then
+                config.ochan_name   = args[1]
+                config.ochan_pass   = args[2]
+                config.ochan_key    = args[3]
+                config.ochan_cipher = args[4]
+            elseif op == "s" then
+                if args[1] and args[2] then
+                    var[args[1]] = args[2]
+                end
+            elseif op == "v" then
+                config.min_ver      = args[1]
+            else
+                GwDebug(D_ERROR, format("unknown configuration directive: GW%s", op))
+                seen[op] = nil
+            end
+        end
+    end
+    
+    for op, buffer in gmatch(text, 'GW:?(%l):([^\n]*)') do
+        local args = { strsplit(':', buffer) }
+        if seen[op] then
+            GwError(format("ignored duplicate directive in configuration: GW%s", op))
+        else
+            seen[op] = true
+            if op == "c" then
+                config.conf_name    = ""
+                config.cont_tag     = ""
+                config.gchan_name   = args[1]
+                config.gchan_pass   = args[2]
+            elseif op == "a" then
+                config.ochan_name   = args[1]
+                config.ochan_pass   = args[2]
+            elseif op == "s" then
+                if args[1] and args[2] then
+                    var[args[2]] = args[1]
+                end
+            elseif op == "v" then
+                config.min_ver      = args[1]
+            elseif op == "d" then
+                config.min_ver      = args[1]
+            else
+                GwDebug(D_ERROR, format("unknown configuration directive: GW%s", op))
+                seen[op] = nil
+            end
+        end
+    end
+        
+    return config
+end
+
+
 --- Parse the guild information page to gather configuration information.
 -- @param chan Channel control table to update.
 -- @return True if successful, false otherwise.
