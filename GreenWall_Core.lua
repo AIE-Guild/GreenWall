@@ -1374,7 +1374,7 @@ function GreenWall_OnEvent(self, event, ...)
                     --
                     -- Incoming request
                     --
-                    if message:match('^reload(%w.*)?$') then 
+                    if message == 'reload' then 
                         local diff = timestamp - gwReloadHoldTime;
                         GwWrite(format('Received configuration reload request from %s.', sender));
                         if diff >= gwReloadHoldInt then
