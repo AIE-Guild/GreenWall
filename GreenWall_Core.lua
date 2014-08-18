@@ -1,37 +1,19 @@
 --[[-----------------------------------------------------------------------
 
-    Copyright (c) 2010-2014; Mark Rogaski.
+    Copyright (C) 2010-2014  Mark Rogaski.
 
-    All rights reserved.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions
-    are met:
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-        * Redistributions of source code must retain the above copyright
-          notice, this list of conditions and the following disclaimer.
-
-        * Redistributions in binary form must reproduce the above
-          copyright notice, this list of conditions and the following
-          disclaimer in the documentation and/or other materials provided
-          with the distribution.
-
-        * Neither the name of the copyright holder nor the names of any
-          contributors may be used to endorse or promote products derived
-          from this software without specific prior written permission.
-
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 --]]-----------------------------------------------------------------------
 
@@ -120,9 +102,11 @@ local gwUsage = [[
 -- Player variables
 --
 
-local gwPlayerName      = UnitName('player') .. '-' .. GetRealmName():gsub("%s+", "");
-local gwGuildName       = nil;  -- wait until guild info is retrieved. 
-local gwPlayerLanguage  = GetDefaultLanguage('Player');
+local gwRealmName       = GetRealmName()
+local gwPlayerShortName = UnitName('player')
+local gwPlayerName      = gwPlayerShortName .. '-' .. gwRealmName:gsub("%s+", "")
+local gwGuildName       = nil  -- wait until guild info is retrieved. 
+local gwPlayerLanguage  = GetDefaultLanguage('Player')
 
 
 --
@@ -242,6 +226,42 @@ local function GwDebug(level, msg)
         end
     end
     
+end
+
+
+--- Format name for cross-realm addressing.
+-- @param name Character name or guild name.
+-- @param realm Name of the realm.
+-- @return A formatted cross-realm address.
+local function GwGlobalName(name, realm)
+
+    -- Pass formatted names without modification.
+    if name:match('.+-%a+$') then
+        return name
+    end
+
+    -- Use local realm as the default.
+    if realm == nil then
+        realm = gwRealmName
+    end
+
+    return name .. '-' .. realm:gsub("%s+", "")
+
+end
+
+
+--- Get the player's fully-qualified guild name.
+-- @param target (optional) unit ID, default is 'Player'.
+-- @return A qualified guild name or nil if the player is not in a guild.
+local function GwGuildName(target)
+    if target == nil then
+        target = 'Player'
+    end
+    local name = GetGuildInfo(target)
+    if name == nil then
+        return
+    end
+    return GwGlobalName(name)
 end
 
 
@@ -763,12 +783,12 @@ local function GwGetGuildInfoConfig(chan)
 
         -- Make sure we know which co-guild we are in.
         if gwGuildName == nil or gwGuildName == '' then
-            gwGuildName = GetGuildInfo('Player');
+            gwGuildName = GwGuildName()
             if gwGuildName == nil then
-                GwDebug(D_ERROR, 'guild_info: co-guild unavailable.');
-                return false;
+                GwDebug(D_ERROR, 'guild_info: co-guild unavailable.')
+                return false
             else
-                GwDebug(D_INFO, format('guild_info: co-guild is %s.', gwGuildName));
+                GwDebug(D_INFO, format('guild_info: co-guild is %s.', gwGuildName))
             end
         end
     
@@ -808,9 +828,10 @@ local function GwGetGuildInfoConfig(chan)
                     
                     local cog_name, cog_id, count;
                     
-                    cog_name, count = string.gsub(vector[2], '%$(%a)', function(a) return xlat[a] end);
+                    cog_name, count = string.gsub(vector[2], '%$(%a)', function(a) return xlat[a] end)
+                    cog_name = GwGlobalName(cog_name)
                     if count > 0 then
-                        GwDebug(D_INFO, format('guild_info: parser co-guild name substitution "%s" => "%s"', vector[2], cog_name));
+                        GwDebug(D_INFO, format('guild_info: parser co-guild name substitution "%s" => "%s"', vector[2], cog_name))
                     end
                     
                     cog_id, count   = string.gsub(vector[3], '%$(%a)', function(a) return xlat[a] end);
@@ -1317,6 +1338,9 @@ function GreenWall_OnEvent(self, event, ...)
         gwAddonLoaded = true;
         GwWrite(format('v%s loaded.', gwVersion));
         
+        GwDebug(D_DEBUG, format('init: name=%s, short_name=%s, realm=%s', 
+                gwPlayerName, gwPlayerShortName, gwRealmName))
+        
     end            
         
     if gwAddonLoaded then
@@ -1648,12 +1672,12 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
-        gwGuildName = GetGuildInfo('Player');
+        gwGuildName = GwGuildName()
         if gwGuildName == nil then
-            GwDebug(D_NOTICE, 'guild_info: co-guild unavailable.');
-            return false;
+            GwDebug(D_NOTICE, 'guild_info: co-guild unavailable.')
+            return false
         else
-            GwDebug(D_DEBUG, format('guild_info: co-guild is %s.', gwGuildName));
+            GwDebug(D_DEBUG, format('guild_info: co-guild is %s.', gwGuildName))
         end
             
         local holdtime = timestamp - gwConfigHoldTime;
