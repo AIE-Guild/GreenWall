@@ -1363,11 +1363,11 @@ function GreenWall_OnEvent(self, event, ...)
         local payload, sender, language, _, _, flags, _, 
                 chanNum, _, _, counter, guid = select(1, ...);
         
-        GwDebug(D_DEBUG, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
-        GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
-        
         if chanNum == gwCommonChannel.number or chanNum == gwOfficerChannel.number then
         
+            GwDebug(D_DEBUG, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
+            GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
+
             local opcode, container, _, message = strsplit('#', payload, 4);
             
             if opcode == nil or container == nil or message == nil then
@@ -1483,6 +1483,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
+        GwDebug(D_DEBUG, format('Rx<GUILD(%s), %s>: %s', prefix, sender, message));
         GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName then
             GwSendConfederationMsg(gwCommonChannel, 'chat', message);        
@@ -1491,6 +1492,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_OFFICER' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
+        GwDebug(D_DEBUG, format('Rx<OFFICER(%s), %s>: %s', prefix, sender, message));
         GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName and GreenWall.ochat then
             GwSendConfederationMsg(gwOfficerChannel, 'chat', message);        
@@ -1499,6 +1501,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
     
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...);
+        GwDebug(D_DEBUG, format('Rx<ACHIEVEMENT(%s), %s>: %s', prefix, sender, message));
         GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName then
             GwSendConfederationMsg(gwCommonChannel, 'achievement', message);
