@@ -1483,7 +1483,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
-        GwDebug(D_DEBUG, format('Rx<GUILD(%s), %s>: %s', prefix, sender, message));
+        GwDebug(D_DEBUG, format('Rx<GUILD, %s>: %s', sender, message));
         GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName then
             GwSendConfederationMsg(gwCommonChannel, 'chat', message);        
@@ -1492,7 +1492,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_OFFICER' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
-        GwDebug(D_DEBUG, format('Rx<OFFICER(%s), %s>: %s', prefix, sender, message));
+        GwDebug(D_DEBUG, format('Rx<OFFICER, %s>: %s', sender, message));
         GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName and GreenWall.ochat then
             GwSendConfederationMsg(gwOfficerChannel, 'chat', message);        
@@ -1501,7 +1501,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
     
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...);
-        GwDebug(D_DEBUG, format('Rx<ACHIEVEMENT(%s), %s>: %s', prefix, sender, message));
+        GwDebug(D_DEBUG, format('Rx<ACHIEVEMENT, %s>: %s', sender, message));
         GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName then
             GwSendConfederationMsg(gwCommonChannel, 'achievement', message);
