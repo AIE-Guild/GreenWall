@@ -264,11 +264,11 @@ local function GwGuildName(target)
     if target == nil then
         target = 'Player'
     end
-    local name = GetGuildInfo(target)
+    local name, _, _, realm = GetGuildInfo(target)
     if name == nil then
         return
     end
-    return GwGlobalName(name)
+    return GwGlobalName(name, realm)
 end
 
 
@@ -565,7 +565,7 @@ local function GwSendConfederationMsg(chan, type, message, sync)
     end
     
     -- Format the message.
-    local payload = strsub(strjoin('#', opcode, gwContainerId, '', message), 1, 255);
+    local payload = strsub(strjoin('#', opcode, coguild, '', message), 1, 255);
     
     -- Send the message.
     GwDebug(D_DEBUG, format('Tx<%d, %s>: %s', chan.number, gwPlayerName, payload));
