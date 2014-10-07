@@ -110,8 +110,7 @@ local gwUsage = [[
 --
 
 local gwRealmName       = GetRealmName()
-local gwPlayerShortName = UnitName('player')
-local gwPlayerName      = gwPlayerShortName .. '-' .. gwRealmName:gsub("%s+", "")
+local gwPlayerName      = UnitName('player') .. '-' .. gwRealmName:gsub("%s+", "")
 local gwGuildName       = nil  -- wait until guild info is retrieved. 
 local gwPlayerLanguage  = GetDefaultLanguage('Player')
 
@@ -1345,8 +1344,7 @@ function GreenWall_OnEvent(self, event, ...)
         gwAddonLoaded = true;
         GwWrite(format('v%s loaded.', gwVersion));
         
-        GwDebug(D_DEBUG, format('init: name=%s, short_name=%s, realm=%s', 
-                gwPlayerName, gwPlayerShortName, gwRealmName))
+        GwDebug(D_DEBUG, format('init: name=%s, realm=%s', gwPlayerName, gwRealmName))
         
     end            
         
@@ -1365,8 +1363,10 @@ function GreenWall_OnEvent(self, event, ...)
         
         if chanNum == gwCommonChannel.number or chanNum == gwOfficerChannel.number then
         
+            sender = GwGlobalName(sender)   -- Groom sender name.
+        
             GwDebug(D_DEBUG, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
-            GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
+            GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
 
             local opcode, container, _, message = strsplit('#', payload, 4);
             
@@ -1484,7 +1484,7 @@ function GreenWall_OnEvent(self, event, ...)
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
         GwDebug(D_DEBUG, format('Rx<GUILD, %s>: %s', sender, message));
-        GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
+        GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName then
             GwSendConfederationMsg(gwCommonChannel, 'chat', message);        
         end
@@ -1493,7 +1493,7 @@ function GreenWall_OnEvent(self, event, ...)
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
         GwDebug(D_DEBUG, format('Rx<OFFICER, %s>: %s', sender, message));
-        GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
+        GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName and GreenWall.ochat then
             GwSendConfederationMsg(gwOfficerChannel, 'chat', message);        
         end
@@ -1502,7 +1502,7 @@ function GreenWall_OnEvent(self, event, ...)
     
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...);
         GwDebug(D_DEBUG, format('Rx<ACHIEVEMENT, %s>: %s', sender, message));
-        GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
+        GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName then
             GwSendConfederationMsg(gwCommonChannel, 'achievement', message);
         end
@@ -1514,7 +1514,7 @@ function GreenWall_OnEvent(self, event, ...)
         GwDebug(D_DEBUG, format('on_event: event=%s, prefix=%s, sender=%s, dist=%s, message=%s',
                 event, prefix, sender, dist, message));
         GwDebug(D_DEBUG, format('Rx<ADDON(%s), %s>: %s', prefix, sender, message));
-        GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
+        GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
         
         if prefix == 'GreenWall' and dist == 'GUILD' and sender ~= gwPlayerName then
         
