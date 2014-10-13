@@ -57,6 +57,7 @@ local gwDefaults = {
     log             = { default=false,  desc="event logging" },
     logsize         = { default=2048,   desc="maximum log buffer size" },
     ochat           = { default=false,  desc="officer chat bridging" },
+    out_mod         = { default=true,   desc="Enable outbound message checking" },
 };
 
 local gwUsage = [[
@@ -95,6 +96,8 @@ local gwUsage = [[
         -- Toggle output logging to the GreenWall.lua file.
   logsize <length>
         -- Specify the maximum number of log entries to keep.
+  out_mod <on|off>
+    -- Enable outbound checking of messages for manipulation
  
 ]];
         
@@ -1054,6 +1057,7 @@ function GreenWallInterfaceFrame_OnShow(self)
     -- Populate interface panel.
     getglobal(self:GetName().."OptionTag"):SetChecked(GreenWall.tag)
     getglobal(self:GetName().."OptionAchievements"):SetChecked(GreenWall.achievements)
+    getglobal(self:GetName().."OptionOutMod"):SetChecked(GreenWall.out_mod)
     getglobal(self:GetName().."OptionRoster"):SetChecked(GreenWall.roster)
     getglobal(self:GetName().."OptionRank"):SetChecked(GreenWall.rank)
     if (GwIsOfficer()) then
@@ -1070,6 +1074,7 @@ end
 function GreenWallInterfaceFrame_SaveUpdates(self)
     GreenWall.tag = getglobal(self:GetName().."OptionTag"):GetChecked() and true or false;
     GreenWall.achievements = getglobal(self:GetName().."OptionAchievements"):GetChecked() and true or false;
+    GreenWall.out_mod = getglobal(self:GetName().."OptionOutMod"):GetChecked() and true or false;
     GreenWall.roster = getglobal(self:GetName().."OptionRoster"):GetChecked() and true or false;
     GreenWall.rank = getglobal(self:GetName().."OptionRank"):GetChecked() and true or false;
     if (GwIsOfficer()) then
@@ -1083,6 +1088,7 @@ function GreenWallInterfaceFrame_SetDefaults(self)
     GreenWall.roster = gwDefaults['roster']['default'];
     GreenWall.rank = gwDefaults['rank']['default'];
     GreenWall.ochat = gwDefaults['ochat']['default'];
+    GreenWall.out_mod = gwDefaults['out_mod']['default'];
 end
 
 
@@ -1208,6 +1214,7 @@ local function GwSlashCmd(message, editbox)
         
         GwWrite('tag='          .. tostring(GreenWall.tag));
         GwWrite('achievements=' .. tostring(GreenWall.achievements));
+        GwWrite('out_mod='      .. tostring(GreenWall.out_mod));
         GwWrite('roster='       .. tostring(GreenWall.roster));
         GwWrite('rank='         .. tostring(GreenWall.rank));
         GwWrite('debug='        .. tostring(GreenWall.debug));
@@ -1451,7 +1458,7 @@ function GreenWall_OnEvent(self, event, ...)
                     tx_hash = gwOfficerChannel.tx_hash;
                 end
                 
-                if tx_hash ~= nil then
+                if tx_hash ~= nil and GreenWall.out_mod then
                     
                     local hash = GwStringHash(payload);
                     
