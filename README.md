@@ -82,7 +82,42 @@ You can also check out the latest version from the GitHub repository, if you are
         - If the button is NOT there: means you did not install the addons properly. 
 
 
-## Usage ##
+## Configuration ##
+
+GreenWall was designed to minimize the amount of configuration necessary by most members.  If your officers have set up the guild configuration correctly, you don't need to do anything to particiapte in the conversation between co-guilds.
+
+However, there are a few options you may want to consider.  
+
+To access the user configuration screen:
+
+1. Open the **Game Menu** by hitting the `Esc` key.
+2. Click on the **Interface** button.
+3. Select the **AddOns** tab.
+4. Click on **GreenWall** in the sidebar.
+
+You will be able to enable or disable the following options.
+
+**Show Co-Guild Tags**
+> Show co-guild identifier in messages. 
+> Default: on
+
+**Show Co-Guild Achievement Announcements**
+> Show achievements from other co-guilds. 
+> Default: off
+
+**Show Co-Guild Roster Announcements**
+> Show guild join and leave messages from other co-guilds. 
+> Default: on 
+
+**Show Co-Guild Rank Announcements**
+> Show promotion and demotion messages from other co-guilds. 
+> Default: off 
+
+**Bridge Officer Chat**
+> Show bridge officer chat between the co-guilds. This only works for members who have privileges to view officer notes.
+> Default: off 
+
+## Command Line Interface ##
 
 All commands must be prefixed with `/greenwall` or `/gw`.
 
@@ -96,23 +131,15 @@ To view the current configuration, you would enter one of the following.
     /greenwall tag
     /gw tag
 
-
-## Configuration ##
-
-You don't need to configure GreenWall at all to use it. 
-
-Most of the configuration is done by the guild officers, it's a big mess of gibberish in the guild information tab in game. But you can change certain aspects of its behavior to suit your tastes.
-
-
 ### Output Options ###
 
 tag [ on | off ]
 > Show co-guild identifier in messages. 
-> Default: on</dd>
+> Default: on
 
 achievements [ on | off ]
 > Show achievements from other co-guilds. 
-> Default: off</dd>
+> Default: off
 
 roster [ on | off ]
 > Show guild join and leave messages from other co-guilds. 
