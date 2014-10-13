@@ -62,7 +62,6 @@ local gwDefaults = {
     log             = { default=false,  desc="event logging" },
     logsize         = { default=2048,   desc="maximum log buffer size" },
     ochat           = { default=false,  desc="officer chat bridging" },
-    out_mod         = { default=true,   desc="Enable outbound message checking" },
 };
 
 local gwUsage = [[
@@ -98,11 +97,9 @@ local gwUsage = [[
   verbose <on|off>
         -- Toggle the display of debugging output in the chat window.
   log <on|off>
-        -- Toggle output logging to the GreenWall.lua file  logsize <length>
+        -- Toggle output logging to the GreenWall.lua file.
   logsize <length>
         -- Specify the maximum number of log entries to keep.
-  out_mod <on|off>
-		-- Enable outbound checking of messages for manipulation
  
 ]];
         
@@ -1129,7 +1126,6 @@ local function GwSlashCmd(message, editbox)
         
         GwWrite('tag='          .. tostring(GreenWall.tag));
         GwWrite('achievements=' .. tostring(GreenWall.achievements));
-        GwWrite('out_mod='      .. tostring(GreenWall.out_mod));
         GwWrite('roster='       .. tostring(GreenWall.roster));
         GwWrite('rank='         .. tostring(GreenWall.rank));
         GwWrite('debug='        .. tostring(GreenWall.debug));
@@ -1343,7 +1339,7 @@ function GreenWall_OnEvent(self, event, ...)
                     tx_hash = gwOfficerChannel.tx_hash;
                 end
                 
-                if tx_hash ~= nil and GreenWall.out_mod then
+                if tx_hash ~= nil then
                     
                     local hash = GwStringHash(payload);
                     
