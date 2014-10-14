@@ -1,19 +1,26 @@
 --[[-----------------------------------------------------------------------
 
-    Copyright (C) 2010-2014  Mark Rogaski.
+The MIT License (MIT)
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+Copyright (c) 2010-2014 Mark Rogaski
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 --]]-----------------------------------------------------------------------
 
@@ -103,8 +110,7 @@ local gwUsage = [[
 --
 
 local gwRealmName       = GetRealmName()
-local gwPlayerShortName = UnitName('player')
-local gwPlayerName      = gwPlayerShortName .. '-' .. gwRealmName:gsub("%s+", "")
+local gwPlayerName      = UnitName('player') .. '-' .. gwRealmName:gsub("%s+", "")
 local gwGuildName       = nil  -- wait until guild info is retrieved. 
 local gwPlayerLanguage  = GetDefaultLanguage('Player')
 
@@ -257,11 +263,11 @@ local function GwGuildName(target)
     if target == nil then
         target = 'Player'
     end
-    local name = GetGuildInfo(target)
+    local name, _, _, realm = GetGuildInfo(target)
     if name == nil then
         return
     end
-    return GwGlobalName(name)
+    return GwGlobalName(name, realm)
 end
 
 
@@ -558,7 +564,7 @@ local function GwSendConfederationMsg(chan, type, message, sync)
     end
     
     -- Format the message.
-    local payload = strsub(strjoin('#', opcode, gwContainerId, '', message), 1, 255);
+    local payload = strsub(strjoin('#', opcode, coguild, '', message), 1, 255);
     
     -- Send the message.
     GwDebug(D_DEBUG, format('Tx<%d, %s>: %s', chan.number, gwPlayerName, payload));
@@ -1338,8 +1344,7 @@ function GreenWall_OnEvent(self, event, ...)
         gwAddonLoaded = true;
         GwWrite(format('v%s loaded.', gwVersion));
         
-        GwDebug(D_DEBUG, format('init: name=%s, short_name=%s, realm=%s', 
-                gwPlayerName, gwPlayerShortName, gwRealmName))
+        GwDebug(D_DEBUG, format('init: name=%s, realm=%s', gwPlayerName, gwRealmName))
         
     end            
         
@@ -1356,11 +1361,13 @@ function GreenWall_OnEvent(self, event, ...)
         local payload, sender, language, _, _, flags, _, 
                 chanNum, _, _, counter, guid = select(1, ...);
         
-        GwDebug(D_DEBUG, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
-        GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
-        
         if chanNum == gwCommonChannel.number or chanNum == gwOfficerChannel.number then
         
+            sender = GwGlobalName(sender)   -- Groom sender name.
+        
+            GwDebug(D_DEBUG, format('Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload));
+            GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
+
             local opcode, container, _, message = strsplit('#', payload, 4);
             
             if opcode == nil or container == nil or message == nil then
@@ -1476,7 +1483,8 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
-        GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
+        GwDebug(D_DEBUG, format('Rx<GUILD, %s>: %s', sender, message));
+        GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName then
             GwSendConfederationMsg(gwCommonChannel, 'chat', message);        
         end
@@ -1484,7 +1492,8 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_OFFICER' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
-        GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
+        GwDebug(D_DEBUG, format('Rx<OFFICER, %s>: %s', sender, message));
+        GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName and GreenWall.ochat then
             GwSendConfederationMsg(gwOfficerChannel, 'chat', message);        
         end
@@ -1492,7 +1501,8 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
     
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...);
-        GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
+        GwDebug(D_DEBUG, format('Rx<ACHIEVEMENT, %s>: %s', sender, message));
+        GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
         if sender == gwPlayerName then
             GwSendConfederationMsg(gwCommonChannel, 'achievement', message);
         end
@@ -1504,7 +1514,7 @@ function GreenWall_OnEvent(self, event, ...)
         GwDebug(D_DEBUG, format('on_event: event=%s, prefix=%s, sender=%s, dist=%s, message=%s',
                 event, prefix, sender, dist, message));
         GwDebug(D_DEBUG, format('Rx<ADDON(%s), %s>: %s', prefix, sender, message));
-        GwDebug(D_DEBUG, format('tx_check: sender=%s, id=%s', sender, gwPlayerName));
+        GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
         
         if prefix == 'GreenWall' and dist == 'GUILD' and sender ~= gwPlayerName then
         
