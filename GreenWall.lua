@@ -360,8 +360,8 @@ local function GwReplicateMessage(target, sender, container, language, flags,
         event = 'CHAT_MSG_GUILD'
     elseif target == 'OFFICER' then
         event = 'CHAT_MSG_OFFICER'
-    elseif target == 'GUILGW_D_ACHIEVEMENT' then
-        event = 'CHAT_MSG_GUILGW_D_ACHIEVEMENT'
+    elseif target == 'GUILD_ACHIEVEMENT' then
+        event = 'CHAT_MSG_GUILD_ACHIEVEMENT'
     elseif target == 'SYSTEM' then
         event = 'CHAT_MSG_SYSTEM'
     else
@@ -1261,11 +1261,11 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE')
     self:RegisterEvent('CHAT_MSG_GUILD')
     self:RegisterEvent('CHAT_MSG_OFFICER')
-    self:RegisterEvent('CHAT_MSG_GUILGW_D_ACHIEVEMENT')
+    self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT')
     self:RegisterEvent('CHAT_MSG_SYSTEM')
-    self:RegisterEvent('GUILGW_D_ROSTER_UPDATE')
+    self:RegisterEvent('GUILD_ROSTER_UPDATE')
     self:RegisterEvent('PLAYER_ENTERING_WORLD')
-    self:RegisterEvent('PLAYER_GUILGW_D_UPDATE')
+    self:RegisterEvent('PLAYER_GUILD_UPDATE')
     self:RegisterEvent('PLAYER_LOGIN')
     
     --
@@ -1395,7 +1395,7 @@ function GreenWall_OnEvent(self, event, ...)
                     elseif opcode == 'A' then
         
                         if GreenWall.achievements then
-                            GwReplicateMessage('GUILGW_D_ACHIEVEMENT', sender, container, language, flags, message, counter, guid)
+                            GwReplicateMessage('GUILD_ACHIEVEMENT', sender, container, language, flags, message, counter, guid)
                         end
         
                     elseif opcode == 'B' then
@@ -1405,27 +1405,27 @@ function GreenWall_OnEvent(self, event, ...)
                         if action == 'join' then
                             if GreenWall.roster then
                                 GwReplicateMessage('SYSTEM', sender, container, language, flags, 
-                                        format(ERR_GUILGW_D_JOIN_S, sender), counter, guid)
+                                        format(ERR_GUILD_JOIN_S, sender), counter, guid)
                             end
                         elseif action == 'leave' then
                             if GreenWall.roster then
                                 GwReplicateMessage('SYSTEM', sender, container, language, flags, 
-                                        format(ERR_GUILGW_D_LEAVE_S, sender), counter, guid)
+                                        format(ERR_GUILD_LEAVE_S, sender), counter, guid)
                             end
                         elseif action == 'remove' then
                             if GreenWall.rank then
                                 GwReplicateMessage('SYSTEM', sender, container, language, flags, 
-                                        format(ERR_GUILGW_D_REMOVE_SS, target, sender), counter, guid)
+                                        format(ERR_GUILD_REMOVE_SS, target, sender), counter, guid)
                             end
                         elseif action == 'promote' then
                             if GreenWall.rank then
                                 GwReplicateMessage('SYSTEM', sender, container, language, flags, 
-                                        format(ERR_GUILGW_D_PROMOTE_SSS, sender, target, arg), counter, guid)
+                                        format(ERR_GUILD_PROMOTE_SSS, sender, target, arg), counter, guid)
                             end
                         elseif action == 'demote' then
                             if GreenWall.rank then
                                 GwReplicateMessage('SYSTEM', sender, container, language, flags, 
-                                        format(ERR_GUILGW_D_DEMOTE_SSS, sender, target, arg), counter, guid)
+                                        format(ERR_GUILD_DEMOTE_SSS, sender, target, arg), counter, guid)
                             end
                         end                                
                 
@@ -1487,7 +1487,7 @@ function GreenWall_OnEvent(self, event, ...)
             GwSendConfederationMsg(gwOfficerChannel, 'chat', message)
         end
     
-    elseif event == 'CHAT_MSG_GUILGW_D_ACHIEVEMENT' then
+    elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
     
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_D_DEBUG, format('Rx<ACHIEVEMENT, %s>: %s', sender, message))
@@ -1550,7 +1550,7 @@ function GreenWall_OnEvent(self, event, ...)
                     gw.Debug(GW_D_DEBUG, format('comember_cache: hit %s', player))
                 else
                     gw.Debug(GW_D_DEBUG, format('comember_cache: miss %s', player))
-                    GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIENGW_D_ONLINE_SS, player, player), nil, nil)
+                    GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_ONLINE_SS, player, player), nil, nil)
                 end
             end
         end
@@ -1566,7 +1566,7 @@ function GreenWall_OnEvent(self, event, ...)
                     gw.Debug(GW_D_DEBUG, format('comember_cache: hit %s', player))
                 else
                     gw.Debug(GW_D_DEBUG, format('comember_cache: miss %s', player))
-                    GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIENGW_D_OFFLINE_S, player), nil, nil)
+                    GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_OFFLINE_S, player), nil, nil)
                 end
             end
         end
@@ -1669,7 +1669,7 @@ function GreenWall_OnEvent(self, event, ...)
         
         end
 
-    elseif event == 'GUILGW_D_ROSTER_UPDATE' then
+    elseif event == 'GUILD_ROSTER_UPDATE' then
     
         gwGuildName = GwGuildName()
         if gwGuildName == nil then
@@ -1712,7 +1712,7 @@ function GreenWall_OnEvent(self, event, ...)
             RegisterAddonMessagePrefix("GreenWall")
         end
 
-    elseif event == 'PLAYER_GUILGW_D_UPDATE' then
+    elseif event == 'PLAYER_GUILD_UPDATE' then
     
         -- Query the guild info.
         GuildRoster()
