@@ -243,7 +243,7 @@ end
 local function GwGlobalName(name, realm)
 
     -- Pass formatted names without modification.
-    if name:match('.+-%a+$') then
+    if name:match(".+-[%a']+$") then
         return name
     end
 
