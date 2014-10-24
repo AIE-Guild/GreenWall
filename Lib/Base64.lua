@@ -46,7 +46,7 @@ all copies or substantial portions of the Software.
 -- Package Definition
 ----------------------------------------------------------------------------
 
-local VERSION_MAJOR = "Encoding:Hash:Base64-1.0"
+local VERSION_MAJOR = "Encoding:Base64-1.0"
 local VERSION_MINOR = 1
 local Base64 = LibStub:NewLibrary(VERSION_MAJOR, VERSION_MINOR)
 if not Base64 then

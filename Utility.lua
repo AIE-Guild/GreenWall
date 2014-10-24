@@ -72,39 +72,6 @@ function gw.Debug(level, msg)
 end
 
 
---- CRC-16-CCITT
--- @param str The string to hash.
--- @return The CRC hash.
-function gw.StringHash(str)
-
-    if str == nil then
-        str = ''
-    end
-    
-    local crc = 0xffff
-    
-    for i = 1, #str do
-    
-        c = str:byte(i)
-        crc = bit.bxor(crc, c)
-
-        for j = 1, 8 do
-
-            local k = bit.band(crc, 1)
-            crc = bit.rshift(crc, 1)
-
-            if k ~= 0 then
-                crc = bit.bxor(crc, 0x8408)
-            end
-
-        end
-
-    end
-    
-    return crc
-end
-
-
 --[[-----------------------------------------------------------------------
 
 END

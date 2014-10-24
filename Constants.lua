@@ -27,10 +27,17 @@ SOFTWARE.
 --
 -- Debugging levels
 --
-GW_D_NONE       = 0
-GW_D_ERROR      = 1
-GW_D_WARNING    = 2
-GW_D_NOTICE     = 3
-GW_D_INFO       = 4
-GW_D_DEBUG      = 5 
+GW_LOG_NONE       = 0
+GW_LOG_ERROR      = 1
+GW_LOG_WARNING    = 2
+GW_LOG_NOTICE     = 3
+GW_LOG_INFO       = 4
+GW_LOG_DEBUG      = 5 
+
+
+--
+-- Message Flags
+--
+GW_MSG_END        = 0x01
+GW_MSG_CRYPT      = 0x02
 
