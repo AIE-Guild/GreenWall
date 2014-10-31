@@ -1591,6 +1591,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_CHANNEL_NOTICE' then
 
         local action, _, _, _, _, _, type, number, name = select(1, ...);
+        GwDebug(D_DEBUG, format('chat_notice: type=%s, number=%s, name=%s, action=%s', type, number, name, action))
         
         if number == gwCommonChannel.number then
             
@@ -1608,7 +1609,7 @@ function GreenWall_OnEvent(self, event, ...)
         
         elseif type == 1 then
         
-            if action == 'YOU_JOINED' then
+            if action == 'YOU_JOINED' or action == 'YOU_CHANGED' then
                 GwDebug(D_INFO, 'on_event: General joined, unblocking reconnect.');
                 gwFlagChatBlock = false;
                 GwRefreshComms();
