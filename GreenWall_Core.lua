@@ -323,11 +323,12 @@ end
 
 --- Check a target player for officer status in the same container guild.
 -- @param target The name of the player to check.
--- @return True is the target has access to officer chat, false otherwise.
+-- @return True is the target has at least read access to officer chat and officer notes, false otherwise.
 local function GwIsOfficer(target)
 
     local rank;
-    local ochat = false;
+    local see_chat = false
+    local see_note = false
     
     if target == nil then
         target = 'Player';
@@ -335,19 +336,25 @@ local function GwIsOfficer(target)
     _, _, rank = GetGuildInfo(target);
     
     if rank == 0 then
-        ochat = true
+        see_chat = true
+        see_note = true
     else
         GuildControlSetRank(rank);
-        _, _, ochat = GuildControlGetRankFlags();
+        for i, v in ipairs({GuildControlGetRankFlags()}) do
+            local flag = _G["GUILDCONTROL_OPTION"..i]
+            if flag == 'Officerchat Listen' then
+                see_chat = true
+            elseif flag == 'View Officer Note' then
+                see_note = true
+            end
+        end
     end
     
-    if ochat then
-        GwDebug(D_INFO, format('is_officer: %s is rank %d and can see ochat', target, rank));
-    else
-        GwDebug(D_INFO, format('is_officer: %s is rank %d and cannot see ochat', target, rank));
-    end
-    
-    return ochat;
+    local result = see_chat and see_note
+    GwDebug(D_INFO, format('is_officer: %s; rank=%d, chat=%s, note=%s', 
+            tostring(result), rank, tostring(see_chat), tostring(see_note)));
+
+    return result;
 
 end
 
@@ -1591,6 +1598,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_CHANNEL_NOTICE' then
 
         local action, _, _, _, _, _, type, number, name = select(1, ...);
+        GwDebug(D_DEBUG, format('chat_notice: type=%s, number=%s, name=%s, action=%s', type, number, name, action))
         
         if number == gwCommonChannel.number then
             
@@ -1608,7 +1616,7 @@ function GreenWall_OnEvent(self, event, ...)
         
         elseif type == 1 then
         
-            if action == 'YOU_JOINED' then
+            if action == 'YOU_JOINED' or action == 'YOU_CHANGED' then
                 GwDebug(D_INFO, 'on_event: General joined, unblocking reconnect.');
                 gwFlagChatBlock = false;
                 GwRefreshComms();
