@@ -64,7 +64,8 @@ end
 function GwChannel:isConnected()
     if self.name then
         local number = GetChannelName(self.name)
-        gw.Debug(GW_LOG_DEBUG, format('conn_check: chan_name=<<%04X>>, chan_id=%d', crc.Hash(self.name), number))
+        gw.Debug(GW_LOG_DEBUG, 'conn_check: chan_name=<<%04X>>, chan_id=%d',
+                crc.Hash(self.name), number)
         if number ~= 0 then
             self.number = number
             return true

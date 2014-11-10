@@ -26,7 +26,6 @@ SOFTWARE.
 
 --- Add a message to the log file
 -- @param msg A string to write to the log.
--- @param level (optional) The log level of the message.  Defaults to 0.
 function gw.Log(msg)
     if GreenWall ~= nil and GreenWall.log and GreenWallLog ~= nil then
         local ts = date('%Y-%m-%d %H:%M:%S')
@@ -40,7 +39,8 @@ end
 
 --- Write a message to the default chat frame.
 -- @param msg The message to send.
-function gw.Write(msg)
+function gw.Write(...)
+    local msg = string.format(unpack({...}))
     DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r ' .. msg)
     gw.Log(msg)
 end
@@ -48,7 +48,8 @@ end
 
 --- Write an error message to the default chat frame.
 -- @param msg The error message to send.
-function gw.Error(msg)
+function gw.Error(...)
+    local msg = string.format(unpack({...}))
     DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r |cffff6000[ERROR] ' .. msg)
     gw.Log('[ERROR] ' .. msg)
 end
@@ -58,8 +59,8 @@ end
 -- Messages will be filtered with the "/greenwall debug <level>" command.
 -- @param level A positive integer specifying the debug level to display this under.
 -- @param msg The message to send.
-function gw.Debug(level, msg)
-
+function gw.Debug(level, ...)
+    local msg = string.format(unpack({...}))
     if GreenWall ~= nil then
         if level <= GreenWall.debug then
             gw.Log(format('[DEBUG/%d] %s', level, msg))
@@ -68,7 +69,6 @@ function gw.Debug(level, msg)
             end
         end
     end
-    
 end
 
 
