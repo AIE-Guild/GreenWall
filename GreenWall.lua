@@ -273,7 +273,7 @@ local function GwIsOfficer(target)
     end
     
     local result = see_chat and see_note
-    GwDebug(D_INFO, format('is_officer: %s; rank=%d, chat=%s, note=%s', 
+    gw.Debug(GW_LOG_INFO, format('is_officer: %s; rank=%d, chat=%s, note=%s', 
             tostring(result), rank, tostring(see_chat), tostring(see_note)));
 
     return result;
@@ -1596,7 +1596,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_CHANNEL_NOTICE' then
 
         local action, _, _, _, _, _, type, number, name = select(1, ...)
-        GwDebug(D_DEBUG, format('chat_notice: type=%s, number=%s, name=%s, action=%s', type, number, name, action))
+        gw.Debug(GW_LOG_DEBUG, format('chat_notice: type=%s, number=%s, name=%s, action=%s', type, number, name, action))
         
         if number == gwCommonChannel.number then
             
