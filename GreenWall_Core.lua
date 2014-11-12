@@ -1570,6 +1570,8 @@ function GreenWall_OnEvent(self, event, ...)
                     GwDebug(D_DEBUG, format('comember_cache: miss %s', player));
                     GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_ONLINE_SS, player, player), nil, nil);
                 end
+                gwComemberCache[player] = timestamp
+                GwDebug(D_DEBUG, format('comember_cache: updated %s', player))
             end
         end
     
@@ -1586,6 +1588,8 @@ function GreenWall_OnEvent(self, event, ...)
                     GwDebug(D_DEBUG, format('comember_cache: miss %s', player));
                     GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_OFFLINE_S, player), nil, nil);
                 end
+                gwComemberCache[player] = timestamp
+                GwDebug(D_DEBUG, format('comember_cache: updated %s', player))
             end
         end
                         
@@ -1645,14 +1649,14 @@ function GreenWall_OnEvent(self, event, ...)
             local _, player = message:match(pat_online);
             GwDebug(D_DEBUG, format('player_status: player %s online', player));
             gwComemberCache[player] = timestamp;
-            GwDebug(D_DEBUG, format('comember_cache: added %s', player));
+            GwDebug(D_DEBUG, format('comember_cache: updated %s', player));
         
         elseif message:match(pat_offline) then
         
             local player = message:match(pat_offline);
             GwDebug(D_DEBUG, format('player_status: player %s offline', player));
             gwComemberCache[player] = timestamp;
-            GwDebug(D_DEBUG, format('comember_cache: added %s', player));
+            GwDebug(D_DEBUG, format('comember_cache: updated %s', player));
         
         elseif message:match(pat_join) then
 
