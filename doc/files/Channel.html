@@ -40,18 +40,6 @@
 
 	<li><strong>Channel.lua</strong></li>
 	
-	<li>
-		<a href="../files/Constants.html">Constants.lua</a>
-	</li>
-
-	<li>
-		<a href="../files/GreenWall.html">GreenWall.lua</a>
-	</li>
-
-	<li>
-		<a href="../files/Utility.html">Utility.lua</a>
-	</li>
-
 </ul>
 
 
@@ -75,6 +63,11 @@
 <table class="function_list">
 
 	<tr>
+	<td class="name" nowrap><a href="#GwChannel:getRoles">GwChannel:getRoles</a>&nbsp;(player)</td>
+	<td class="summary">Find channel roles for a player.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#GwChannel:initialize">GwChannel:initialize</a>&nbsp;()</td>
 	<td class="summary">Initialize a GwChannel object with the default attributes and state.</td>
 	</tr>
@@ -85,8 +78,23 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#GwChannel:join">GwChannel:join</a>&nbsp;()</td>
+	<td class="summary">Join a bridge channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:leave">GwChannel:leave</a>&nbsp;()</td>
+	<td class="summary">Leave a bridge channel.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#GwChannel:new">GwChannel:new</a>&nbsp;(name, password)</td>
 	<td class="summary">GwChannel constructor function.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:send">GwChannel:send</a>&nbsp;(message, type)</td>
+	<td class="summary">Sends an encoded message on the shared channel.</td>
 	</tr>
 
 </table>
@@ -104,6 +112,41 @@
 
 <h2><a name="functions"></a>Functions</h2>
 <dl class="function">
+
+
+
+<dt><a name="GwChannel:getRoles"></a><strong>GwChannel:getRoles</strong>&nbsp;(player)</dt>
+<dd>
+Find channel roles for a player.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>player</em></code>: Name of the player to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>True if target is the channel owner, false otherwise.</li>
+	
+	<li>True if target is a channel moderator, false otherwise.</li>
+	
+</ol>
+
+
+
+</dd>
+
 
 
 
@@ -147,6 +190,43 @@ Check if a connection exists to the custom channel.
 
 
 
+<dt><a name="GwChannel:join"></a><strong>GwChannel:join</strong>&nbsp;()</dt>
+<dd>
+Join a bridge channel.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if connection success, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:leave"></a><strong>GwChannel:leave</strong>&nbsp;()</dt>
+<dd>
+Leave a bridge channel.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="GwChannel:new"></a><strong>GwChannel:new</strong>&nbsp;(name, password)</dt>
 <dd>
 GwChannel constructor function.
@@ -172,6 +252,36 @@ GwChannel constructor function.
 
 <h3>Return value:</h3>
 <ul>An initialized GwChannel instance.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:send"></a><strong>GwChannel:send</strong>&nbsp;(message, type)</dt>
+<dd>
+Sends an encoded message on the shared channel.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>message</em></code>: Text of the message.
+	</li>
+	
+	<li>
+	  <code><em>type</em></code>: (optional) The message type. Accepted values are: GW_CTYPE_CHAT, GW_CTYPE_ACHIEVEMENT, GW_CTYPE_BROADCAST, GW_CTYPE_NOTICE, GW_CTYPE_REQUEST, GW_CTYPE_ADDON. Default is GW_CTYPE_CHAT.
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 

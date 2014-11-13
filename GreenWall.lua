@@ -1570,7 +1570,7 @@ function GreenWall_OnEvent(self, event, ...)
                     GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_ONLINE_SS, player, player), nil, nil)
                 end
                 gwComemberCache[player] = timestamp
-                GwDebug(D_DEBUG, format('comember_cache: updated %s', player))
+                gw.Debug(GW_LOG_DEBUG, format('comember_cache: updated %s', player))
             end
         end
     
@@ -1588,7 +1588,7 @@ function GreenWall_OnEvent(self, event, ...)
                     GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_OFFLINE_S, player), nil, nil)
                 end
                 gwComemberCache[player] = timestamp
-                GwDebug(D_DEBUG, format('comember_cache: updated %s', player))
+                gw.Debug(GW_LOG_DEBUG, format('comember_cache: updated %s', player))
             end
         end
                         

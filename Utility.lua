@@ -38,7 +38,7 @@ end
 
 
 --- Write a message to the default chat frame.
--- @param msg The message to send.
+-- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Write(...)
     local msg = string.format(unpack({...}))
     DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r ' .. msg)
@@ -47,7 +47,7 @@ end
 
 
 --- Write an error message to the default chat frame.
--- @param msg The error message to send.
+-- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Error(...)
     local msg = string.format(unpack({...}))
     DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r |cffff6000[ERROR] ' .. msg)
@@ -58,7 +58,7 @@ end
 --- Write a debugging message to the default chat frame with a detail level.
 -- Messages will be filtered with the "/greenwall debug <level>" command.
 -- @param level A positive integer specifying the debug level to display this under.
--- @param msg The message to send.
+-- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Debug(level, ...)
     local msg = string.format(unpack({...}))
     if GreenWall ~= nil then

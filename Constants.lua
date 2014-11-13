@@ -36,8 +36,25 @@ GW_LOG_DEBUG      = 5
 
 
 --
+-- Chat types
+--
+GW_CTYPE_CHAT           = 0
+GW_CTYPE_ACHIEVEMENT    = 1
+GW_CTYPE_BROADCAST      = 2
+GW_CTYPE_NOTICE         = 3
+GW_CTYPE_REQUEST        = 4
+GW_CTYPE_ADDON          = 5
+
+
+--
 -- Message Flags
 --
-GW_MSG_END        = 0x01
-GW_MSG_CRYPT      = 0x02
+GW_MSG_END        = 0x01    -- Last segment of a message
+GW_MSG_CRYPT      = 0x02    -- Encrypted
+
+
+--
+-- Limits
+--
+GW_MAX_MESSAGE_LENGTH = 255
 

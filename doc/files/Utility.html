@@ -38,18 +38,6 @@
 <h1>Files</h1>
 <ul>
 
-	<li>
-		<a href="../files/Channel.html">Channel.lua</a>
-	</li>
-
-	<li>
-		<a href="../files/Constants.html">Constants.lua</a>
-	</li>
-
-	<li>
-		<a href="../files/GreenWall.html">GreenWall.lua</a>
-	</li>
-
 	<li><strong>Utility.lua</strong></li>
 	
 </ul>
@@ -75,12 +63,12 @@
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><a href="#gw.Debug">gw.Debug</a>&nbsp;(level, ..., msg)</td>
+	<td class="name" nowrap><a href="#gw.Debug">gw.Debug</a>&nbsp;(level, ...)</td>
 	<td class="summary">Write a debugging message to the default chat frame with a detail level.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#gw.Error">gw.Error</a>&nbsp;(..., msg)</td>
+	<td class="name" nowrap><a href="#gw.Error">gw.Error</a>&nbsp;(...)</td>
 	<td class="summary">Write an error message to the default chat frame.</td>
 	</tr>
 
@@ -90,7 +78,7 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#gw.Write">gw.Write</a>&nbsp;(..., msg)</td>
+	<td class="name" nowrap><a href="#gw.Write">gw.Write</a>&nbsp;(...)</td>
 	<td class="summary">Write a message to the default chat frame.</td>
 	</tr>
 
@@ -112,7 +100,7 @@
 
 
 
-<dt><a name="gw.Debug"></a><strong>gw.Debug</strong>&nbsp;(level, ..., msg)</dt>
+<dt><a name="gw.Debug"></a><strong>gw.Debug</strong>&nbsp;(level, ...)</dt>
 <dd>
 Write a debugging message to the default chat frame with a detail level. Messages will be filtered with the "/greenwall debug <level>" command.
 
@@ -125,11 +113,7 @@ Write a debugging message to the default chat frame with a detail level. Message
 	</li>
 	
 	<li>
-	  <code><em>...</em></code>: 
-	</li>
-	
-	<li>
-	  <code><em>msg</em></code>: The message to send.
+	  <code><em>...</em></code>: A list of the string and arguments for substitution using the syntax of string.format.
 	</li>
 	
 </ul>
@@ -146,7 +130,7 @@ Write a debugging message to the default chat frame with a detail level. Message
 
 
 
-<dt><a name="gw.Error"></a><strong>gw.Error</strong>&nbsp;(..., msg)</dt>
+<dt><a name="gw.Error"></a><strong>gw.Error</strong>&nbsp;(...)</dt>
 <dd>
 Write an error message to the default chat frame.
 
@@ -155,11 +139,7 @@ Write an error message to the default chat frame.
 <ul>
 	
 	<li>
-	  <code><em>...</em></code>: 
-	</li>
-	
-	<li>
-	  <code><em>msg</em></code>: The error message to send.
+	  <code><em>...</em></code>: A list of the string and arguments for substitution using the syntax of string.format.
 	</li>
 	
 </ul>
@@ -202,7 +182,7 @@ Add a message to the log file
 
 
 
-<dt><a name="gw.Write"></a><strong>gw.Write</strong>&nbsp;(..., msg)</dt>
+<dt><a name="gw.Write"></a><strong>gw.Write</strong>&nbsp;(...)</dt>
 <dd>
 Write a message to the default chat frame.
 
@@ -211,11 +191,7 @@ Write a message to the default chat frame.
 <ul>
 	
 	<li>
-	  <code><em>...</em></code>: 
-	</li>
-	
-	<li>
-	  <code><em>msg</em></code>: The message to send.
+	  <code><em>...</em></code>: A list of the string and arguments for substitution using the syntax of string.format.
 	</li>
 	
 </ul>
