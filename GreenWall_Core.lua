@@ -235,6 +235,19 @@ local function GwDebug(level, msg)
 end
 
 
+--- Case insensitive string comparison.
+-- @param a A string
+-- @param b A string
+-- @return True if the strings match in all respects except case, false otherwise.
+local function GwCmp(a, b)
+    if string.lower(a) == string.lower(b) then
+        return true
+    else
+        return false
+    end
+end
+
+
 --- Format name for cross-realm addressing.
 -- @param name Character name or guild name.
 -- @param realm Name of the realm.
@@ -425,7 +438,7 @@ local function GwChannelRoles(chan, name)
         local _, _, _, _, count = GetChannelDisplayInfo(chan.number);
         for i = 1, count do
             local target, town, tmod = GetChannelRosterInfo(chan.number, i);
-            if target == name then
+            if GwCmp(target, name) then
                 return town, tmod;
             end
         end
@@ -1400,7 +1413,7 @@ function GreenWall_OnEvent(self, event, ...)
                         end
                     end
         
-                elseif sender ~= gwPlayerName and container ~= gwContainerId then
+                elseif not GwCmp(sender, gwPlayerName) and container ~= gwContainerId then
                 
                     if opcode == 'C' then
         
@@ -1456,7 +1469,7 @@ function GreenWall_OnEvent(self, event, ...)
             --
             -- Check for corruption of outbound messages on the shared channels (e.g. modification by Identity).
             --
-            if sender == gwPlayerName then                
+            if GwCmp(sender, gwPlayerName) then                
             
                 local tx_hash = nil;
                 if chanNum == gwCommonChannel.number then
@@ -1492,7 +1505,7 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
         GwDebug(D_DEBUG, format('Rx<GUILD, %s>: %s', sender, message));
         GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
-        if sender == gwPlayerName then
+        if GwCmp(sender, gwPlayerName) then
             GwSendConfederationMsg(gwCommonChannel, 'chat', message);        
         end
     
@@ -1501,7 +1514,7 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...);
         GwDebug(D_DEBUG, format('Rx<OFFICER, %s>: %s', sender, message));
         GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
-        if sender == gwPlayerName and GreenWall.ochat then
+        if GwCmp(sender, gwPlayerName) and GreenWall.ochat then
             GwSendConfederationMsg(gwOfficerChannel, 'chat', message);        
         end
     
@@ -1510,7 +1523,7 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...);
         GwDebug(D_DEBUG, format('Rx<ACHIEVEMENT, %s>: %s', sender, message));
         GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
-        if sender == gwPlayerName then
+        if GwCmp(sender, gwPlayerName) then
             GwSendConfederationMsg(gwCommonChannel, 'achievement', message);
         end
     
@@ -1523,7 +1536,7 @@ function GreenWall_OnEvent(self, event, ...)
         GwDebug(D_DEBUG, format('Rx<ADDON(%s), %s>: %s', prefix, sender, message));
         GwDebug(D_DEBUG, format('sender_info: sender=%s, id=%s', sender, gwPlayerName));
         
-        if prefix == 'GreenWall' and dist == 'GUILD' and sender ~= gwPlayerName then
+        if prefix == 'GreenWall' and dist == 'GUILD' and not GwCmp(sender, gwPlayerName) then
         
             local type, command = strsplit('#', message);
             
