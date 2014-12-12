@@ -78,6 +78,11 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#GwCmp">GwCmp</a>&nbsp;(a, b)</td>
+	<td class="summary">Case insensitive string comparison.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#GwDebug">GwDebug</a>&nbsp;(level, msg)</td>
 	<td class="summary">Write a debugging message to the default chat frame with a detail level.</td>
 	</tr>
@@ -225,11 +230,11 @@
 Leave a shared confederation channel and clear current configuration.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  chan: The channel control table.
+	  <code><em>chan</em></code>: The channel control table.
 	</li>
 	
 </ul>
@@ -251,15 +256,15 @@ Leave a shared confederation channel and clear current configuration.
 Finds channel roles for a player.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  chan: Control table for the channel.
+	  <code><em>chan</em></code>: Control table for the channel.
 	</li>
 	
 	<li>
-	  name: Name of the player to check.
+	  <code><em>name</em></code>: Name of the player to check.
 	</li>
 	
 </ul>
@@ -272,9 +277,9 @@ Finds channel roles for a player.
 <h3>Return values:</h3>
 <ol>
 	
-	<li>True if target is the channel owner, false otherwise.
+	<li>True if target is the channel owner, false otherwise.</li>
 	
-	<li>True if target is a channel moderator, false otherwise.
+	<li>True if target is a channel moderator, false otherwise.</li>
 	
 </ol>
 
@@ -290,15 +295,15 @@ Finds channel roles for a player.
 Update or display the value of a user configuration variable.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  key: The name of the variable.
+	  <code><em>key</em></code>: The name of the variable.
 	</li>
 	
 	<li>
-	  val: The variable value.
+	  <code><em>val</em></code>: The variable value.
 	</li>
 	
 </ul>
@@ -309,7 +314,40 @@ Update or display the value of a user configuration variable.
 
 
 <h3>Return value:</h3>
-True if the key matches a variable name, false otherwise.
+<ul>True if the key matches a variable name, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwCmp"></a><strong>GwCmp</strong>&nbsp;(a, b)</dt>
+<dd>
+Case insensitive string comparison.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>a</em></code>: A string
+	</li>
+	
+	<li>
+	  <code><em>b</em></code>: A string
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the strings match in all respects except case, false otherwise.</ul>
 
 
 
@@ -323,15 +361,15 @@ True if the key matches a variable name, false otherwise.
 Write a debugging message to the default chat frame with a detail level. Messages will be filtered with the "/greenwall debug <level>" command.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  level: A positive integer specifying the debug level to display this under.
+	  <code><em>level</em></code>: A positive integer specifying the debug level to display this under.
 	</li>
 	
 	<li>
-	  msg: The message to send.
+	  <code><em>msg</em></code>: The message to send.
 	</li>
 	
 </ul>
@@ -353,11 +391,11 @@ Write a debugging message to the default chat frame with a detail level. Message
 Decode a broadcast message.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  string: An encoded string.
+	  <code><em>string</em></code>: An encoded string.
 	</li>
 	
 </ul>
@@ -370,11 +408,11 @@ Decode a broadcast message.
 <h3>Return values:</h3>
 <ol>
 	
-	<li>The action type.
+	<li>The action type.</li>
 	
-	<li>The target of the action (optional).
+	<li>The target of the action (optional).</li>
 	
-	<li>Additional data (optional).
+	<li>Additional data (optional).</li>
 	
 </ol>
 
@@ -390,19 +428,19 @@ Decode a broadcast message.
 Encode a broadcast message.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  action: The action type.
+	  <code><em>action</em></code>: The action type.
 	</li>
 	
 	<li>
-	  target: The target of the action (optional).
+	  <code><em>target</em></code>: The target of the action (optional).
 	</li>
 	
 	<li>
-	  arg: Additional data (optional).
+	  <code><em>arg</em></code>: Additional data (optional).
 	</li>
 	
 </ul>
@@ -413,7 +451,7 @@ Encode a broadcast message.
 
 
 <h3>Return value:</h3>
-An encoded string.
+<ul>An encoded string.</ul>
 
 
 
@@ -427,11 +465,11 @@ An encoded string.
 Write an error message to the default chat frame.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  msg: The error message to send.
+	  <code><em>msg</em></code>: The error message to send.
 	</li>
 	
 </ul>
@@ -453,11 +491,11 @@ Write an error message to the default chat frame.
 Drain a channel's message queue.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  chan: Channel control table.
+	  <code><em>chan</em></code>: Channel control table.
 	</li>
 	
 </ul>
@@ -468,7 +506,7 @@ Drain a channel's message queue.
 
 
 <h3>Return value:</h3>
-Number of messages flushed.
+<ul>Number of messages flushed.</ul>
 
 
 
@@ -499,11 +537,11 @@ Send a configuration reload request to the rest of the confederation.
 Parse the guild information page to gather configuration information.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  chan: Channel control table to update.
+	  <code><em>chan</em></code>: Channel control table to update.
 	</li>
 	
 </ul>
@@ -514,7 +552,7 @@ Parse the guild information page to gather configuration information.
 
 
 <h3>Return value:</h3>
-True if successful, false otherwise.
+<ul>True if successful, false otherwise.</ul>
 
 
 
@@ -528,11 +566,11 @@ True if successful, false otherwise.
 Parse the officer note of the guild leader to gather configuration information.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  chan: Channel control table to update.
+	  <code><em>chan</em></code>: Channel control table to update.
 	</li>
 	
 </ul>
@@ -543,7 +581,7 @@ Parse the officer note of the guild leader to gather configuration information.
 
 
 <h3>Return value:</h3>
-True if successful, false otherwise.
+<ul>True if successful, false otherwise.</ul>
 
 
 
@@ -557,15 +595,15 @@ True if successful, false otherwise.
 Format name for cross-realm addressing.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  name: Character name or guild name.
+	  <code><em>name</em></code>: Character name or guild name.
 	</li>
 	
 	<li>
-	  realm: Name of the realm.
+	  <code><em>realm</em></code>: Name of the realm.
 	</li>
 	
 </ul>
@@ -576,7 +614,7 @@ Format name for cross-realm addressing.
 
 
 <h3>Return value:</h3>
-A formatted cross-realm address.
+<ul>A formatted cross-realm address.</ul>
 
 
 
@@ -590,11 +628,11 @@ A formatted cross-realm address.
 Get the player's fully-qualified guild name.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  target: (optional) unit ID, default is 'Player'.
+	  <code><em>target</em></code>: (optional) unit ID, default is 'Player'.
 	</li>
 	
 </ul>
@@ -605,7 +643,7 @@ Get the player's fully-qualified guild name.
 
 
 <h3>Return value:</h3>
-A qualified guild name or nil if the player is not in a guild.
+<ul>A qualified guild name or nil if the player is not in a guild.</ul>
 
 
 
@@ -619,11 +657,11 @@ A qualified guild name or nil if the player is not in a guild.
 Check if a connection exists to the common chat.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  chan: A channel control table.
+	  <code><em>chan</em></code>: A channel control table.
 	</li>
 	
 </ul>
@@ -634,7 +672,7 @@ Check if a connection exists to the common chat.
 
 
 <h3>Return value:</h3>
-True if connected, otherwise false.
+<ul>True if connected, otherwise false.</ul>
 
 
 
@@ -648,11 +686,11 @@ True if connected, otherwise false.
 Check a guild for membership within the confederation.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  guild: The name of the guild to check.
+	  <code><em>guild</em></code>: The name of the guild to check.
 	</li>
 	
 </ul>
@@ -663,7 +701,7 @@ Check a guild for membership within the confederation.
 
 
 <h3>Return value:</h3>
-True if the target guild is in the confederation, false otherwise.
+<ul>True if the target guild is in the confederation, false otherwise.</ul>
 
 
 
@@ -677,11 +715,11 @@ True if the target guild is in the confederation, false otherwise.
 Check a target player for officer status in the same container guild.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  target: The name of the player to check.
+	  <code><em>target</em></code>: The name of the player to check.
 	</li>
 	
 </ul>
@@ -692,7 +730,7 @@ Check a target player for officer status in the same container guild.
 
 
 <h3>Return value:</h3>
-True is the target has access to officer chat, false otherwise.
+<ul>True is the target has at least read access to officer chat and officer notes, false otherwise.</ul>
 
 
 
@@ -706,11 +744,11 @@ True is the target has access to officer chat, false otherwise.
 Check a guild for peer status.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  guild: The name of the guild to check.
+	  <code><em>guild</em></code>: The name of the guild to check.
 	</li>
 	
 </ul>
@@ -721,7 +759,7 @@ Check a guild for peer status.
 
 
 <h3>Return value:</h3>
-True if the target guild is a peer co-guild, false otherwise.
+<ul>True if the target guild is a peer co-guild, false otherwise.</ul>
 
 
 
@@ -735,11 +773,11 @@ True if the target guild is a peer co-guild, false otherwise.
 Join the shared confederation channel.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  chan: the channel control block.
+	  <code><em>chan</em></code>: the channel control block.
 	</li>
 	
 </ul>
@@ -750,7 +788,7 @@ Join the shared confederation channel.
 
 
 <h3>Return value:</h3>
-True if connection success, false otherwise.
+<ul>True if connection success, false otherwise.</ul>
 
 
 
@@ -764,11 +802,11 @@ True if connection success, false otherwise.
 Leave a shared confederation channel.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  chan: The channel control table.
+	  <code><em>chan</em></code>: The channel control table.
 	</li>
 	
 </ul>
@@ -790,15 +828,15 @@ Leave a shared confederation channel.
 Add a message to the log file
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  msg: A string to write to the log.
+	  <code><em>msg</em></code>: A string to write to the log.
 	</li>
 	
 	<li>
-	  level: (optional) The log level of the message.  Defaults to 0.
+	  <code><em>level</em></code>: (optional) The log level of the message.  Defaults to 0.
 	</li>
 	
 </ul>
@@ -820,15 +858,15 @@ Add a message to the log file
 Create a new channel control data structure.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  name: The channel name.
+	  <code><em>name</em></code>: The channel name.
 	</li>
 	
 	<li>
-	  password: The channel password.
+	  <code><em>password</em></code>: The channel password.
 	</li>
 	
 </ul>
@@ -839,7 +877,7 @@ Create a new channel control data structure.
 
 
 <h3>Return value:</h3>
-Channel control table.
+<ul>Channel control table.</ul>
 
 
 
@@ -887,23 +925,23 @@ Parse confederation configuration and connect to the common channel.
 Sends an encoded message to the rest of the confederation on the shared channel.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  chan: The channel control table.
+	  <code><em>chan</em></code>: The channel control table.
 	</li>
 	
 	<li>
-	  type: The message type. Accepted values are: chat, achievement, broadcast, notice, and request.
+	  <code><em>type</em></code>: The message type. Accepted values are: chat, achievement, broadcast, notice, and request.
 	</li>
 	
 	<li>
-	  message: Text of the message.
+	  <code><em>message</em></code>: Text of the message.
 	</li>
 	
 	<li>
-	  sync: (optional) Boolean specifying whether to suppress queuing of messages.  Default is false.
+	  <code><em>sync</em></code>: (optional) Boolean specifying whether to suppress queuing of messages.  Default is false.
 	</li>
 	
 </ul>
@@ -925,15 +963,15 @@ Sends an encoded message to the rest of the confederation on the shared channel.
 Sends an encoded message to the rest of the same container on the add-on channel.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  type: The message type.
+	  <code><em>type</em></code>: The message type.
 	</li>
 	
 	<li>
-	  message: Text of the message.
+	  <code><em>message</em></code>: Text of the message.
 	</li>
 	
 </ul>
@@ -955,11 +993,11 @@ Sends an encoded message to the rest of the same container on the add-on channel
 Initialize options to default values.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  soft: If true, set only undefined options to the default values.
+	  <code><em>soft</em></code>: If true, set only undefined options to the default values.
 	</li>
 	
 </ul>
@@ -981,11 +1019,11 @@ Initialize options to default values.
 CRC-16-CCITT
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  str: The string to hash.
+	  <code><em>str</em></code>: The string to hash.
 	</li>
 	
 </ul>
@@ -996,7 +1034,7 @@ CRC-16-CCITT
 
 
 <h3>Return value:</h3>
-The CRC hash.
+<ul>The CRC hash.</ul>
 
 
 
@@ -1010,11 +1048,11 @@ The CRC hash.
 Write a message to the default chat frame.
 
 
-<h3>Parameters</h3>
+<h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  msg: The message to send.
+	  <code><em>msg</em></code>: The message to send.
 	</li>
 	
 </ul>
