@@ -26,6 +26,15 @@ SOFTWARE.
 
 --[[-----------------------------------------------------------------------
 
+Imported Libraries
+
+--]]-----------------------------------------------------------------------
+
+local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
+
+
+--[[-----------------------------------------------------------------------
+
 Class Variables
 
 --]]-----------------------------------------------------------------------
@@ -60,17 +69,47 @@ end
 -- @param keep If true, update only undefined attributes.
 -- @return The initialized GwConfig instance.
 function GwConfig:initialize(keep)
+    local function new_channel(name, password)
+        return {
+            name = name ~= nil and name or '',
+            password = password ~= nil and password or '',
+            number = 0,
+            configured = false;
+            dirty = false,
+            owner = false,
+            handoff = false,
+            queue = {},
+            tx_hash = {},
+            stats = {
+                sconn = 0,
+                fconn = 0,
+                leave = 0,
+                disco = 0
+            }
+        }
+    end
+    
     -- General configuration
-    self.config_version = nil
-    self.minimum_version = 0
+    self.version = 0
+    self.minimum = 0
+    self.loaded = false
     
     -- Confederation configuration
-    self.guild_id = nil
+    self.guild_id = ''
     self.peer = {}
-    self.channel = {
-        guild = {},
-        officer = {},
-    }
+    
+    -- Channel configuration
+    if self.channel == nil then
+        self.channel = {
+            guild = {},
+            officer = {},
+        }
+    end
+    for k, v in pairs(self.channel) do
+        if self.channel[k].configured == nil then
+            self.channel[k] = new_channel()
+        end
+    end
     
     -- Groom parameters
     if keep == nil then
@@ -90,15 +129,140 @@ function GwConfig:initialize(keep)
 end
 
 
+--- Reset all attributes and state.
+-- @return The initialized GwConfig instance.
+function GwConfig:reset()
+    self:initialize(false)
+end
+
+
 --- Dump configuration attributes.
 function GwConfig:dump(keep)
-    local index = {}
-    for i in pairs(self) do
-        table.insert(index, i)
+    local function dump_tier(t, level)
+        level = level == nil and 0 or level 
+        local indent = strrep('  ', level)
+        local index = {}
+        for i in pairs(t) do
+            table.insert(index, i)
+        end
+        table.sort(index)
+        for i, k in ipairs(index) do
+            if type(t[k]) == 'table' then
+                gw.Write("%s%s:", indent, k, tostring(t[k]))
+                dump_tier(t[k], level + 1)
+            else
+                if type(t[k]) == 'string' then
+                    if k == 'name' or k == 'password' then
+                        gw.Write("%s%s = <<%04X>>", indent, k, crc.Hash(tostring(t[k])))
+                    else
+                        gw.Write("%s%s = '%s'", indent, k, tostring(t[k]))
+                    end
+                else
+                    gw.Write("%s%s = %s", indent, k, tostring(t[k]))
+                end
+            end 
+        end
     end
-    table.sort(index)
-    for i, k in ipairs(index) do
-        gw.Write("%s = %s", k, tostring(self[k]))
+    
+    dump_tier(self, 0)
+end
+
+
+--- Parse the guild information page to gather configuration information.
+-- @return True if successful, false otherwise.
+function GwConfig:load()
+    local function substitute(cstr, xlat)
+        local estr, count = string.gsub(cstr, '%$(%a)', function(s) return xlat[s] end)
+        if count > 0 then
+            gw.Debug(GW_LOG_DEBUG, "guild_conf: expanded '%s' to '%s'", cstr, estr)
+        end
+        return estr
     end
+    
+    local info = GetGuildInfoText()     -- Guild information text.
+    local xlat = {}                     -- Translation table for string substitution.
+
+    if info == '' then
+        gw.Debug(GW_LOG_INFO, 'guild_conf: guild configuration not available.')
+        return false
+    end
+    
+    gw.Debug(GW_LOG_INFO, 'guild_conf: parsing guild configuration.')
+    
+    local guild_name = gw.GetGuildName()
+    gw.Debug(GW_LOG_INFO, 'guild_conf: co-guild is %s', guild_name)
+
+    -- Soft reset of configuration
+    self:initialize(true)
+    
+    -- Parse version 1 configuration
+    for buffer in gmatch(info, 'GW:?(%l:[^\n]*)') do
+    
+        if buffer ~= nil then
+        
+            self.version = 1
+            buffer = strtrim(buffer)
+            local field = { strsplit(':', buffer) }
+        
+            if field[1] == 'c' then
+                -- Guild channel configuration
+                if self.channel.guild.name ~= field[2] then
+                    self.channel.guild.name = field[2]
+                    self.channel.guild.dirty = true
+                end
+                if self.channel.guild.password ~= field[3] then
+                    self.channel.guild.password = field[3]
+                    self.channel.guild.dirty = true
+                end
+                gw.Debug(GW_LOG_DEBUG, 'guild_config: channel=<<%04X>>, password=<<%04X>>',
+                        crc.Hash(self.channel.guild.name),
+                        crc.Hash(self.channel.guild.password));
+            elseif field[1] == 'p' then
+                -- Peer guild
+                local peer_name = gw.GlobalName(substitute(field[2], xlat))                
+                local peer_id = substitute(field[3], xlat)
+                if gw.iCmp(guild_name, peer_name) then
+                    self.guild_id = peer_id
+                    gw.Debug(GW_LOG_INFO, 'guild_config: guild=%s (%s)', guild_name, peer_id);
+                else
+                    self.peer[peer_id] = peer_name
+                    gw.Debug(GW_LOG_INFO, 'guild_config: peer=%s (%s)', peer_name, peer_id);
+                end
+            elseif field[1] == 's' then
+                local key = field[3]
+                local val = field[2]
+                if string.len(key) == 1 then
+                    xlat[key] = val
+                    gw.Debug(GW_LOG_INFO, "guild_config: parser substitution added, '$%s' := '%s'", key, val)
+                else
+                    gw.Debug(GW_LOG_ERROR, "guild_config: invalid parser substitution key, '$%s'", key)
+                end
+            elseif field[1] == 'v' then
+                -- Minimum version
+                if strmatch(field[2], '^%d+%.%d+%.%d+%w*$') then
+                    self.minimum = field[2];
+                    gw.Debug(GW_LOG_INFO, 'guild_config: minimum version set to %s', self.minimum);
+                end
+            elseif field[1] == 'o' then
+                -- Deprecated option list
+                local optlist = { strsplit(',', gsub(field[2], '%s+', '')) }
+                for i, opt in ipairs(optlist) do
+                    local key, val = strsplit('=', opt)
+                    key = strlower(key)
+                    val = strlower(val)
+                    if key == 'mv' then
+                        if strmatch(val, '^%d+%.%d+%.%d+%w*$') then
+                            self.minimum = val;
+                            gw.Debug(GW_LOG_INFO, 'guild_config: minimum version set to %s', self.minimum);
+                        end
+                    end
+                end
+            end
+        end
+    
+    end
+    
+    return true;
+    
 end
 

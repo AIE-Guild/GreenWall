@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2014 Mark Rogaski
+Copyright (c) 2010-2015 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,18 +32,6 @@ Imported Libraries
 
 local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
 
-
---[[-----------------------------------------------------------------------
-
-Global Variables
-
---]]-----------------------------------------------------------------------
-
---
--- Add-on metadata
---
-
-gw = {}
 
 --
 -- Kludge to avoid the MoP glyph bug
@@ -1240,6 +1228,9 @@ local function GwSlashCmd(message, editbox)
         gw.Write('log='          .. tostring(GreenWall.log))
         gw.Write('logsize='      .. tostring(GreenWall.logsize))
     
+        gw.Write('NEW CONFIG:')
+        gwConfig:dump()
+    
     elseif command == 'stats' then
     
         gw.Write('common: %d sconn, %d fconn, %d leave, %d disco', 
@@ -1722,6 +1713,7 @@ function GreenWall_OnEvent(self, event, ...)
         -- Update the configuration
         if not gwCommonChannel.configured then
             GwGetGuildInfoConfig(gwCommonChannel)
+            gwConfig:load()
         end
         
         if GreenWall.ochat then
@@ -1733,6 +1725,7 @@ function GreenWall_OnEvent(self, event, ...)
         -- Periodic check for updated configuration.
         if holdtime >= gwConfigHoldInt then
             GwGetGuildInfoConfig(gwCommonChannel)
+            gwConfig:load()
             if GreenWall.ochat then
                 GwGetOfficerNoteConfig(gwOfficerChannel)
             end

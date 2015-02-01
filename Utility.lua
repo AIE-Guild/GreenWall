@@ -102,7 +102,7 @@ end
 -- @param name Character name or guild name.
 -- @param realm Name of the realm.
 -- @return A formatted cross-realm address.
-local function GwGlobalName(name, realm)
+function gw.GlobalName(name, realm)
     -- Pass formatted names without modification.
     if name:match(".+-[%a']+$") then
         return name
@@ -136,7 +136,7 @@ function gw.GetGuildName(target)
     if name == nil then
         return
     end
-    return GwGlobalName(name, realm)
+    return gw.GlobalName(name, realm)
 end
 
 

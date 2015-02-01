@@ -11,10 +11,11 @@
 ## X-Date: 12/12/2014
 
 Lib\Load.xml
+Globals.lua
 Constants.lua
-Config.lua
-GreenWall.lua
 Utility.lua
+Config.lua
 Channel.lua
+GreenWall.lua
 GreenWall.xml
 
