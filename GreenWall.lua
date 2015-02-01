@@ -1356,7 +1356,8 @@ function GreenWall_OnEvent(self, event, ...)
         -- Initialize the saved variables
         --
         GwSetDefaults(true)
-
+        gwConfig = GwConfig:new()
+        
         --
         -- Thundercats are go!
         --

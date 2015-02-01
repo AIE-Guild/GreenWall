@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2014 Mark Rogaski
+Copyright (c) 2010-2015 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,14 +47,17 @@ GW_CTYPE_ADDON          = 5
 
 
 --
--- Message Flags
---
-GW_MSG_END        = 0x01    -- Last segment of a message
-GW_MSG_CRYPT      = 0x02    -- Encrypted
-
-
---
 -- Limits
 --
-GW_MAX_MESSAGE_LENGTH = 255
+GW_MAX_MESSAGE_LENGTH   = 255
 
+
+--
+-- Intervals, timeouts, and thresholds
+--
+GW_INTERVAL_CONFIG_HOLD     = 300
+GW_INTERVAL_RELOAD_HOLD     = 300
+GW_TIMEOUT_COMEMBER_CACHE   = 180
+GW_TIMEOUT_CHAT_BLOCK       = 30
+
+    

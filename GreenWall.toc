@@ -12,6 +12,7 @@
 
 Lib\Load.xml
 Constants.lua
+Config.lua
 GreenWall.lua
 Utility.lua
 Channel.lua
