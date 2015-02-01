@@ -24,6 +24,28 @@ SOFTWARE.
 
 --]]-----------------------------------------------------------------------
 
+
+---------------------------------------------------------------------------
+-- Logic functions
+---------------------------------------------------------------------------
+
+--- Case insensitive string comparison.
+-- @param a A string
+-- @param b A string
+-- @return True if the strings match in all respects except case, false otherwise.
+function gw.iCmp(a, b)
+    if string.lower(a) == string.lower(b) then
+        return true
+    else
+        return false
+    end
+end
+
+
+---------------------------------------------------------------------------
+-- Logging functions
+---------------------------------------------------------------------------
+
 --- Add a message to the log file
 -- @param msg A string to write to the log.
 function gw.Log(msg)
@@ -69,6 +91,52 @@ function gw.Debug(level, ...)
             end
         end
     end
+end
+
+
+---------------------------------------------------------------------------
+-- Game functions
+---------------------------------------------------------------------------
+
+--- Format name for cross-realm addressing.
+-- @param name Character name or guild name.
+-- @param realm Name of the realm.
+-- @return A formatted cross-realm address.
+local function GwGlobalName(name, realm)
+    -- Pass formatted names without modification.
+    if name:match(".+-[%a']+$") then
+        return name
+    end
+
+    -- Use local realm as the default.
+    if realm == nil then
+        realm = GetRealmName()
+    end
+
+    return name .. '-' .. realm:gsub("%s+", "")
+
+end
+
+
+--- Get the player's fully-qualified name.
+-- @return A qualified player name.
+function gw.GetPlayerName(target)
+    return UnitName('player') .. '-' .. gwRealmName:gsub("%s+", "")
+end
+
+
+--- Get the player's fully-qualified guild name.
+-- @param target (optional) unit ID, default is 'Player'.
+-- @return A qualified guild name or nil if the player is not in a guild.
+function gw.GetGuildName(target)
+    if target == nil then
+        target = 'Player'
+    end
+    local name, _, _, realm = GetGuildInfo(target)
+    if name == nil then
+        return
+    end
+    return GwGlobalName(name, realm)
 end
 
 
