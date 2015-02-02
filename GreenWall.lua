@@ -1229,7 +1229,7 @@ local function GwSlashCmd(message, editbox)
         gw.Write('logsize='      .. tostring(GreenWall.logsize))
     
         gw.Write('NEW CONFIG:')
-        gwConfig:dump()
+        gw.config:dump()
     
     elseif command == 'stats' then
     
@@ -1347,7 +1347,7 @@ function GreenWall_OnEvent(self, event, ...)
         -- Initialize the saved variables
         --
         GwSetDefaults(true)
-        gwConfig = GwConfig:new()
+        gw.config = GwConfig:new()
         
         --
         -- Thundercats are go!
@@ -1713,7 +1713,7 @@ function GreenWall_OnEvent(self, event, ...)
         -- Update the configuration
         if not gwCommonChannel.configured then
             GwGetGuildInfoConfig(gwCommonChannel)
-            gwConfig:load()
+            gw.config:load()
         end
         
         if GreenWall.ochat then
@@ -1725,7 +1725,7 @@ function GreenWall_OnEvent(self, event, ...)
         -- Periodic check for updated configuration.
         if holdtime >= gwConfigHoldInt then
             GwGetGuildInfoConfig(gwCommonChannel)
-            gwConfig:load()
+            gw.config:load()
             if GreenWall.ochat then
                 GwGetOfficerNoteConfig(gwOfficerChannel)
             end

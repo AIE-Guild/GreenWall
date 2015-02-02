@@ -42,18 +42,6 @@ Class Variables
 GwConfig = {}
 GwConfig.__index = GwConfig
 
-GwConfig.Options = {
-    tag           = { default = true,           desc = "co-guild tagging"                   },
-    achievements  = { default = false,          desc = "co-guild achievement announcements" },
-    roster        = { default = true,           desc = "co-guild roster announcements"      },
-    rank          = { default = false,          desc = "co-guild rank announcements"        },
-    debug         = { default = GW_LOG_NONE,    desc = "debugging level"                    },
-    verbose       = { default = false,          desc = "verbose debugging"                  },
-    log           = { default = false,          desc = "event logging"                      },
-    logsize       = { default = 2048,           desc = "maximum log buffer size"            },
-    ochat         = { default = false,          desc = "officer chat bridging"              },
-}
-
 
 --- GwConfig constructor function.
 -- @return An initialized GwConfig instance.
@@ -111,20 +99,6 @@ function GwConfig:initialize(keep)
         end
     end
     
-    -- Groom parameters
-    if keep == nil then
-        keep = false
-    else
-        keep = true
-    end
-    
-    -- Set user options
-    for k, v in pairs(GwConfig.Options) do
-        if not keep or self[k] == nil then
-            self[k] = v.default
-        end
-    end
-
     return self
 end
 
@@ -179,6 +153,23 @@ function GwConfig:load()
         return estr
     end
     
+    local function get_gm_officer_note()
+        if not gw.IsOfficer() then
+            return
+        end
+        
+        local n = GetNumGuildMembers();
+        local name, rank, note
+        for i = 1, n do
+            name, _, rank, _, _, _, _, note = GetGuildRosterInfo(i);
+            if rank == 0 then
+                gw.Debug(GW_LOG_INFO, 'officer_config: parsing officer note for %s.', name);
+                return note;
+            end
+        end
+        return
+    end
+    
     local info = GetGuildInfoText()     -- Guild information text.
     local xlat = {}                     -- Translation table for string substitution.
 
@@ -195,7 +186,11 @@ function GwConfig:load()
     -- Soft reset of configuration
     self:initialize(true)
     
+    --
     -- Parse version 1 configuration
+    --
+    
+    -- Guild info
     for buffer in gmatch(info, 'GW:?(%l:[^\n]*)') do
     
         if buffer ~= nil then
@@ -260,6 +255,19 @@ function GwConfig:load()
             end
         end
     
+    end
+    
+    -- Officer note
+    if GreenWall.ochat then
+        local cname, cpass = string.match(get_gm_officer_note(), 'GW:?a:([%w_]+):([%w_]*)')
+        if cname ~= nil then
+            self.channel.officer.name = cname
+            self.channel.officer.password = cpass ~= nil and cpass or ''
+            self.channel.officer.configured = true
+            gw.Debug(GW_LOG_DEBUG, 'officer_config: channel=<<%04X>>, password=<<%04X>>',
+                        crc.Hash(self.channel.officer.name),
+                        crc.Hash(self.channel.officer.password));
+        end
     end
     
     return true;
