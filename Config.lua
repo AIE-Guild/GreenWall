@@ -78,7 +78,7 @@ function GwConfig:initialize(keep)
     end
     
     -- General configuration
-    self.version = 0
+    self.major_version = 0
     self.minimum = 0
     self.loaded = false
     
@@ -99,6 +99,15 @@ function GwConfig:initialize(keep)
         end
     end
     
+    -- State information
+    self.addon_loaded = false
+    self.send_who = 0
+    self.timeout = {
+        config_hold = 0,
+        reload_hold = 0,
+        channel_hold = 0,
+    }
+            
     return self
 end
 
@@ -195,7 +204,7 @@ function GwConfig:load()
     
         if buffer ~= nil then
         
-            self.version = 1
+            self.major_version = 1
             buffer = strtrim(buffer)
             local field = { strsplit(':', buffer) }
         
@@ -272,5 +281,53 @@ function GwConfig:load()
     
     return true;
     
+end
+
+
+--- Check whether the configuration hold-down has expired.
+-- @param flag (optional) True to start the hold-down, false to clear the hold-down.
+-- @return True if the hold-down is still in effect, false if it has expired.
+function GwConfig:configHold(flag)    
+    local t = time()
+    if flag ~= nil then
+        if flag then
+            self.timeout.config_hold = t + GW_TIMEOUT_CONFIG_HOLD
+        else
+            self.timeout.config_hold = 1
+        end
+    end
+    return t > self.timeout.config_hold
+end
+
+
+--- Check whether the channel hold-down has expired.
+-- @param flag (optional) True to start the hold-down, false to clear the hold-down.
+-- @return True if the hold-down is still in effect, false if it has expired.
+function GwConfig:channelHold(flag)    
+    local t = time()
+    if flag ~= nil then
+        if flag then
+            self.timeout.channel_hold = t + GW_TIMEOUT_CHANNEL_HOLD
+        else
+            self.timeout.channel_hold = 1
+        end
+    end
+    return t > self.timeout.channel_hold
+end
+
+
+--- Check whether the reload hold-down has expired.
+-- @param flag (optional) True to start the hold-down, false to clear the hold-down.
+-- @return True if the hold-down is still in effect, false if it has expired.
+function GwConfig:reloadHold(flag)    
+    local t = time()
+    if flag ~= nil then
+        if flag then
+            self.timeout.reload_hold = t + GW_TIMEOUT_RELOAD_HOLD
+        else
+            self.timeout.reload_hold = 1
+        end
+    end
+    return t > self.timeout.reload_hold
 end
 
