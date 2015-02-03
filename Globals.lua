@@ -30,5 +30,7 @@ Global Variables
 
 --]]-----------------------------------------------------------------------
 
-gw = {}
+gw = {
+    version = GetAddOnMetadata('GreenWall', 'Version')
+}
 

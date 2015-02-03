@@ -38,7 +38,7 @@ local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
 --
 local _
 
-local gwVersion = GetAddOnMetadata('GreenWall', 'Version')
+gw.config = GwConfig:new()
 
 --
 -- Default configuration values
@@ -108,7 +108,6 @@ local gwPlayerLanguage  = GetDefaultLanguage('Player')
 -- Co-guild variables
 --
 
-local gwConfederation   = ""
 local gwContainerId     = nil
 local gwPeerTable       = {}
 local gwCommonChannel 	= {}
@@ -135,7 +134,7 @@ local gwComemberTimeout = 180
 --
 -- Guild options
 --
-local gwOptMinVersion   = gwVersion
+local gwOptMinVersion   = gw.version
 local gwOptChanKick     = false
 local gwOptChanBan      = false
 
@@ -176,19 +175,6 @@ local gwGuildCheck      = {}
 Convenience Functions
 
 --]]-----------------------------------------------------------------------
-
---- Case insensitive string comparison.
--- @param a A string
--- @param b A string
--- @return True if the strings match in all respects except case, false otherwise.
-local function GwCmp(a, b)
-    if string.lower(a) == string.lower(b) then
-        return true
-    else
-        return false
-    end
-end
-
 
 --- Format name for cross-realm addressing.
 -- @param name Character name or guild name.
@@ -348,7 +334,7 @@ local function GwChannelRoles(chan, name)
         local _, _, _, _, count = GetChannelDisplayInfo(chan.number)
         for i = 1, count do
             local target, town, tmod = GetChannelRosterInfo(chan.number, i)
-            if GwCmp(target, name) then
+            if gw.iCmp(target, name) then
                 return town, tmod
             end
         end
@@ -690,7 +676,6 @@ local function GwPrepComms()
     
     gw.Debug(GW_LOG_INFO, 'prep_comms: initiating reconnect, querying guild roster.')
     
-    gwConfederation = ""
     gwContainerId   = nil
     gwPeerTable     = {}
     gwCommonChannel = GwNewChannelTable()
@@ -1216,7 +1201,7 @@ local function GwSlashCmd(message, editbox)
             gw.Write('peer[%s] => %s', i, v)
         end
     
-        gw.Write('version='      .. gwVersion)
+        gw.Write('version='      .. gw.version)
         gw.Write('min_version='  .. gwOptMinVersion)
         
         gw.Write('tag='          .. tostring(GreenWall.tag))
@@ -1244,7 +1229,7 @@ local function GwSlashCmd(message, editbox)
     
     elseif command == 'version' then
 
-        gw.Write('GreenWall version %s.', gwVersion)
+        gw.Write('GreenWall version %s.', gw.version)
 
     else
     
@@ -1292,7 +1277,7 @@ function GreenWall_OnLoad(self)
     --
     -- Add a tab to the Interface Options panel.
     --
-    self.name = 'GreenWall ' .. gwVersion
+    self.name = 'GreenWall ' .. gw.version
     self.refresh = function (self) GreenWallInterfaceFrame_OnShow(self) end
     self.okay = function (self) GreenWallInterfaceFrame_SaveUpdates(self) end
     self.cancel = function (self) return end
@@ -1321,7 +1306,7 @@ local function GwSetDefaults(soft)
             GreenWall[k] = p['default']
         end
     end
-    GreenWall.version = gwVersion
+    GreenWall.version = gw.version
 
     if GreenWallLog == nil then
         GreenWallLog = {}
@@ -1347,13 +1332,12 @@ function GreenWall_OnEvent(self, event, ...)
         -- Initialize the saved variables
         --
         GwSetDefaults(true)
-        gw.config = GwConfig:new()
         
         --
         -- Thundercats are go!
         --
         gwAddonLoaded = true
-        gw.Write('v%s loaded.', gwVersion)
+        gw.Write('v%s loaded.', gw.version)
         
         gw.Debug(GW_LOG_DEBUG, 'init: name=%s, realm=%s', gwPlayerName, gwRealmName)
         
@@ -1404,7 +1388,7 @@ function GreenWall_OnEvent(self, event, ...)
                         end
                     end
         
-                elseif not GwCmp(sender, gwPlayerName) and container ~= gwContainerId then
+                elseif not gw.iCmp(sender, gwPlayerName) and container ~= gw.config.guild_id then
                 
                     if opcode == 'C' then
         
@@ -1460,7 +1444,7 @@ function GreenWall_OnEvent(self, event, ...)
             --
             -- Check for corruption of outbound messages on the shared channels (e.g. modification by Identity).
             --
-            if GwCmp(sender, gwPlayerName) then                
+            if gw.iCmp(sender, gwPlayerName) then                
             
                 local tx_hash = nil
                 if chanNum == gwCommonChannel.number then
@@ -1496,7 +1480,7 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<GUILD, %s>: %s', sender, message)
         gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gwPlayerName)
-        if GwCmp(sender, gwPlayerName) then
+        if gw.iCmp(sender, gwPlayerName) then
             GwSendConfederationMsg(gwCommonChannel, 'chat', message)
         end
     
@@ -1505,7 +1489,7 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<OFFICER, %s>: %s', sender, message)
         gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gwPlayerName)
-        if GwCmp(sender, gwPlayerName) and GreenWall.ochat then
+        if gw.iCmp(sender, gwPlayerName) and GreenWall.ochat then
             GwSendConfederationMsg(gwOfficerChannel, 'chat', message)
         end
     
@@ -1514,7 +1498,7 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<ACHIEVEMENT, %s>: %s', sender, message)
         gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gwPlayerName)
-        if GwCmp(sender, gwPlayerName) then
+        if gw.iCmp(sender, gwPlayerName) then
             GwSendConfederationMsg(gwCommonChannel, 'achievement', message)
         end
     
@@ -1527,7 +1511,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<ADDON(%s), %s>: %s', prefix, sender, message)
         gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gwPlayerName)
         
-        if prefix == 'GreenWall' and dist == 'GUILD' and not GwCmp(sender, gwPlayerName) then
+        if prefix == 'GreenWall' and dist == 'GUILD' and not gw.iCmp(sender, gwPlayerName) then
         
             local type, command = strsplit('#', message)
             
