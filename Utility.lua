@@ -121,7 +121,7 @@ end
 --- Get the player's fully-qualified name.
 -- @return A qualified player name.
 function gw.GetPlayerName(target)
-    return UnitName('player') .. '-' .. gwRealmName:gsub("%s+", "")
+    return UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
 end
 
 

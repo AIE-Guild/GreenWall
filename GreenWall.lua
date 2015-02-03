@@ -98,10 +98,7 @@ local gwUsage = [[
 -- Player variables
 --
 
-local gwRealmName       = GetRealmName()
-local gwPlayerName      = UnitName('player') .. '-' .. gwRealmName:gsub("%s+", "")
 local gwGuildName       = nil  -- wait until guild info is retrieved. 
-local gwPlayerLanguage  = GetDefaultLanguage('Player')
 
 
 --
@@ -359,7 +356,7 @@ local function GwSendConfederationMsg(chan, type, message, sync)
     local payload = strsub(strjoin('#', opcode, coguild, '', message), 1, 255)
     
     -- Send the message.
-    gw.Debug(GW_LOG_DEBUG, 'Tx<%d, %s>: %s', chan.number, gwPlayerName, payload)
+    gw.Debug(GW_LOG_DEBUG, 'Tx<%d, %s>: %s', chan.number, gw.player, payload)
     SendChatMessage(payload , "CHANNEL", nil, chan.number)
 
     -- Record the hash of the outbound message for integrity checking, keeping a count of collisions.  
@@ -400,7 +397,7 @@ local function GwSendContainerMsg(type, message)
     end
 
     local payload = strsub(strjoin('#', opcode, message), 1, 255)
-    gw.Debug(GW_LOG_DEBUG, 'Tx<ADDON/GUILD, *, %s>: %s', gwPlayerName, payload)
+    gw.Debug(GW_LOG_DEBUG, 'Tx<ADDON/GUILD, *, %s>: %s', gw.player, payload)
     SendAddonMessage('GreenWall', payload, 'GUILD')
     
 end
@@ -1141,7 +1138,7 @@ function GreenWall_OnEvent(self, event, ...)
         gwAddonLoaded = true
         gw.Write('v%s loaded.', gw.version)
         
-        gw.Debug(GW_LOG_DEBUG, 'init: name=%s, realm=%s', gwPlayerName, gwRealmName)
+        gw.Debug(GW_LOG_DEBUG, 'init: name=%s, realm=%s', gw.player, gw.realm)
         
     end            
         
@@ -1163,7 +1160,7 @@ function GreenWall_OnEvent(self, event, ...)
             sender = gw.GlobalName(sender)   -- Groom sender name.
         
             gw.Debug(GW_LOG_DEBUG, 'Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload)
-            gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gwPlayerName)
+            gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
 
             local opcode, container, _, message = strsplit('#', payload, 4)
             
@@ -1190,7 +1187,7 @@ function GreenWall_OnEvent(self, event, ...)
                         end
                     end
         
-                elseif not gw.iCmp(sender, gwPlayerName) and container ~= gw.config.guild_id then
+                elseif not gw.iCmp(sender, gw.player) and container ~= gw.config.guild_id then
                 
                     if opcode == 'C' then
         
@@ -1246,7 +1243,7 @@ function GreenWall_OnEvent(self, event, ...)
             --
             -- Check for corruption of outbound messages on the shared channels (e.g. modification by Identity).
             --
-            if gw.iCmp(sender, gwPlayerName) then                
+            if gw.iCmp(sender, gw.player) then                
             
                 local tx_hash = nil
                 if chanNum == gwCommonChannel.number then
@@ -1281,8 +1278,8 @@ function GreenWall_OnEvent(self, event, ...)
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<GUILD, %s>: %s', sender, message)
-        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gwPlayerName)
-        if gw.iCmp(sender, gwPlayerName) then
+        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
+        if gw.iCmp(sender, gw.player) then
             GwSendConfederationMsg(gwCommonChannel, 'chat', message)
         end
     
@@ -1290,8 +1287,8 @@ function GreenWall_OnEvent(self, event, ...)
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<OFFICER, %s>: %s', sender, message)
-        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gwPlayerName)
-        if gw.iCmp(sender, gwPlayerName) and GreenWall.ochat then
+        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
+        if gw.iCmp(sender, gw.player) and GreenWall.ochat then
             GwSendConfederationMsg(gwOfficerChannel, 'chat', message)
         end
     
@@ -1299,8 +1296,8 @@ function GreenWall_OnEvent(self, event, ...)
     
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<ACHIEVEMENT, %s>: %s', sender, message)
-        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gwPlayerName)
-        if gw.iCmp(sender, gwPlayerName) then
+        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
+        if gw.iCmp(sender, gw.player) then
             GwSendConfederationMsg(gwCommonChannel, 'achievement', message)
         end
     
@@ -1311,9 +1308,9 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'on_event: event=%s, prefix=%s, sender=%s, dist=%s, message=%s',
                 event, prefix, sender, dist, message)
         gw.Debug(GW_LOG_DEBUG, 'Rx<ADDON(%s), %s>: %s', prefix, sender, message)
-        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gwPlayerName)
+        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
         
-        if prefix == 'GreenWall' and dist == 'GUILD' and not gw.iCmp(sender, gwPlayerName) then
+        if prefix == 'GreenWall' and dist == 'GUILD' and not gw.iCmp(sender, gw.player) then
         
             local type, command = strsplit('#', message)
             
@@ -1426,13 +1423,13 @@ function GreenWall_OnEvent(self, event, ...)
         
         local pat_online = string.gsub(format(ERR_FRIEND_ONLINE_SS, '(.+)', '(.+)'), '%[', '%%[')
         local pat_offline = format(ERR_FRIEND_OFFLINE_S, '(.+)')
-        local pat_join = format(ERR_GUILD_JOIN_S, gwPlayerName)
-        local pat_leave = format(ERR_GUILD_LEAVE_S, gwPlayerName)
-        local pat_quit = format(ERR_GUILD_QUIT_S, gwPlayerName)
-        local pat_removed = format(ERR_GUILD_REMOVE_SS, gwPlayerName, '(.+)')
-        local pat_kick = format(ERR_GUILD_REMOVE_SS, '(.+)', gwPlayerName)
-        local pat_promote = format(ERR_GUILD_PROMOTE_SSS, gwPlayerName, '(.+)', '(.+)')
-        local pat_demote = format(ERR_GUILD_DEMOTE_SSS, gwPlayerName, '(.+)', '(.+)')
+        local pat_join = format(ERR_GUILD_JOIN_S, gw.player)
+        local pat_leave = format(ERR_GUILD_LEAVE_S, gw.player)
+        local pat_quit = format(ERR_GUILD_QUIT_S, gw.player)
+        local pat_removed = format(ERR_GUILD_REMOVE_SS, gw.player, '(.+)')
+        local pat_kick = format(ERR_GUILD_REMOVE_SS, '(.+)', gw.player)
+        local pat_promote = format(ERR_GUILD_PROMOTE_SSS, gw.player, '(.+)', '(.+)')
+        local pat_demote = format(ERR_GUILD_DEMOTE_SSS, gw.player, '(.+)', '(.+)')
         
         if message:match(pat_online) then
         
