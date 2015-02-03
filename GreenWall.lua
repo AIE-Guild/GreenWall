@@ -94,22 +94,6 @@ local gwUsage = [[
  
 ]]
         
---
--- Player variables
---
-
-local gwGuildName       = nil  -- wait until guild info is retrieved. 
-
-
---
--- Co-guild variables
---
-
-local gwContainerId     = nil
-local gwPeerTable       = {}
-local gwCommonChannel 	= {}
-local gwOfficerChannel 	= {}
-
 
 --
 -- State variables
@@ -126,14 +110,6 @@ local gwStateSendWho    = 0
 
 local gwComemberCache   = {}
 local gwComemberTimeout = 180
-
-
---
--- Guild options
---
-local gwOptMinVersion   = gw.version
-local gwOptChanKick     = false
-local gwOptChanBan      = false
 
 
 --
@@ -179,7 +155,7 @@ Convenience Functions
 -- @return True if connected, otherwise false.
 local function GwIsConnected(chan)
 
-    if chan.name then
+    if chan.configured then
         chan.number = GetChannelName(chan.name)
         gw.Debug(GW_LOG_DEBUG, 'conn_check: chan_name=<<%04X>>, chan_id=%d', crc.Hash(chan.name), chan.number)
         if chan.number ~= 0 then
@@ -341,11 +317,11 @@ local function GwSendConfederationMsg(chan, type, message, sync)
     end
     
     local coguild
-    if gwContainerId == nil then
+    if gw.config.guild_id == nil then
         gw.Debug(GW_LOG_NOTICE, 'coguild_msg: missing container ID.')
         coguild = '-'
     else
-        coguild = gwContainerId
+        coguild = gw.config.guild_id
     end
     
     if message == nil then
@@ -460,7 +436,7 @@ end
 -- @return True if connection success, false otherwise.
 local function GwJoinChannel(chan)
 
-    if chan.name then
+    if chan.configured then
         --
         -- Open the communication link
         --
@@ -548,234 +524,8 @@ end
 local function GwPrepComms()
     
     gw.Debug(GW_LOG_INFO, 'prep_comms: initiating reconnect, querying guild roster.')
-    
-    gwContainerId   = nil
-    gwPeerTable     = {}
-    gwCommonChannel = GwNewChannelTable()
-    gwOfficerChannel = GwNewChannelTable()
-
+    gw.config:initialize()
     GuildRoster()
-    
-end
-
-
---- Parse the guild information page to gather configuration information.
--- @param chan Channel control table to update.
--- @return True if successful, false otherwise.
-local function GwGetGuildInfoConfig(chan)
-
-    gw.Debug(GW_LOG_INFO, 'guild_info: parsing guild information.')
-
-    local info = GetGuildInfoText()     -- Guild information text.
-    local xlat = {}                     -- Translation table for string substitution.
-    
-    if info == '' then
-
-        gw.Debug(GW_LOG_INFO, 'guild_info: not yet available.')
-        return false
-    
-    else    
-
-        -- Make sure we know which co-guild we are in.
-        if gwGuildName == nil or gwGuildName == '' then
-            gwGuildName = gw.GetGuildName()
-            if gwGuildName == nil then
-                gw.Debug(GW_LOG_ERROR, 'guild_info: co-guild unavailable.')
-                return false
-            else
-                gw.Debug(GW_LOG_INFO, 'guild_info: co-guild is %s.', gwGuildName)
-            end
-        end
-    
-        -- We will rebuild the list of peer container guilds
-        wipe(gwPeerTable)
-        wipe(xlat)
-
-        for buffer in gmatch(info, 'GW:?(%l:[^\n]*)') do
-        
-            if buffer ~= nil then
-                        
-                buffer = strtrim(buffer)
-                local vector = { strsplit(':', buffer) }
-            
-                if vector[1] == 'c' then
-                
-                    -- Common Channel:
-                    -- This specifies the custom chat channel to use for all general confederation bridging.
-                    
-                    if chan.name ~= vector[2] then
-                        chan.name = vector[2]
-                        chan.dirty = true
-                    end
-                    
-                    if chan.password ~= vector[3] then
-                        chan.password = vector[3]
-                        chan.dirty = true
-                    end
-                        
-                    gw.Debug(GW_LOG_DEBUG, 'guild_info: channel=<<%04X>>, password=<<%04X>>', 
-                            crc.Hash(chan.name), crc.Hash(chan.password))
-
-                elseif vector[1] == 'p' then
-        
-                    -- Peer Co-Guild:
-                    -- You must specify one of these directives for each co-guild in the confederation, including the co-guild you are configuring.
-                    
-                    local cog_name, cog_id, count
-                    
-                    cog_name, count = string.gsub(vector[2], '%$(%a)', function(a) return xlat[a] end)
-                    cog_name = gw.GlobalName(cog_name)
-                    if count > 0 then
-                        gw.Debug(GW_LOG_INFO, 'guild_info: parser co-guild name substitution "%s" => "%s"', vector[2], cog_name)
-                    end
-                    
-                    cog_id, count   = string.gsub(vector[3], '%$(%a)', function(a) return xlat[a] end)
-                    if count > 0 then
-                        gw.Debug(GW_LOG_INFO, 'guild_info: parser co-guild ID substitution "%s" => "%s"', vector[3], cog_id)
-                    end
-                    
-                    if cog_name == gwGuildName then
-                        gwContainerId = cog_id
-                        gw.Debug(GW_LOG_INFO, 'guild_info: container=%s (%s)', gwGuildName, gwContainerId)
-                    else 
-                        gwPeerTable[cog_id] = cog_name
-                        gw.Debug(GW_LOG_INFO, 'guild_info: peer=%s (%s)', cog_name, cog_id)
-                    end
-                    
-                elseif vector[1] == 's' then
-                
-                    -- Substitution Variable:
-                    -- This specifies a variable that will can be used in the peer co-guild directives to reduce the size of the configuration.
-                           
-                    local key = vector[3]
-                    local val = vector[2]            
-                    if string.len(key) == 1 then
-                        if key ~= nil then
-                            xlat[key] = val
-                            gw.Debug(GW_LOG_INFO, 'guild_info: parser substitution rule added, "$%s" := "%s"', key, val)
-                        end
-                    else
-                        gw.Debug(GW_LOG_ERROR, 'guild_info: invalid parser substitution variable name, "$%s"', key)
-                    end
-                                        
-                elseif vector[1] == 'v' then
-                
-                    -- Minimum Version:
-                    -- The minimum version of GreenWall that the guild management wishes to allow members to use.
-                    
-                    if strmatch(vector[2], '^%d+%.%d+%.%d+%w*$') then
-                        gwOptMinVersion = vector[2]
-                        gw.Debug(GW_LOG_INFO, 'guild_info: minimum version is %s', gwOptMinVersion)
-                    end
-                    
-                elseif vector[1] == 'd' then
-                
-                    -- Channel Defense:
-                    -- This option specifies the type of channel defense hat should be employed. This feature is currently unimplemented.
-                    
-                    if vector[2] == 'k' then
-                        gwOptChanKick = true
-                        gw.Debug(GW_LOG_INFO, 'guild_info: channel defense mode is kick.')
-                    elseif vector[2] == 'kb' then
-                        gwOptChanBan = true
-                        gw.Debug(GW_LOG_INFO, 'guild_info: channel defense mode is kick/ban.')
-                    else
-                        gw.Debug(GW_LOG_INFO, 'guild_info: channel defense mode is disabled.')
-                    end
-                                                                     
-                elseif vector[1] == 'o' then
-                
-                    -- Option List:
-                    -- This is the old, deprecated format for specifying configuration options.
-                
-                    local optlist = { strsplit(',', gsub(vector[2], '%s+', '')) }
-                
-                    for i, opt in ipairs(optlist) do
-                    
-                        local k, v = strsplit('=', opt)
-                    
-                        k = strlower(k)
-                        v = strlower(v)
-                        
-                        if k == 'mv' then
-                            if strmatch(v, '^%d+%.%d+%.%d+%w*$') then
-                                gwOptMinVersion = v
-                                gw.Debug(GW_LOG_INFO, 'guild_info: minimum version is %s', gwOptMinVersion)
-                            end
-                        elseif k == 'cd' then
-                            if v == 'k' then
-                                gwOptChanKick = true
-                                gw.Debug(GW_LOG_INFO, 'guild_info: channel defense mode is kick.')
-                            elseif v == 'kb' then
-                                gwOptChanBan = true
-                                gw.Debug(GW_LOG_INFO, 'guild_info: channel defense mode is kick/ban.')
-                            else
-                                gw.Debug(GW_LOG_INFO, 'guild_info: channel defense mode is disabled.')
-                            end
-                        end
-                        
-                    end
-                                    
-                end
-        
-            end
-    
-        end
-            
-        chan.configured = true
-        gw.Debug(GW_LOG_INFO, 'guild_info: configuration updated.')
-            
-    end
-        
-    return true
-        
-end
-
-
---- Parse the officer note of the guild leader to gather configuration information.
--- @param chan Channel control table to update.
--- @return True if successful, false otherwise.
-local function GwGetOfficerNoteConfig(chan)
-
-    -- Avoid pointless work if we're not an officer
-    if not gw.IsOfficer() then
-        return false
-    end
-    
-    -- Find the guild leader
-    local n = GetNumGuildMembers()
-    local leader = 0
-    local config = ''
-
-    local name
-    local rank
-    local note
-    for i = 1, n do
-        name, _, rank, _, _, _, _, note = GetGuildRosterInfo(i)
-        if rank == 0 then
-            gw.Debug(GW_LOG_INFO, 'officer_note: parsing officer note for %s.', name)
-            leader = 1
-            config = note
-            break
-        end
-    end
-    
-    if leader == 0 then
-        return false
-    else
-
-        -- update the channel control table
-        chan.name, chan.password = config:match('GW:?a:([%w_]+):([%w_]*)')
-        if chan.name ~= nil then
-            chan.configured = true
-            gw.Debug(GW_LOG_DEBUG, 
-                    'officer_note: channel=<<%04X>>, password=<<%04X>>', 
-                    crc.Hash(chan.name), crc.Hash(chan.password))
-            return true
-        else
-            return false
-        end        
-    end
     
 end
 
@@ -788,38 +538,38 @@ local function GwRefreshComms()
     --
     -- Connect if necessary
     --
-    if GwIsConnected(gwCommonChannel) then    
-        if gwCommonChannel.dirty then
+    if GwIsConnected(gw.config.channel.guild) then    
+        if gw.config.channel.guild.dirty then
             gw.Debug(GW_LOG_INFO, 'refresh_comms: common channel dirty flag set.')
-            GwLeaveChannel(gwCommonChannel)
-            if GwJoinChannel(gwCommonChannel) then
-                GwFlushChannel(gwCommonChannel)
+            GwLeaveChannel(gw.config.channel.guild)
+            if GwJoinChannel(gw.config.channel.guild) then
+                GwFlushChannel(gw.config.channel.guild)
             end
-            gwCommonChannel.dirty = false
+            gw.config.channel.guild.dirty = false
         end
     elseif gwFlagChatBlock then
         gw.Debug(GW_LOG_INFO, 'refresh_comms: deferring common channel refresh, General not yet joined.')
     else    
-        if GwJoinChannel(gwCommonChannel) then
-            GwFlushChannel(gwCommonChannel)
+        if GwJoinChannel(gw.config.channel.guild) then
+            GwFlushChannel(gw.config.channel.guild)
         end
     end
 
     if GreenWall.ochat then
-        if GwIsConnected(gwOfficerChannel) then    
-            if gwOfficerChannel.dirty then
+        if GwIsConnected(gw.config.channel.officer) then    
+            if gw.config.channel.officer.dirty then
                 gw.Debug(GW_LOG_INFO, 'refresh_comms: common channel dirty flag set.')
-                GwLeaveChannel(gwOfficerChannel)
-                if GwJoinChannel(gwOfficerChannel) then
-                    GwFlushChannel(gwOfficerChannel)
+                GwLeaveChannel(gw.config.channel.officer)
+                if GwJoinChannel(gw.config.channel.officer) then
+                    GwFlushChannel(gw.config.channel.officer)
                 end
-                gwOfficerChannel.dirty = false
+                gw.config.channel.officer.dirty = false
             end
         elseif gwFlagChatBlock then
             gw.Debug(GW_LOG_INFO, 'refresh_comms: deferring officer channel refresh, General not yet joined.')
         else    
-            if GwJoinChannel(gwOfficerChannel) then
-                GwFlushChannel(gwOfficerChannel)
+            if GwJoinChannel(gw.config.channel.officer) then
+                GwFlushChannel(gw.config.channel.officer)
             end
         end
     end
@@ -829,8 +579,8 @@ end
 
 --- Send a configuration reload request to the rest of the confederation.
 local function GwForceReload()
-    if GwIsConnected(gwCommonChannel) then
-        GwSendConfederationMsg(gwCommonChannel, 'request', 'reload')
+    if GwIsConnected(gw.config.channel.guild) then
+        GwSendConfederationMsg(gw.config.channel.guild, 'request', 'reload')
     end 
 end
 
@@ -960,7 +710,7 @@ local function GwSlashCmd(message, editbox)
                 tremove(GreenWallLog, 1)
             end
         elseif command == 'ochat' then
-            GwGetOfficerNoteConfig(gwOfficerChannel)
+            gw.config:load()
             GwRefreshComms()
         end
     
@@ -976,54 +726,17 @@ local function GwSlashCmd(message, editbox)
     
     elseif command == 'status' then
     
-        gw.Write('container=' .. tostring(gwContainerId))
-        gw.Write('common: chan=<<%04X>>, num=%d, pass=<<%04X>>, connected=%s',
-                crc.Hash(gwCommonChannel.name), 
-                tostring(gwCommonChannel.number), 
-                crc.Hash(gwCommonChannel.password),
-                tostring(GwIsConnected(gwCommonChannel))
-            )
-        if GreenWall.ochat then
-            gw.Write('officer: chan=<<%04X>>, num=%d, pass=<<%04X>>, connected=%s',
-                    crc.Hash(gwOfficerChannel.name), 
-                    tostring(gwOfficerChannel.number), 
-                    crc.Hash(gwOfficerChannel.password),
-                    tostring(GwIsConnected(gwOfficerChannel))
-                )
-        end
-        
-        gw.Write('hold_down=%d/%d', (time() - gwConfigHoldTime), gwConfigHoldInt)
-        -- gw.Write('chan_kick=' .. tostring(gwOptKick))
-        -- gw.Write('chan_ban=' .. tostring(gwOptBan))
-        
-        for i, v in pairs(gwPeerTable) do
-            gw.Write('peer[%s] => %s', i, v)
-        end
-    
-        gw.Write('version='      .. gw.version)
-        gw.Write('min_version='  .. gwOptMinVersion)
-        
-        gw.Write('tag='          .. tostring(GreenWall.tag))
-        gw.Write('achievements=' .. tostring(GreenWall.achievements))
-        gw.Write('roster='       .. tostring(GreenWall.roster))
-        gw.Write('rank='         .. tostring(GreenWall.rank))
-        gw.Write('debug='        .. tostring(GreenWall.debug))
-        gw.Write('verbose='      .. tostring(GreenWall.verbose))
-        gw.Write('log='          .. tostring(GreenWall.log))
-        gw.Write('logsize='      .. tostring(GreenWall.logsize))
-    
-        gw.Write('NEW CONFIG:')
         gw.config:dump()
     
     elseif command == 'stats' then
     
         gw.Write('common: %d sconn, %d fconn, %d leave, %d disco', 
-                gwCommonChannel.stats.sconn, gwCommonChannel.stats.fconn,
-                gwCommonChannel.stats.leave, gwCommonChannel.stats.disco)
+                gw.config.channel.guild.stats.sconn, gw.config.channel.guild.stats.fconn,
+                gw.config.channel.guild.stats.leave, gw.config.channel.guild.stats.disco)
         if GreenWall.ochat then
             gw.Write('officer: %d sconn, %d fconn, %d leave, %d disco', 
-                    gwOfficerChannel.stats.sconn, gwOfficerChannel.stats.fconn,
-                    gwOfficerChannel.stats.leave, gwOfficerChannel.stats.disco)
+                    gw.config.channel.officer.stats.sconn, gw.config.channel.officer.stats.fconn,
+                    gw.config.channel.officer.stats.leave, gw.config.channel.officer.stats.disco)
         end
     
     elseif command == 'version' then
@@ -1155,7 +868,7 @@ function GreenWall_OnEvent(self, event, ...)
         local payload, sender, language, _, _, flags, _, 
                 chanNum, _, _, counter, guid = select(1, ...)
         
-        if chanNum == gwCommonChannel.number or chanNum == gwOfficerChannel.number then
+        if chanNum == gw.config.channel.guild.number or chanNum == gw.config.channel.officer.number then
         
             sender = gw.GlobalName(sender)   -- Groom sender name.
         
@@ -1181,8 +894,8 @@ function GreenWall_OnEvent(self, event, ...)
                         if diff >= gwReloadHoldInt then
                             gw.Debug(GW_LOG_INFO, 'on_event: initiating reload.')
                             gwReloadHoldTime = timestamp
-                            gwCommonChannel.configured = false
-                            gwOfficerChannel.configured = false
+                            gw.config.channel.guild.configured = false
+                            gw.config.channel.officer.configured = false
                             GuildRoster()
                         end
                     end
@@ -1191,9 +904,9 @@ function GreenWall_OnEvent(self, event, ...)
                 
                     if opcode == 'C' then
         
-                        if chanNum == gwCommonChannel.number then
+                        if chanNum == gw.config.channel.guild.number then
                             GwReplicateMessage('GUILD', sender, container, language, flags, message, counter, guid)
-                        elseif chanNum == gwOfficerChannel.number then
+                        elseif chanNum == gw.config.channel.officer.number then
                             GwReplicateMessage('OFFICER', sender, container, language, flags, message, counter, guid)
                         end
                         
@@ -1246,10 +959,10 @@ function GreenWall_OnEvent(self, event, ...)
             if gw.iCmp(sender, gw.player) then                
             
                 local tx_hash = nil
-                if chanNum == gwCommonChannel.number then
-                    tx_hash = gwCommonChannel.tx_hash
-                elseif chanNum == gwOfficerChannel.number then
-                    tx_hash = gwOfficerChannel.tx_hash
+                if chanNum == gw.config.channel.guild.number then
+                    tx_hash = gw.config.channel.guild.tx_hash
+                elseif chanNum == gw.config.channel.officer.number then
+                    tx_hash = gw.config.channel.officer.tx_hash
                 end
                 
                 if tx_hash ~= nil then
@@ -1280,7 +993,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<GUILD, %s>: %s', sender, message)
         gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
         if gw.iCmp(sender, gw.player) then
-            GwSendConfederationMsg(gwCommonChannel, 'chat', message)
+            GwSendConfederationMsg(gw.config.channel.guild, 'chat', message)
         end
     
     elseif event == 'CHAT_MSG_OFFICER' then
@@ -1289,7 +1002,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<OFFICER, %s>: %s', sender, message)
         gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
         if gw.iCmp(sender, gw.player) and GreenWall.ochat then
-            GwSendConfederationMsg(gwOfficerChannel, 'chat', message)
+            GwSendConfederationMsg(gw.config.channel.officer, 'chat', message)
         end
     
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
@@ -1298,7 +1011,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<ACHIEVEMENT, %s>: %s', sender, message)
         gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
         if gw.iCmp(sender, gw.player) then
-            GwSendConfederationMsg(gwCommonChannel, 'achievement', message)
+            GwSendConfederationMsg(gw.config.channel.guild, 'achievement', message)
         end
     
     elseif event == 'CHAT_MSG_ADDON' then
@@ -1331,9 +1044,9 @@ function GreenWall_OnEvent(self, event, ...)
                     if gwFlagOwner then
                         -- Verify the claim
                         if gw.IsOfficer(sender) then
-                            if gwCommonChannel.owner then
+                            if gw.config.channel.guild.owner then
                                 gw.Debug(GW_LOG_INFO, 'on_event: granting owner status to $s.', sender)
-                                SetChannelOwner(gwCommonChannel.name, sender)
+                                SetChannelOwner(gw.config.channel.guild.name, sender)
                             end
                             gwFlagHandoff = true
                         end
@@ -1349,7 +1062,7 @@ function GreenWall_OnEvent(self, event, ...)
         local _, player, _, _, _, _, _, number = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'chan_join: channel=%s, player=%s', number, player)
         
-        if number == gwCommonChannel.number then
+        if number == gw.config.channel.guild.number then
             if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
                 if gwComemberCache[player] then
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', player)
@@ -1367,7 +1080,7 @@ function GreenWall_OnEvent(self, event, ...)
         local _, player, _, _, _, _, _, number = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'chan_leave: channel=%s, player=%s', number, player)
         
-        if number == gwCommonChannel.number then
+        if number == gw.config.channel.guild.number then
             if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
                 if gwComemberCache[player] then
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', player)
@@ -1382,7 +1095,7 @@ function GreenWall_OnEvent(self, event, ...)
                         
     elseif event == 'CHANNEL_UI_UPDATE' then
     
-        if gwGuildName ~= nil then
+        if gw.GetGuildName() ~= nil then
             GwRefreshComms()
         end
 
@@ -1391,17 +1104,17 @@ function GreenWall_OnEvent(self, event, ...)
         local action, _, _, _, _, _, type, number, name = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'chat_notice: type=%s, number=%s, name=%s, action=%s', type, number, name, action)
         
-        if number == gwCommonChannel.number then
+        if number == gw.config.channel.guild.number then
             
             if action == 'YOU_LEFT' then
-                gwCommonChannel.stats.disco = gwCommonChannel.stats.disco + 1
+                gw.config.channel.guild.stats.disco = gw.config.channel.guild.stats.disco + 1
                 GwRefreshComms()
             end
         
-        elseif number == gwOfficerChannel.number then
+        elseif number == gw.config.channel.officer.number then
             
             if action == 'YOU_LEFT' then
-                gwOfficerChannel.stats.disco = gwOfficerChannel.stats.disco + 1
+                gw.config.channel.officer.stats.disco = gw.config.channel.officer.stats.disco + 1
                 GwRefreshComms()
             end
         
@@ -1449,69 +1162,58 @@ function GreenWall_OnEvent(self, event, ...)
 
             -- We have joined the guild.
             gw.Debug(GW_LOG_DEBUG, 'on_event: guild join detected.')
-            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('join'))
+            GwSendConfederationMsg(gw.config.channel.guild, 'broadcast', GwEncodeBroadcast('join'))
 
         elseif message:match(pat_leave) or message:match(pat_quit) or message:match(pat_removed) then
         
             -- We have left the guild.
             gw.Debug(GW_LOG_DEBUG, 'on_event: guild quit detected.')
-            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('leave'))
-            if GwIsConnected(gwCommonChannel) then
-                GwAbandonChannel(gwCommonChannel)
-                gwCommonChannel = GwNewChannelTable()
+            GwSendConfederationMsg(gw.config.channel.guild, 'broadcast', GwEncodeBroadcast('leave'))
+            if GwIsConnected(gw.config.channel.guild) then
+                GwAbandonChannel(gw.config.channel.guild)
+                gw.config.channel.guild = GwNewChannelTable()
             end
-            if GwIsConnected(gwOfficerChannel) then
-                GwAbandonChannel(gwOfficerChannel)
-                gwOfficerChannel = GwNewChannelTable()
+            if GwIsConnected(gw.config.channel.officer) then
+                GwAbandonChannel(gw.config.channel.officer)
+                gw.config.channel.officer = GwNewChannelTable()
             end
 
         elseif message:match(pat_kick) then
             
-            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('remove', message:match(pat_kick)))
+            GwSendConfederationMsg(gw.config.channel.guild, 'broadcast', GwEncodeBroadcast('remove', message:match(pat_kick)))
         
         elseif message:match(pat_promote) then
             
-            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('promote', message:match(pat_promote)))
+            GwSendConfederationMsg(gw.config.channel.guild, 'broadcast', GwEncodeBroadcast('promote', message:match(pat_promote)))
         
         elseif message:match(pat_demote) then
             
-            GwSendConfederationMsg(gwCommonChannel, 'broadcast', GwEncodeBroadcast('demote', message:match(pat_demote)))
+            GwSendConfederationMsg(gw.config.channel.guild, 'broadcast', GwEncodeBroadcast('demote', message:match(pat_demote)))
         
         end
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
-        gwGuildName = gw.GetGuildName()
-        if gwGuildName == nil then
+        local guild = gw.GetGuildName()
+        if guild == nil then
             gw.Debug(GW_LOG_NOTICE, 'guild_info: co-guild unavailable.')
             return false
         else
-            gw.Debug(GW_LOG_DEBUG, 'guild_info: co-guild is %s.', gwGuildName)
+            gw.Debug(GW_LOG_DEBUG, 'guild_info: co-guild is %s.', guild)
         end
             
         local holdtime = timestamp - gwConfigHoldTime
         gw.Debug(GW_LOG_DEBUG, 'config_reload: common_conf=%s, officer_conf=%s, holdtime=%d, holdint=%d',
-                tostring(gwCommonChannel.configured), tostring(gwOfficerChannel.configured), holdtime, gwConfigHoldInt)
+                tostring(gw.config.channel.guild.configured), tostring(gw.config.channel.officer.configured), holdtime, gwConfigHoldInt)
 
         -- Update the configuration
-        if not gwCommonChannel.configured then
-            GwGetGuildInfoConfig(gwCommonChannel)
+        if not gw.config.channel.guild.configured then
             gw.config:load()
         end
-        
-        if GreenWall.ochat then
-            if not gwOfficerChannel.configured then
-                GwGetOfficerNoteConfig(gwOfficerChannel)
-            end
-        end
-        
+                
         -- Periodic check for updated configuration.
         if holdtime >= gwConfigHoldInt then
-            GwGetGuildInfoConfig(gwCommonChannel)
             gw.config:load()
-            if GreenWall.ochat then
-                GwGetOfficerNoteConfig(gwOfficerChannel)
-            end
             gwConfigHoldTime = timestamp
         end
 
