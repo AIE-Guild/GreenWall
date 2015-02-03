@@ -176,41 +176,6 @@ Convenience Functions
 
 --]]-----------------------------------------------------------------------
 
---- Format name for cross-realm addressing.
--- @param name Character name or guild name.
--- @param realm Name of the realm.
--- @return A formatted cross-realm address.
-local function GwGlobalName(name, realm)
-
-    -- Pass formatted names without modification.
-    if name:match(".+-[%a']+$") then
-        return name
-    end
-
-    -- Use local realm as the default.
-    if realm == nil then
-        realm = gwRealmName
-    end
-
-    return name .. '-' .. realm:gsub("%s+", "")
-
-end
-
-
---- Get the player's fully-qualified guild name.
--- @param target (optional) unit ID, default is 'Player'.
--- @return A qualified guild name or nil if the player is not in a guild.
-local function GwGuildName(target)
-    if target == nil then
-        target = 'Player'
-    end
-    local name, _, _, realm = GetGuildInfo(target)
-    if name == nil then
-        return
-    end
-    return GwGlobalName(name, realm)
-end
-
 
 --- Check if a connection exists to the common chat.
 -- @param chan A channel control table.
@@ -227,44 +192,6 @@ local function GwIsConnected(chan)
     
     return false
             
-end
-
-
---- Check a target player for officer status in the same container guild.
--- @param target The name of the player to check.
--- @return True is the target has at least read access to officer chat and officer notes, false otherwise.
-local function GwIsOfficer(target)
-
-    local rank;
-    local see_chat = false
-    local see_note = false
-    
-    if target == nil then
-        target = 'Player'
-    end
-    _, _, rank = GetGuildInfo(target)
-    
-    if rank == 0 then
-        see_chat = true
-        see_note = true
-    else
-        GuildControlSetRank(rank);
-        for i, v in ipairs({GuildControlGetRankFlags()}) do
-            local flag = _G["GUILDCONTROL_OPTION"..i]
-            if flag == 'Officerchat Listen' then
-                see_chat = true
-            elseif flag == 'View Officer Note' then
-                see_note = true
-            end
-        end
-    end
-    
-    local result = see_chat and see_note
-    gw.Debug(GW_LOG_INFO, 'is_officer: %s; rank=%d, chat=%s, note=%s', 
-            tostring(result), rank, tostring(see_chat), tostring(see_note));
-
-    return result;
-
 end
 
 
@@ -291,57 +218,6 @@ local function GwNewChannelTable(name, password)
         }
     }
     return tab
-end
-
-
---- Check a guild for peer status.
--- @param guild The name of the guild to check.
--- @return True if the target guild is a peer co-guild, false otherwise.
-local function GwIsPeer(guild)
-    for i, v in pairs(gwPeerTable) do
-        if v == guild then
-            return true
-        end
-    end
-    return false
-end
-
-
---- Check a guild for membership within the confederation.
--- @param guild The name of the guild to check.
--- @return True if the target guild is in the confederation, false otherwise.
-local function GwIsContainer(guild)
-    if guild == gwGuildName then
-        return gwContainerId ~= nil
-    else
-        return GwIsPeer(guild)
-    end
-end
-
-
---- Finds channel roles for a player.
--- @param chan Control table for the channel.
--- @param name Name of the player to check.
--- @return True if target is the channel owner, false otherwise.
--- @return True if target is a channel moderator, false otherwise.
-local function GwChannelRoles(chan, name)
-        
-    if name == nil then
-        name = gwPlayerName
-    end
-    
-    if chan.number ~= 0 then
-        local _, _, _, _, count = GetChannelDisplayInfo(chan.number)
-        for i = 1, count do
-            local target, town, tmod = GetChannelRosterInfo(chan.number, i)
-            if gw.iCmp(target, name) then
-                return town, tmod
-            end
-        end
-    end
-    
-    return
-    
 end
 
 
@@ -635,7 +511,7 @@ local function GwJoinChannel(chan)
             --
             -- Request permissions if necessary
             --
-            if GwIsOfficer() then
+            if gw.IsOfficer() then
                 GwSendContainerMsg('response', 'officer')
             end
             
@@ -686,80 +562,6 @@ local function GwPrepComms()
 end
 
 
---- Parse the confederation configuration information.
--- @param text Text containing the confederation configuration
--- @return A table containing the parsed configuration.
-local function GwParseConfig(text)
-
-    local config = {}
-    local var    = {}
-    local seen   = {}
-    
-    for op, buffer in gmatch(text, 'GW(%l)="([^"]*)"') do
-        local args = { strsplit('|', buffer) }
-        if seen[op] then
-            gw.Error('ignored duplicate directive in configuration: GW%s', op)
-        else
-            seen[op] = true
-            if op == "c" then
-                config.conf_name    = args[1]
-                config.cont_tag     = args[2]
-                config.gchan_name   = args[3]
-                config.gchan_pass   = args[4]
-            elseif op == "e" then
-                config.gchan_key    = args[1]
-                config.gchan_cipher = args[2]
-            elseif op == "a" then
-                config.ochan_name   = args[1]
-                config.ochan_pass   = args[2]
-                config.ochan_key    = args[3]
-                config.ochan_cipher = args[4]
-            elseif op == "s" then
-                if args[1] and args[2] then
-                    var[args[1]] = args[2]
-                end
-            elseif op == "v" then
-                config.min_ver      = args[1]
-            else
-                gw.Debug(GW_LOG_ERROR, 'unknown configuration directive: GW%s', op)
-                seen[op] = nil
-            end
-        end
-    end
-    
-    for op, buffer in gmatch(text, 'GW:?(%l):([^\n]*)') do
-        local args = { strsplit(':', buffer) }
-        if seen[op] then
-            gw.Error('ignored duplicate directive in configuration: GW%s', op)
-        else
-            seen[op] = true
-            if op == "c" then
-                config.conf_name    = ""
-                config.cont_tag     = ""
-                config.gchan_name   = args[1]
-                config.gchan_pass   = args[2]
-            elseif op == "a" then
-                config.ochan_name   = args[1]
-                config.ochan_pass   = args[2]
-            elseif op == "s" then
-                if args[1] and args[2] then
-                    var[args[2]] = args[1]
-                end
-            elseif op == "v" then
-                config.min_ver      = args[1]
-            elseif op == "d" then
-                config.min_ver      = args[1]
-            else
-                gw.Debug(GW_LOG_ERROR, 'unknown configuration directive: GW%s', op)
-                seen[op] = nil
-            end
-        end
-    end
-        
-    return config
-end
-
-
 --- Parse the guild information page to gather configuration information.
 -- @param chan Channel control table to update.
 -- @return True if successful, false otherwise.
@@ -779,7 +581,7 @@ local function GwGetGuildInfoConfig(chan)
 
         -- Make sure we know which co-guild we are in.
         if gwGuildName == nil or gwGuildName == '' then
-            gwGuildName = GwGuildName()
+            gwGuildName = gw.GetGuildName()
             if gwGuildName == nil then
                 gw.Debug(GW_LOG_ERROR, 'guild_info: co-guild unavailable.')
                 return false
@@ -825,7 +627,7 @@ local function GwGetGuildInfoConfig(chan)
                     local cog_name, cog_id, count
                     
                     cog_name, count = string.gsub(vector[2], '%$(%a)', function(a) return xlat[a] end)
-                    cog_name = GwGlobalName(cog_name)
+                    cog_name = gw.GlobalName(cog_name)
                     if count > 0 then
                         gw.Debug(GW_LOG_INFO, 'guild_info: parser co-guild name substitution "%s" => "%s"', vector[2], cog_name)
                     end
@@ -939,7 +741,7 @@ end
 local function GwGetOfficerNoteConfig(chan)
 
     -- Avoid pointless work if we're not an officer
-    if not GwIsOfficer() then
+    if not gw.IsOfficer() then
         return false
     end
     
@@ -1054,7 +856,7 @@ function GreenWallInterfaceFrame_OnShow(self)
     getglobal(self:GetName().."OptionAchievements"):SetChecked(GreenWall.achievements)
     getglobal(self:GetName().."OptionRoster"):SetChecked(GreenWall.roster)
     getglobal(self:GetName().."OptionRank"):SetChecked(GreenWall.rank)
-    if (GwIsOfficer()) then
+    if (gw.IsOfficer()) then
         getglobal(self:GetName().."OptionOfficerChat"):SetChecked(GreenWall.ochat)
         getglobal(self:GetName().."OptionOfficerChatText"):SetTextColor(1, 1, 1)
         getglobal(self:GetName().."OptionOfficerChat"):Enable()
@@ -1070,7 +872,7 @@ function GreenWallInterfaceFrame_SaveUpdates(self)
     GreenWall.achievements = getglobal(self:GetName().."OptionAchievements"):GetChecked() and true or false
     GreenWall.roster = getglobal(self:GetName().."OptionRoster"):GetChecked() and true or false
     GreenWall.rank = getglobal(self:GetName().."OptionRank"):GetChecked() and true or false
-    if (GwIsOfficer()) then
+    if (gw.IsOfficer()) then
         GreenWall.ochat = getglobal(self:GetName().."OptionOfficerChat"):GetChecked() and true or false
     end    
 end
@@ -1358,7 +1160,7 @@ function GreenWall_OnEvent(self, event, ...)
         
         if chanNum == gwCommonChannel.number or chanNum == gwOfficerChannel.number then
         
-            sender = GwGlobalName(sender)   -- Groom sender name.
+            sender = gw.GlobalName(sender)   -- Groom sender name.
         
             gw.Debug(GW_LOG_DEBUG, 'Rx<%d, %d, %s>: %s', chanNum, counter, sender, payload)
             gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gwPlayerName)
@@ -1520,7 +1322,7 @@ function GreenWall_OnEvent(self, event, ...)
             if type == 'C' then
             
                 if command == 'officer' then
-                    if GwIsOfficer() then
+                    if gw.IsOfficer() then
                         -- Let 'em know you have the authoritay!
                         GwSendContainerMsg('response', 'officer')
                     end
@@ -1531,7 +1333,7 @@ function GreenWall_OnEvent(self, event, ...)
                 if command == 'officer' then
                     if gwFlagOwner then
                         -- Verify the claim
-                        if GwIsOfficer(sender) then
+                        if gw.IsOfficer(sender) then
                             if gwCommonChannel.owner then
                                 gw.Debug(GW_LOG_INFO, 'on_event: granting owner status to $s.', sender)
                                 SetChannelOwner(gwCommonChannel.name, sender)
@@ -1682,7 +1484,7 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
-        gwGuildName = GwGuildName()
+        gwGuildName = gw.GetGuildName()
         if gwGuildName == nil then
             gw.Debug(GW_LOG_NOTICE, 'guild_info: co-guild unavailable.')
             return false

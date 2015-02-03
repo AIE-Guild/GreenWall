@@ -284,6 +284,31 @@ function GwConfig:load()
 end
 
 
+--- Check a guild for peer status.
+-- @param guild The name of the guild to check.
+-- @return True if the target guild is a peer co-guild, false otherwise.
+function GwConfig:IsPeer(guild)
+    for i, v in pairs(self.peer) do
+        if v == guild then
+            return true
+        end
+    end
+    return false
+end
+
+
+--- Check a guild for membership within the confederation.
+-- @param guild The name of the guild to check.
+-- @return True if the target guild is in the confederation, false otherwise.
+function GwConfig:IsContainer(guild)
+    if guild == self:GetGuildName() then
+        return self.guild_id ~= nil
+    else
+        return self:IsPeer(guild)
+    end
+end
+
+
 --- Check whether the configuration hold-down has expired.
 -- @param flag (optional) True to start the hold-down, false to clear the hold-down.
 -- @return True if the hold-down is still in effect, false if it has expired.
