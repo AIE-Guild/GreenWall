@@ -54,9 +54,9 @@ end
 
 
 --- Initialize a GwConfig object with the default attributes and state.
--- @param keep If true, update only undefined attributes.
+-- @param soft If true, keep state intact.
 -- @return The initialized GwConfig instance.
-function GwConfig:initialize(keep)
+function GwConfig:initialize(soft)
     local function new_channel(name, password)
         return {
             name = name ~= nil and name or '',
@@ -109,13 +109,6 @@ function GwConfig:initialize(keep)
     }
             
     return self
-end
-
-
---- Reset all attributes and state.
--- @return The initialized GwConfig instance.
-function GwConfig:reset()
-    self:initialize(false)
 end
 
 
@@ -212,10 +205,12 @@ function GwConfig:load()
                 -- Guild channel configuration
                 if self.channel.guild.name ~= field[2] then
                     self.channel.guild.name = field[2]
+                    self.channel.guild.configured = true
                     self.channel.guild.dirty = true
                 end
                 if self.channel.guild.password ~= field[3] then
                     self.channel.guild.password = field[3]
+                    self.channel.guild.configured = true
                     self.channel.guild.dirty = true
                 end
                 gw.Debug(GW_LOG_DEBUG, 'guild_config: channel=<<%04X>>, password=<<%04X>>',
@@ -273,6 +268,7 @@ function GwConfig:load()
             self.channel.officer.name = cname
             self.channel.officer.password = cpass ~= nil and cpass or ''
             self.channel.officer.configured = true
+            self.channel.officer.dirty = true
             gw.Debug(GW_LOG_DEBUG, 'officer_config: channel=<<%04X>>, password=<<%04X>>',
                         crc.Hash(self.channel.officer.name),
                         crc.Hash(self.channel.officer.password));

@@ -133,16 +133,6 @@ local gwHandoffTimeout  = 15
 local gwHandoffTimer    = nil
 
 
---
--- Tables external to functions
---
-
-local gwChannelTable    = {}
-local gwChatWindowTable = {}
-local gwFrameTable      = {}
-local gwGuildCheck      = {}
-
-
 --[[-----------------------------------------------------------------------
 
 Convenience Functions
@@ -232,10 +222,10 @@ local function GwReplicateMessage(target, sender, container, language, flags,
     local i    
     for i = 1, NUM_CHAT_WINDOWS do
 
-        gwFrameTable = { GetChatWindowMessages(i) }
+        gw.frame_table = { GetChatWindowMessages(i) }
         
         local v
-        for _, v in ipairs(gwFrameTable) do
+        for _, v in ipairs(gw.frame_table) do
                         
             if v == target then
                     
@@ -468,8 +458,8 @@ local function GwJoinChannel(chan)
             -- Hide the channel
             --
             for i = 1, 10 do
-                gwChatWindowTable = { GetChatWindowMessages(i) }
-                for j, v in ipairs(gwChatWindowTable) do
+                gw.frame_table = { GetChatWindowMessages(i) }
+                for j, v in ipairs(gw.frame_table) do
                     if v == chan.name then
                         local frame = format('ChatFrame%d', i)
                         if _G[frame] then

@@ -30,7 +30,10 @@ Global Variables
 
 --]]-----------------------------------------------------------------------
 
-gw = {}
+gw = {
+    frame_table = {},
+}
+
 gw.version  = GetAddOnMetadata('GreenWall', 'Version')
 gw.realm    = GetRealmName()
 gw.player   = UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
