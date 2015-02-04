@@ -103,12 +103,8 @@ gw.config = GwConfig:new()
 --
 -- Cache tables
 --
-
 local gwComemberCache   = {}
 local gwComemberTimeout = 180
-
-local gwHandoffTimeout  = 15
-local gwHandoffTimer    = nil
 
 
 --[[-----------------------------------------------------------------------
@@ -147,8 +143,6 @@ local function GwNewChannelTable(name, password)
         number = 0,
         configured = false,
         dirty = false,
-        owner = false,
-        handoff = false,
         queue = {},
         tx_hash = {},
         stats = {
@@ -1015,7 +1009,6 @@ function GreenWall_OnEvent(self, event, ...)
                                 gw.Debug(GW_LOG_INFO, 'on_event: granting owner status to $s.', sender)
                                 SetChannelOwner(gw.config.channel.guild.name, sender)
                             end
-                            gwFlagHandoff = true
                         end
                     end
                 end
