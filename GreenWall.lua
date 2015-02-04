@@ -101,29 +101,12 @@ gw.config = GwConfig:new()
 
 
 --
--- State variables
---
-
-local gwFlagChatBlock   = true
-
-
---
 -- Cache tables
 --
 
 local gwComemberCache   = {}
 local gwComemberTimeout = 180
 
-
---
--- Timers and thresholds
---
-
--- Timeout for General chat barrier
-local gwChatBlockTimeout    = 30
-local gwChatBlockTimestamp  = 0
-
--- Channel ownership handoff
 local gwHandoffTimeout  = 15
 local gwHandoffTimer    = nil
 
@@ -532,7 +515,7 @@ local function GwRefreshComms()
             end
             gw.config.channel.guild.dirty = false
         end
-    elseif gwFlagChatBlock then
+    elseif gw.config.timer.channel:hold() then
         gw.Debug(GW_LOG_INFO, 'refresh_comms: deferring common channel refresh, General not yet joined.')
     else    
         if GwJoinChannel(gw.config.channel.guild) then
@@ -543,14 +526,14 @@ local function GwRefreshComms()
     if GreenWall.ochat then
         if GwIsConnected(gw.config.channel.officer) then    
             if gw.config.channel.officer.dirty then
-                gw.Debug(GW_LOG_INFO, 'refresh_comms: common channel dirty flag set.')
+                gw.Debug(GW_LOG_INFO, 'refresh_comms: officer channel dirty flag set.')
                 GwLeaveChannel(gw.config.channel.officer)
                 if GwJoinChannel(gw.config.channel.officer) then
                     GwFlushChannel(gw.config.channel.officer)
                 end
                 gw.config.channel.officer.dirty = false
             end
-        elseif gwFlagChatBlock then
+        elseif gw.config.timer.channel:hold() then
             gw.Debug(GW_LOG_INFO, 'refresh_comms: deferring officer channel refresh, General not yet joined.')
         else    
             if GwJoinChannel(gw.config.channel.officer) then
@@ -1106,7 +1089,7 @@ function GreenWall_OnEvent(self, event, ...)
         
             if action == 'YOU_JOINED' or action == 'YOU_CHANGED' then
                 gw.Debug(GW_LOG_INFO, 'on_event: General joined, unblocking reconnect.')
-                gwFlagChatBlock = false
+                gw.config.timer.channel:clear()
                 GwRefreshComms()
             end
                 
@@ -1213,24 +1196,16 @@ function GreenWall_OnEvent(self, event, ...)
         GwPrepComms()
         
         -- Defer joining to allow General to grab slot 1
-        gwFlagChatBlock = true
-        
-        -- Timer in case player has left General at some point
-        gwChatBlockTimestamp = timestamp + gwChatBlockTimeout
-    
+        gw.config.timer.channel:set()
+
     end
 
     --
     -- Take care of our lazy timers
     --
     
-    if gwFlagChatBlock then
-        if gwChatBlockTimestamp <= timestamp then
-            -- Give up
-            gw.Debug(GW_LOG_INFO, 'on_event: reconnect deferral timeout expired.')
-            gwFlagChatBlock = false
-            GwRefreshComms()
-        end
+    if gw.config.timer.channel:hold() then
+        GwRefreshComms()
     end
     
     --

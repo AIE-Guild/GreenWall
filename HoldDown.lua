@@ -53,10 +53,17 @@ function GwHoldDown:set()
     return self.expiry
 end
 
+--- Clear the hold-down timer.
+-- @return The time at which the interval will end.
+function GwHoldDown:clear()
+    self.expiry = 0
+    return self.expiry
+end
+
 --- Test the hold-down status.
 -- @return True is the hold-down is still in effect, false otherwise.
 function GwHoldDown:hold()
     local t = time()
-    return t <= self.expiry
+    return t < self.expiry
 end
 
