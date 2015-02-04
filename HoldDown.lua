@@ -24,18 +24,39 @@ SOFTWARE.
 
 --]]-----------------------------------------------------------------------
 
+
 --[[-----------------------------------------------------------------------
 
-Global Variables
+Class Variables
 
 --]]-----------------------------------------------------------------------
 
-gw = {
-    frame_table     = {},
-    addon_loaded    = false,
-}
+GwHoldDown = {}
+GwHoldDown.__index = GwHoldDown
 
-gw.version  = GetAddOnMetadata('GreenWall', 'Version')
-gw.realm    = GetRealmName()
-gw.player   = UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
+--- GwHoldDown constructor function.
+-- @param interval The length, in seconds, of the hold-down interval.
+-- @return An initialized GwHoldDown instance.
+function GwHoldDown:new(interval)
+    local self = {}
+    setmetatable(self, GwHoldDown)
+    self.interval = interval
+    self.expiry = 0
+    return self
+end
+
+--- Set the start of the hold-down interval.
+-- @return The time at which the interval will end.
+function GwHoldDown:set()
+    local t = time()
+    self.expiry = t + self.interval
+    return self.expiry
+end
+
+--- Test the hold-down status.
+-- @return True is the hold-down is still in effect, false otherwise.
+function GwHoldDown:hold()
+    local t = time()
+    return t <= self.expiry
+end
 

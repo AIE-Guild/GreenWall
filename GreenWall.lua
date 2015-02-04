@@ -38,7 +38,6 @@ local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
 --
 local _
 
-gw.config = GwConfig:new()
 
 --
 -- Default configuration values
@@ -96,12 +95,17 @@ local gwUsage = [[
         
 
 --
+-- Global objects
+--
+gw.config = GwConfig:new()
+
+
+--
 -- State variables
 --
 
 local gwAddonLoaded     = false
 local gwFlagChatBlock   = true
-local gwStateSendWho    = 0
 
 
 --
@@ -119,10 +123,6 @@ local gwComemberTimeout = 180
 -- Timeout for General chat barrier
 local gwChatBlockTimeout    = 30
 local gwChatBlockTimestamp  = 0
-
--- Configuration hold-down
-local gwConfigHoldInt   = 300
-local gwConfigHoldTime  = 0
 
 -- Hold-down for reload requests
 local gwReloadHoldInt   = 180
@@ -1186,28 +1186,20 @@ function GreenWall_OnEvent(self, event, ...)
     
         local guild = gw.GetGuildName()
         if guild == nil then
+
             gw.Debug(GW_LOG_NOTICE, 'guild_info: co-guild unavailable.')
-            return false
+            
         else
             gw.Debug(GW_LOG_DEBUG, 'guild_info: co-guild is %s.', guild)
-        end
             
-        local holdtime = timestamp - gwConfigHoldTime
-        gw.Debug(GW_LOG_DEBUG, 'config_reload: common_conf=%s, officer_conf=%s, holdtime=%d, holdint=%d',
-                tostring(gw.config.channel.guild.configured), tostring(gw.config.channel.officer.configured), holdtime, gwConfigHoldInt)
-
-        -- Update the configuration
-        if not gw.config.channel.guild.configured then
-            gw.config:load()
+            -- Update the configuration
+            if not gw.config.loaded then
+                gw.config:load()
+            end
+                    
+            GwRefreshComms()
+            
         end
-                
-        -- Periodic check for updated configuration.
-        if holdtime >= gwConfigHoldInt then
-            gw.config:load()
-            gwConfigHoldTime = timestamp
-        end
-
-        GwRefreshComms()
 
     elseif event == 'PLAYER_ENTERING_WORLD' then
     

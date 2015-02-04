@@ -100,12 +100,10 @@ function GwConfig:initialize(soft)
     end
     
     -- State information
-    self.addon_loaded = false
-    self.send_who = 0
-    self.timeout = {
-        config_hold = 0,
-        reload_hold = 0,
-        channel_hold = 0,
+    self.timer = {
+        channel = GwHoldDown:new(GW_TIMEOUT_CHANNEL_HOLD),
+        config  = GwHoldDown:new(GW_TIMEOUT_CONFIG_HOLD),
+        reload  = GwHoldDown:new(GW_TIMEOUT_RELOAD_HOLD),
     }
             
     return self
@@ -174,6 +172,11 @@ function GwConfig:load()
     
     local info = GetGuildInfoText()     -- Guild information text.
     local xlat = {}                     -- Translation table for string substitution.
+
+    if self.timer.config:hold() then
+        gw.Debug(GW_LOG_INFO, 'guild_conf: configuration hold-down in effect.')
+        return false
+    end
 
     if info == '' then
         gw.Debug(GW_LOG_INFO, 'guild_conf: guild configuration not available.')
@@ -274,6 +277,10 @@ function GwConfig:load()
                         crc.Hash(self.channel.officer.password));
         end
     end
+    
+    -- Clean up.
+    self.loaded = true
+    self.timer.config:set()
     
     return true;
     
