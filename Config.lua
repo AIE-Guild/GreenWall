@@ -48,15 +48,27 @@ GwConfig.__index = GwConfig
 function GwConfig:new()
     local self = {}
     setmetatable(self, GwConfig)
-    self:initialize()
+    self:initialize_param()
+    self:initialize_state()
     return self
 end
 
 
---- Initialize a GwConfig object with the default attributes and state.
--- @param force If true, reset state.  Otherwise, only clear configuration.
+--- Initialize a GwConfig object with the default parameters.
 -- @return The initialized GwConfig instance.
-function GwConfig:initialize(force)
+function GwConfig:initialize_param()
+    self.valid = false
+    self.major_version = 0
+    self.minimum = 0
+    self.guild_id = ''
+    self.peer = {}
+    return self
+end
+
+
+--- Initialize a GwConfig object with the default state.
+-- @return The initialized GwConfig instance.
+function GwConfig:initialize_state()
     local function new_channel(name, password)
         return {
             name = name ~= nil and name or '',
@@ -75,34 +87,10 @@ function GwConfig:initialize(force)
         }
     end
     
-    -- Groom arguments
-    if force == nil then
-        force = false
-    end
-    
-    -- General configuration
-    self.valid = false
-    self.major_version = 0
-    self.minimum = 0
-    
-    -- Confederation configuration
-    self.guild_id = ''
-    self.peer = {}
-    
-    -- Channel configuration
-    if self.channel == nil then
-        self.channel = {
-            guild = {},
-            officer = {},
-        }
-    end
-    for k, v in pairs(self.channel) do
-        if self.channel[k].configured == nil then
-            self.channel[k] = new_channel()
-        end
-    end
-    
-    -- State information
+    self.channel = {
+        guild   = new_channel(),
+        officer = new_channel(),
+    }
     self.timer = {
         channel = GwHoldDown:new(GW_TIMEOUT_CHANNEL_HOLD),
         config  = GwHoldDown:new(GW_TIMEOUT_CONFIG_HOLD),
@@ -175,16 +163,24 @@ function GwConfig:load()
         return
     end
     
-    local info = GetGuildInfoText()     -- Guild information text.
     local xlat = {}                     -- Translation table for string substitution.
 
-    -- Abort if a hold-down is in effect
-    if self.timer.config:hold() then
-        gw.Debug(GW_LOG_INFO, 'guild_conf: configuration hold-down in effect.')
+    -- Abort if current configuration is valid
+    if self.valid then
         return false
     end
 
+    -- Abort if not in a guild
+    local guild_name = gw.GetGuildName()
+    if guild_name then
+        gw.Debug(GW_LOG_INFO, 'guild_conf: co-guild is %s', guild_name)
+    else
+        gw.Debug(GW_LOG_INFO, 'guild_conf: not in a guild.')
+        return false
+    end
+    
     -- Abort if configuration is not yet available
+    local info = GetGuildInfoText()     -- Guild information text.
     if info == '' then
         gw.Debug(GW_LOG_INFO, 'guild_conf: guild configuration not available.')
         return false
@@ -192,11 +188,10 @@ function GwConfig:load()
     
     gw.Debug(GW_LOG_INFO, 'guild_conf: parsing guild configuration.')
     
-    local guild_name = gw.GetGuildName()
-    gw.Debug(GW_LOG_INFO, 'guild_conf: co-guild is %s', guild_name)
+
 
     -- Soft reset of configuration
-    self:initialize()
+    self:initialize_param()
     
     --
     -- Parse version 1 configuration
@@ -291,6 +286,50 @@ function GwConfig:load()
     
     return true;
     
+end
+
+
+--- Initiate a refresh of the configuration.
+-- This is a periodic or user-initiated update.
+-- @return True is refresh submitted, false otherwise.
+function GwConfig:refresh()
+    if self.timer.config:hold() then
+        gw.Debug(GW_LOG_DEBUG, 'config_refresh: skipping due to hold-down.')
+        return false
+    else
+        self.valid = false
+        GuildRoster()
+        gw.Debug(GW_LOG_DEBUG, 'config_refresh: roster update requested.')
+        return true
+    end
+end
+
+
+--- Initiate a reload of the configuration.
+-- This is an update initiated by a reload request.
+-- @return True is refresh submitted, false otherwise.
+function GwConfig:refresh()
+    if self.timer.reload:hold() then
+        gw.Debug(GW_LOG_DEBUG, 'config_reload: skipping due to hold-down.')
+        return false
+    else
+        self.valid = false
+        GuildRoster()
+        self.timer.reload:set()
+        gw.Debug(GW_LOG_DEBUG, 'config_reload: roster update requested.')
+        return true
+    end
+end
+
+
+--- Initiate a reset and reload of the configuration.
+-- This is a disruptive reset of the configuration and state.
+-- @return True is refresh submitted, false otherwise.
+function GwConfig:reset()
+    self:initialize_param(true)
+    GuildRoster()
+    gw.Debug(GW_LOG_DEBUG, 'config_reset: roster update requested.')
+    return true
 end
 
 

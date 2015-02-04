@@ -474,17 +474,6 @@ local function GwFlushChannel(chan)
 end
 
 
---- Clear confederation configuration and request updated guild roster 
--- information from the server.
-local function GwPrepComms()
-    
-    gw.Debug(GW_LOG_INFO, 'prep_comms: initiating reconnect, querying guild roster.')
-    gw.config:initialize()
-    GuildRoster()
-    
-end
-
-
 --- Parse confederation configuration and connect to the common channel.
 local function GwRefreshComms()
 
@@ -846,13 +835,7 @@ function GreenWall_OnEvent(self, event, ...)
                     --
                     if message == 'reload' then
                         gw.Write('Received configuration reload request from %s.', sender)
-                        if not gw.config.timer.reload:hold() then
-                            gw.Debug(GW_LOG_INFO, 'on_event: initiating reload.')
-                            gw.config.channel.guild.configured = false
-                            gw.config.channel.officer.configured = false
-                            gw.config.timer.reload:set()
-                            GuildRoster()
-                        end
+                        gw.config:reload()
                     end
         
                 elseif not gw.iCmp(sender, gw.player) and container ~= gw.config.guild_id then
@@ -1144,22 +1127,8 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
-        local guild = gw.GetGuildName()
-        if guild == nil then
-
-            gw.Debug(GW_LOG_NOTICE, 'guild_info: co-guild unavailable.')
-            
-        else
-            gw.Debug(GW_LOG_DEBUG, 'guild_info: co-guild is %s.', guild)
-            
-            -- Update the configuration
-            if not gw.config.valid then
-                gw.config:load()
-            end
-                    
-            GwRefreshComms()
-            
-        end
+        gw.config:load()
+        GwRefreshComms()
 
     elseif event == 'PLAYER_ENTERING_WORLD' then
     
@@ -1170,17 +1139,17 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'PLAYER_GUILD_UPDATE' then
     
-        -- Query the guild info.
-        GuildRoster()
+        -- Looks like our status has changed.
+        gw.config:reset()
         
     elseif event == 'PLAYER_LOGIN' then
 
-        -- Initiate the comms
-        GwPrepComms()
-        
         -- Defer joining to allow General to grab slot 1
         gw.config.timer.channel:set()
 
+        -- Initiate the comms
+        gw.config:refresh()
+        
     end
 
     --
