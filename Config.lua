@@ -54,9 +54,9 @@ end
 
 
 --- Initialize a GwConfig object with the default attributes and state.
--- @param soft If true, keep state intact.
+-- @param force If true, reset state.  Otherwise, only clear configuration.
 -- @return The initialized GwConfig instance.
-function GwConfig:initialize(soft)
+function GwConfig:initialize(force)
     local function new_channel(name, password)
         return {
             name = name ~= nil and name or '',
@@ -64,8 +64,6 @@ function GwConfig:initialize(soft)
             number = 0,
             configured = false;
             dirty = false,
-            owner = false,
-            handoff = false,
             queue = {},
             tx_hash = {},
             stats = {
@@ -77,10 +75,15 @@ function GwConfig:initialize(soft)
         }
     end
     
+    -- Groom arguments
+    if force == nil then
+        force = false
+    end
+    
     -- General configuration
+    self.valid = false
     self.major_version = 0
     self.minimum = 0
-    self.loaded = false
     
     -- Confederation configuration
     self.guild_id = ''
@@ -175,11 +178,13 @@ function GwConfig:load()
     local info = GetGuildInfoText()     -- Guild information text.
     local xlat = {}                     -- Translation table for string substitution.
 
+    -- Abort if a hold-down is in effect
     if self.timer.config:hold() then
         gw.Debug(GW_LOG_INFO, 'guild_conf: configuration hold-down in effect.')
         return false
     end
 
+    -- Abort if configuration is not yet available
     if info == '' then
         gw.Debug(GW_LOG_INFO, 'guild_conf: guild configuration not available.')
         return false
@@ -191,7 +196,7 @@ function GwConfig:load()
     gw.Debug(GW_LOG_INFO, 'guild_conf: co-guild is %s', guild_name)
 
     -- Soft reset of configuration
-    self:initialize(true)
+    self:initialize()
     
     --
     -- Parse version 1 configuration
@@ -281,7 +286,7 @@ function GwConfig:load()
     end
     
     -- Clean up.
-    self.loaded = true
+    self.valid = true
     self.timer.config:set()
     
     return true;
@@ -311,53 +316,5 @@ function GwConfig:IsContainer(guild)
     else
         return self:IsPeer(guild)
     end
-end
-
-
---- Check whether the configuration hold-down has expired.
--- @param flag (optional) True to start the hold-down, false to clear the hold-down.
--- @return True if the hold-down is still in effect, false if it has expired.
-function GwConfig:configHold(flag)    
-    local t = time()
-    if flag ~= nil then
-        if flag then
-            self.timeout.config_hold = t + GW_TIMEOUT_CONFIG_HOLD
-        else
-            self.timeout.config_hold = 1
-        end
-    end
-    return t > self.timeout.config_hold
-end
-
-
---- Check whether the channel hold-down has expired.
--- @param flag (optional) True to start the hold-down, false to clear the hold-down.
--- @return True if the hold-down is still in effect, false if it has expired.
-function GwConfig:channelHold(flag)    
-    local t = time()
-    if flag ~= nil then
-        if flag then
-            self.timeout.channel_hold = t + GW_TIMEOUT_CHANNEL_HOLD
-        else
-            self.timeout.channel_hold = 1
-        end
-    end
-    return t > self.timeout.channel_hold
-end
-
-
---- Check whether the reload hold-down has expired.
--- @param flag (optional) True to start the hold-down, false to clear the hold-down.
--- @return True if the hold-down is still in effect, false if it has expired.
-function GwConfig:reloadHold(flag)    
-    local t = time()
-    if flag ~= nil then
-        if flag then
-            self.timeout.reload_hold = t + GW_TIMEOUT_RELOAD_HOLD
-        else
-            self.timeout.reload_hold = 1
-        end
-    end
-    return t > self.timeout.reload_hold
 end
 
