@@ -790,8 +790,10 @@ Frame Event Functions
 
 function GreenWall_OnEvent(self, event, ...)
 
+    gw.Debug(GW_LOG_DEBUG, 'on_event: event=%s', event)
+
     --
-    -- Event switch
+    -- Addon loading check
     --
     if event == 'ADDON_LOADED' and select(1, ...) == 'GreenWall' then
         
@@ -806,18 +808,17 @@ function GreenWall_OnEvent(self, event, ...)
         gw.addon_loaded = true
         gw.Write('v%s loaded.', gw.version)
         
-        gw.Debug(GW_LOG_DEBUG, 'init: name=%s, realm=%s', gw.player, gw.realm)
+        gw.Debug(GW_LOG_DEBUG, 'load_complete: name=%s, realm=%s', gw.player, gw.realm)
         
     end            
         
-    if gw.addon_loaded then
-        gw.Debug(GW_LOG_DEBUG, 'on_event: event=%s', event)
-    else
+    if not gw.addon_loaded then
         return      -- early exit
     end
 
-    local timestamp = time()
-
+    --
+    -- Main event switch
+    --
     if event == 'CHAT_MSG_CHANNEL' then
     
         local payload, sender, language, _, _, flags, _, 
@@ -1152,7 +1153,7 @@ function GreenWall_OnEvent(self, event, ...)
             gw.Debug(GW_LOG_DEBUG, 'guild_info: co-guild is %s.', guild)
             
             -- Update the configuration
-            if not gw.config.loaded then
+            if not gw.config.valid then
                 gw.config:load()
             end
                     
