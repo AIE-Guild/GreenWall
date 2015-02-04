@@ -104,7 +104,6 @@ gw.config = GwConfig:new()
 -- State variables
 --
 
-local gwAddonLoaded     = false
 local gwFlagChatBlock   = true
 
 
@@ -578,7 +577,7 @@ UI Handlers
 --]]-----------------------------------------------------------------------
 
 function GreenWallInterfaceFrame_OnShow(self)
-    if (not gwAddonLoaded) then
+    if (not gw.addon_loaded) then
         -- Configuration not loaded.
         self:Hide()
         return
@@ -834,14 +833,14 @@ function GreenWall_OnEvent(self, event, ...)
         --
         -- Thundercats are go!
         --
-        gwAddonLoaded = true
+        gw.addon_loaded = true
         gw.Write('v%s loaded.', gw.version)
         
         gw.Debug(GW_LOG_DEBUG, 'init: name=%s, realm=%s', gw.player, gw.realm)
         
     end            
         
-    if gwAddonLoaded then
+    if gw.addon_loaded then
         gw.Debug(GW_LOG_DEBUG, 'on_event: event=%s', event)
     else
         return      -- early exit
