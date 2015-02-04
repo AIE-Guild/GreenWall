@@ -105,6 +105,8 @@ function GwConfig:initialize(soft)
         config  = GwHoldDown:new(GW_TIMEOUT_CONFIG_HOLD),
         reload  = GwHoldDown:new(GW_TIMEOUT_RELOAD_HOLD),
     }
+    self.comember_cache = GwHoldDownCache:new(GW_CACHE_COMEMBER_HOLD,
+            GW_CACHE_COMEMBER_SOFT_MAX, GW_CACHE_COMEMBER_HARD_MAX)
             
     return self
 end

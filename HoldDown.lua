@@ -24,13 +24,6 @@ SOFTWARE.
 
 --]]-----------------------------------------------------------------------
 
-
---[[-----------------------------------------------------------------------
-
-Class Variables
-
---]]-----------------------------------------------------------------------
-
 GwHoldDown = {}
 GwHoldDown.__index = GwHoldDown
 
@@ -61,9 +54,69 @@ function GwHoldDown:clear()
 end
 
 --- Test the hold-down status.
--- @return True is the hold-down is still in effect, false otherwise.
+-- @return True if a hold-down is in effect, false otherwise.
 function GwHoldDown:hold()
     local t = time()
-    return t < self.expiry
+    return self.expiry > t
+end
+
+
+GwHoldDownCache = {}
+GwHoldDownCache.__index = GwHoldDownCache
+
+--- GwHoldDownCache constructor function.
+-- @param interval The length, in seconds, of the hold-down interval.
+-- @param soft_max Table size threshold for compaction.
+-- @param hard_max Limit on table size.
+-- @return An initialized GwHoldDownCache instance.
+function GwHoldDownCache:new(interval, soft_max, hard_max)
+    local self = {}
+    setmetatable(self, GwHoldDownCache)
+    self.interval = interval
+    self.soft_max = soft_max
+    self.hard_max = hard_max
+    self.cache = {}
+    return self
+end
+
+--- Test the hold-down status of an element.
+-- @return True if a hold-down is in effect, false otherwise.
+function GwHoldDownCache:hold(s)
+    local t = time()
+    local rv = false
+    
+    -- Check for hold-down
+    if self.cache[s] == nil then
+        self.cache[s] = t + self.interval
+    else
+        if self.cache[s] > t then
+            rv = true
+        else
+            table.remove(self.cache, s)
+        end
+    end
+    
+    -- Prune if necessary
+    if #self.cache > self.soft_max then
+        for k, v in pairs(self.cache) do
+            if v > t then
+                table.remove(self.cache, k)
+            end
+        end
+    end
+    
+    -- Hard prune if necessary
+    if #self.cache > self.hard_max then
+        local index = {}
+        for k, ts in pairs(self.cache) do
+            table.insert(index, {ts, k})
+        end
+        table.sort(index, function(a, b) return a[1] < b [1] end)
+        for i = self.hard_max, #index do
+            table.remove(self.cache, index[i][2])
+        end
+    end
+    
+    return rv
 end
 

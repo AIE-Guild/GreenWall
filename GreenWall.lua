@@ -100,13 +100,6 @@ local gwUsage = [[
 gw.config = GwConfig:new()
 
 
---
--- Cache tables
---
-local gwComemberCache   = {}
-local gwComemberTimeout = 180
-
-
 --[[-----------------------------------------------------------------------
 
 Convenience Functions
@@ -1024,14 +1017,12 @@ function GreenWall_OnEvent(self, event, ...)
         
         if number == gw.config.channel.guild.number then
             if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
-                if gwComemberCache[player] then
+                if gw.config.comember_cache:hold(player) then
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', player)
                 else
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: miss %s', player)
                     GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_ONLINE_SS, player, player), nil, nil)
                 end
-                gwComemberCache[player] = timestamp
-                gw.Debug(GW_LOG_DEBUG, format('comember_cache: updated %s', player))
             end
         end
     
@@ -1042,14 +1033,12 @@ function GreenWall_OnEvent(self, event, ...)
         
         if number == gw.config.channel.guild.number then
             if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
-                if gwComemberCache[player] then
+                if gw.config.comember_cache:hold(player) then
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', player)
                 else
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: miss %s', player)
                     GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_OFFLINE_S, player), nil, nil)
                 end
-                gwComemberCache[player] = timestamp
-                gw.Debug(GW_LOG_DEBUG, format('comember_cache: updated %s', player))
             end
         end
                         
@@ -1108,14 +1097,14 @@ function GreenWall_OnEvent(self, event, ...)
         
             local _, player = message:match(pat_online)
             gw.Debug(GW_LOG_DEBUG, 'player_status: player %s online', player)
-            gwComemberCache[player] = timestamp
+            gw.config.comember_cache:hold(player)
             gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
         
         elseif message:match(pat_offline) then
         
             local player = message:match(pat_offline)
             gw.Debug(GW_LOG_DEBUG, 'player_status: player %s offline', player)
-            gwComemberCache[player] = timestamp
+            gw.config.comember_cache:hold(player)
             gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
         
         elseif message:match(pat_join) then
@@ -1199,17 +1188,6 @@ function GreenWall_OnEvent(self, event, ...)
     
     if gw.config.timer.channel:hold() then
         GwRefreshComms()
-    end
-    
-    --
-    -- Prune co-member cache.
-    --
-    local index, value
-    for index, value in pairs(gwComemberCache) do
-        if timestamp > gwComemberCache[index] + gwComemberTimeout then
-            gwComemberCache[index] = nil
-            gw.Debug(GW_LOG_DEBUG, 'comember_cache: deleted %s', index)
-        end
     end
         
 end
