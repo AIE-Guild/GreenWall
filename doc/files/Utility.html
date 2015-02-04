@@ -38,6 +38,18 @@
 <h1>Files</h1>
 <ul>
 
+	<li>
+		<a href="../files/Config.html">Config.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/GreenWall.html">GreenWall.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/HoldDown.html">HoldDown.lua</a>
+	</li>
+
 	<li><strong>Utility.lua</strong></li>
 	
 </ul>
@@ -73,6 +85,26 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#gw.GetGuildName">gw.GetGuildName</a>&nbsp;(target)</td>
+	<td class="summary">Get the player's fully-qualified guild name.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.GetPlayerName">gw.GetPlayerName</a>&nbsp;(target)</td>
+	<td class="summary">Get the player's fully-qualified name.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.GlobalName">gw.GlobalName</a>&nbsp;(name, realm)</td>
+	<td class="summary">Format name for cross-realm addressing.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.IsOfficer">gw.IsOfficer</a>&nbsp;(target)</td>
+	<td class="summary">Check a target player for officer status in the same container guild.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#gw.Log">gw.Log</a>&nbsp;(msg)</td>
 	<td class="summary">Add a message to the log file </td>
 	</tr>
@@ -80,6 +112,11 @@
 	<tr>
 	<td class="name" nowrap><a href="#gw.Write">gw.Write</a>&nbsp;(...)</td>
 	<td class="summary">Write a message to the default chat frame.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.iCmp">gw.iCmp</a>&nbsp;(a, b)</td>
+	<td class="summary">Case insensitive string comparison.</td>
 	</tr>
 
 </table>
@@ -156,6 +193,126 @@ Write an error message to the default chat frame.
 
 
 
+<dt><a name="gw.GetGuildName"></a><strong>gw.GetGuildName</strong>&nbsp;(target)</dt>
+<dd>
+Get the player's fully-qualified guild name.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>target</em></code>: (optional) unit ID, default is 'Player'.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>A qualified guild name or nil if the player is not in a guild.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.GetPlayerName"></a><strong>gw.GetPlayerName</strong>&nbsp;(target)</dt>
+<dd>
+Get the player's fully-qualified name.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>target</em></code>: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>A qualified player name.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.GlobalName"></a><strong>gw.GlobalName</strong>&nbsp;(name, realm)</dt>
+<dd>
+Format name for cross-realm addressing.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Character name or guild name.
+	</li>
+	
+	<li>
+	  <code><em>realm</em></code>: Name of the realm.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>A formatted cross-realm address.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.IsOfficer"></a><strong>gw.IsOfficer</strong>&nbsp;(target)</dt>
+<dd>
+Check a target player for officer status in the same container guild.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>target</em></code>: The name of the player to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the target has at least read access to officer chat and officer notes, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
 <dt><a name="gw.Log"></a><strong>gw.Log</strong>&nbsp;(msg)</dt>
 <dd>
 Add a message to the log file
@@ -200,6 +357,39 @@ Write a message to the default chat frame.
 
 
 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.iCmp"></a><strong>gw.iCmp</strong>&nbsp;(a, b)</dt>
+<dd>
+Case insensitive string comparison.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>a</em></code>: A string
+	</li>
+	
+	<li>
+	  <code><em>b</em></code>: A string
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the strings match in all respects except case, false otherwise.</ul>
 
 
 

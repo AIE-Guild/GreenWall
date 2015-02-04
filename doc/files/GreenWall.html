@@ -39,15 +39,15 @@
 <ul>
 
 	<li>
-		<a href="../files/Channel.html">Channel.lua</a>
-	</li>
-
-	<li>
-		<a href="../files/Constants.html">Constants.lua</a>
+		<a href="../files/Config.html">Config.lua</a>
 	</li>
 
 	<li><strong>GreenWall.lua</strong></li>
 	
+	<li>
+		<a href="../files/HoldDown.html">HoldDown.lua</a>
+	</li>
+
 	<li>
 		<a href="../files/Utility.html">Utility.lua</a>
 	</li>
@@ -80,11 +80,6 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannelRoles">GwChannelRoles</a>&nbsp;(chan, name)</td>
-	<td class="summary">Finds channel roles for a player.</td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#GwCmdConfig">GwCmdConfig</a>&nbsp;(key, val)</td>
 	<td class="summary">Update or display the value of a user configuration variable.</td>
 	</tr>
@@ -110,43 +105,8 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwGetGuildInfoConfig">GwGetGuildInfoConfig</a>&nbsp;(chan)</td>
-	<td class="summary">Parse the guild information page to gather configuration information.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#GwGetOfficerNoteConfig">GwGetOfficerNoteConfig</a>&nbsp;(chan)</td>
-	<td class="summary">Parse the officer note of the guild leader to gather configuration information.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#GwGlobalName">GwGlobalName</a>&nbsp;(name, realm)</td>
-	<td class="summary">Format name for cross-realm addressing.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#GwGuildName">GwGuildName</a>&nbsp;(target)</td>
-	<td class="summary">Get the player's fully-qualified guild name.</td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#GwIsConnected">GwIsConnected</a>&nbsp;(chan)</td>
 	<td class="summary">Check if a connection exists to the common chat.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#GwIsContainer">GwIsContainer</a>&nbsp;(guild)</td>
-	<td class="summary">Check a guild for membership within the confederation.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#GwIsOfficer">GwIsOfficer</a>&nbsp;(target)</td>
-	<td class="summary">Check a target player for officer status in the same container guild.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#GwIsPeer">GwIsPeer</a>&nbsp;(guild)</td>
-	<td class="summary">Check a guild for peer status.</td>
 	</tr>
 
 	<tr>
@@ -162,11 +122,6 @@
 	<tr>
 	<td class="name" nowrap><a href="#GwNewChannelTable">GwNewChannelTable</a>&nbsp;(name, password)</td>
 	<td class="summary">Create a new channel control data structure.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#GwParseConfig">GwParseConfig</a>&nbsp;(text)</td>
-	<td class="summary">Parse the confederation configuration information.</td>
 	</tr>
 
 	<tr>
@@ -230,45 +185,6 @@ Leave a shared confederation channel and clear current configuration.
 
 
 
-
-
-
-</dd>
-
-
-
-
-<dt><a name="GwChannelRoles"></a><strong>GwChannelRoles</strong>&nbsp;(chan, name)</dt>
-<dd>
-Finds channel roles for a player.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>chan</em></code>: Control table for the channel.
-	</li>
-	
-	<li>
-	  <code><em>name</em></code>: Name of the player to check.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return values:</h3>
-<ol>
-	
-	<li>True if target is the channel owner, false otherwise.</li>
-	
-	<li>True if target is a channel moderator, false otherwise.</li>
-	
-</ol>
 
 
 
@@ -430,126 +346,6 @@ Send a configuration reload request to the rest of the confederation.
 
 
 
-<dt><a name="GwGetGuildInfoConfig"></a><strong>GwGetGuildInfoConfig</strong>&nbsp;(chan)</dt>
-<dd>
-Parse the guild information page to gather configuration information.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>chan</em></code>: Channel control table to update.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if successful, false otherwise.</ul>
-
-
-
-</dd>
-
-
-
-
-<dt><a name="GwGetOfficerNoteConfig"></a><strong>GwGetOfficerNoteConfig</strong>&nbsp;(chan)</dt>
-<dd>
-Parse the officer note of the guild leader to gather configuration information.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>chan</em></code>: Channel control table to update.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if successful, false otherwise.</ul>
-
-
-
-</dd>
-
-
-
-
-<dt><a name="GwGlobalName"></a><strong>GwGlobalName</strong>&nbsp;(name, realm)</dt>
-<dd>
-Format name for cross-realm addressing.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>name</em></code>: Character name or guild name.
-	</li>
-	
-	<li>
-	  <code><em>realm</em></code>: Name of the realm.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>A formatted cross-realm address.</ul>
-
-
-
-</dd>
-
-
-
-
-<dt><a name="GwGuildName"></a><strong>GwGuildName</strong>&nbsp;(target)</dt>
-<dd>
-Get the player's fully-qualified guild name.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>target</em></code>: (optional) unit ID, default is 'Player'.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>A qualified guild name or nil if the player is not in a guild.</ul>
-
-
-
-</dd>
-
-
-
-
 <dt><a name="GwIsConnected"></a><strong>GwIsConnected</strong>&nbsp;(chan)</dt>
 <dd>
 Check if a connection exists to the common chat.
@@ -571,93 +367,6 @@ Check if a connection exists to the common chat.
 
 <h3>Return value:</h3>
 <ul>True if connected, otherwise false.</ul>
-
-
-
-</dd>
-
-
-
-
-<dt><a name="GwIsContainer"></a><strong>GwIsContainer</strong>&nbsp;(guild)</dt>
-<dd>
-Check a guild for membership within the confederation.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>guild</em></code>: The name of the guild to check.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the target guild is in the confederation, false otherwise.</ul>
-
-
-
-</dd>
-
-
-
-
-<dt><a name="GwIsOfficer"></a><strong>GwIsOfficer</strong>&nbsp;(target)</dt>
-<dd>
-Check a target player for officer status in the same container guild.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>target</em></code>: The name of the player to check.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True is the target has at least read access to officer chat and officer notes, false otherwise.</ul>
-
-
-
-</dd>
-
-
-
-
-<dt><a name="GwIsPeer"></a><strong>GwIsPeer</strong>&nbsp;(guild)</dt>
-<dd>
-Check a guild for peer status.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>guild</em></code>: The name of the guild to check.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the target guild is a peer co-guild, false otherwise.</ul>
 
 
 
@@ -746,35 +455,6 @@ Create a new channel control data structure.
 
 <h3>Return value:</h3>
 <ul>Channel control table.</ul>
-
-
-
-</dd>
-
-
-
-
-<dt><a name="GwParseConfig"></a><strong>GwParseConfig</strong>&nbsp;(text)</dt>
-<dd>
-Parse the confederation configuration information.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>text</em></code>: Text containing the confederation configuration
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>A table containing the parsed configuration.</ul>
 
 
 
