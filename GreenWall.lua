@@ -124,10 +124,6 @@ local gwComemberTimeout = 180
 local gwChatBlockTimeout    = 30
 local gwChatBlockTimestamp  = 0
 
--- Hold-down for reload requests
-local gwReloadHoldInt   = 180
-local gwReloadHoldTime  = 0
-
 -- Channel ownership handoff
 local gwHandoffTimeout  = 15
 local gwHandoffTimer    = nil
@@ -878,14 +874,13 @@ function GreenWall_OnEvent(self, event, ...)
                     --
                     -- Incoming request
                     --
-                    if message == 'reload' then 
-                        local diff = timestamp - gwReloadHoldTime
+                    if message == 'reload' then
                         gw.Write('Received configuration reload request from %s.', sender)
-                        if diff >= gwReloadHoldInt then
+                        if not gw.config.timer.reload:hold() then
                             gw.Debug(GW_LOG_INFO, 'on_event: initiating reload.')
-                            gwReloadHoldTime = timestamp
                             gw.config.channel.guild.configured = false
                             gw.config.channel.officer.configured = false
+                            gw.config.timer.reload:set()
                             GuildRoster()
                         end
                     end
