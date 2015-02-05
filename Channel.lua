@@ -292,7 +292,7 @@ Receive Methods
 -- @param f A callback function with the following prototype:
 --   f(type, guild_id, ...)
 -- @return The return value of f applied to the data.
-function GwChannel:recieve(s, f)
+function GwChannel:receive(s, f)
     local guild_id, type, message = self:tl_receive(s)
     local t = { self:al_decode(type, message) }
     return f(type, guild_id, unpack(t))
@@ -306,7 +306,7 @@ function GwChannel:al_decode(type, message)
     end
 end
 
-function GwChannel:tl_recieve(segment)
+function GwChannel:tl_receive(segment)
     gw.Debug(GW_LOG_DEBUG, 'tl_receive[%d]: Rx: %s', self.number, segment)
     local opcode, guild_id, _, message = strsplit('#', segment, 4)
     local type
