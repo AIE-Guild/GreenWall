@@ -55,7 +55,7 @@ function GwChannel:new()
     self.name = ''
     self.password = ''
     self.number = 0
-    self.queue = {}
+    self.tx_queue = {}
     self.tx_hash = {}
     self.stats = {
         txcnt = 0,
@@ -67,6 +67,13 @@ function GwChannel:new()
     }
     return self
 end
+
+
+--[[-----------------------------------------------------------------------
+
+Channel Management Methods
+
+--]]-----------------------------------------------------------------------
 
 --- Configure the channel.
 -- @param version Messaging version.
@@ -91,7 +98,7 @@ end
 -- @return True if connection success, false otherwise.
 function GwChannel:join()
 
-    if not self:configured() then
+    if not self:isConfigured() then
         return false
     end
 
@@ -166,6 +173,13 @@ function GwChannel:isConnected()
     return false            
 end
 
+
+--[[-----------------------------------------------------------------------
+
+Transmit Methods
+
+--]]-----------------------------------------------------------------------
+
 --- Sends an encoded message on the shared channel.
 -- @param type The message type.
 --   Accepted values are: 
@@ -225,20 +239,20 @@ end
 -- @param segment Segment to enqueue.
 -- @return Number of segments in queue after the insertion.
 function GwChannel:tl_enqueue(segment)
-    tinsert(self.queue, segment)
-    return #self.queue
+    tinsert(self.tx_queue, segment)
+    return #self.tx_queue
 end
 
 --- Remove a segment from the channel transmit queue.
 -- @return Segment removed from the queue or nil if queue is empty.
 function GwChannel:tl_dequeue()
-    return tremove(self.queue, 1)
+    return tremove(self.tx_queue, 1)
 end
 
 --- Transmit all messages in the channel transmit queue.
 -- @return Number of messages flushed.
 function GwChannel:tl_flush()
-    gw.Debug(GW_LOG_DEBUG, 'tl_flush[%d]: servicing transmit queue; %d message(s) queued.', self.number, #self.queue)
+    gw.Debug(GW_LOG_DEBUG, 'tl_flush[%d]: servicing transmit queue; %d message(s) queued.', self.number, #self.tx_queue)
     if self:isConnected() then
         local count = 0
         while true do
@@ -252,7 +266,7 @@ function GwChannel:tl_flush()
                     self.tx_hash[hash] = self.tx_hash[hash] + 1
                 end
                 -- Send the segment
-                gw.Debug(GW_LOG_DEBUG, 'tl_flush[%d]: Tx<%s, %s>', self.number, gw.player, segment)
+                gw.Debug(GW_LOG_DEBUG, 'tl_flush[%d]: Tx: %s', self.number, segment)
                 SendChatMessage(segment, 'CHANNEL', nil, self.number)
                 self.stats.txcnt = self.stats.txcnt + 1
                 count = count + 1
@@ -264,5 +278,54 @@ function GwChannel:tl_flush()
         gw.Debug(GW_LOG_WARNING, 'tl_flush[%d]: not connected.', self.number)
         return 0
     end
+end
+
+
+--[[-----------------------------------------------------------------------
+
+Receive Methods
+
+--]]-----------------------------------------------------------------------
+
+--- Handler for data received on a channel.
+-- @param s The data received.
+-- @param f A callback function with the following prototype:
+--   f(type, guild_id, ...)
+-- @return The return value of f applied to the data.
+function GwChannel:recieve(s, f)
+    local guild_id, type, message = self:tl_receive(s)
+    local t = { self:al_decode(type, message) }
+    return f(type, guild_id, unpack(t))
+end
+
+function GwChannel:al_decode(type, message)
+    if type == GW_CTYPE_BROADCAST then
+        return strsplit(':', message)
+    else
+        return message
+    end
+end
+
+function GwChannel:tl_recieve(segment)
+    gw.Debug(GW_LOG_DEBUG, 'tl_receive[%d]: Rx: %s', self.number, segment)
+    local opcode, guild_id, _, message = strsplit('#', segment, 4)
+    local type
+    if opcode == 'C' then
+        type = GW_CTYPE_CHAT
+    elseif opcode == 'A' then
+        type = GW_CTYPE_ACHIEVEMENT
+    elseif opcode == 'B' then
+        type = GW_CTYPE_BROADCAST
+    elseif opcode == 'N' then
+        type = GW_CTYPE_NOTICE
+    elseif opcode == 'R' then
+        type = GW_CTYPE_REQUEST
+    elseif opcode == 'M' then
+        type = GW_CTYPE_ADDON
+    else
+        gw.Debug(GW_LOG_ERROR, 'unknown segment opcode: %s', opcode)
+        return
+    end
+    return guild_id, type, message
 end
 
