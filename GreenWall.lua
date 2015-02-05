@@ -665,8 +665,9 @@ local function GwSlashCmd(message, editbox)
     
     elseif command == 'refresh' then
     
+        gw.config:refresh()
         GwRefreshComms()
-        gw.Write('Refreshed communication link.')
+        gw.Write('Refreshed configuration.')
     
     elseif command == 'status' then
     

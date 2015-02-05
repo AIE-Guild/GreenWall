@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2014 Mark Rogaski
+Copyright (c) 2010-2015 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,6 @@ Imported Libraries
 --]]-----------------------------------------------------------------------
 
 local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
-local b32h = LibStub:GetLibrary("Encoding:Base32Hex-1.0")
 
 
 --[[-----------------------------------------------------------------------
@@ -42,43 +41,59 @@ Class Variables
 
 GwChannel = {}
 GwChannel.__index = GwChannel
-GwChannel.ChatWindowTable = {}
+
 
 --- GwChannel constructor function.
 -- @param name The name of the custom channel.
 -- @param password The password for the custom channel (optional). 
 -- @return An initialized GwChannel instance.
-function GwChannel:new(name, password)
+function GwChannel:new()
     local self = {}
     setmetatable(self, GwChannel)
-    self.name = name
-    self.password = password
-    self:initialize()
-    return self
-end
-
---- Initialize a GwChannel object with the default attributes and state.
--- @return The initialized GwChannel instance.
-function GwChannel:initialize()
+    self.frame_table = {}
+    self.version = 0
+    self.name = ''
+    self.password = ''
     self.number = 0
-    self.configured = false
-    self.dirty = false
-    self.owner = false
-    self.handoff = false
     self.queue = {}
     self.tx_hash = {}
     self.stats = {
+        txcnt = 0,
+        rxcnt = 0,
         sconn = 0,
         fconn = 0,
         leave = 0,
-        disco = 0
+        disco = 0,
     }
     return self
+end
+
+--- Configure the channel.
+-- @param version Messaging version.
+-- @param name Name of the channel.
+-- @param password Password for the channel. (optional)
+function GwChannel:configure(version, name, password)
+    assert(version == 1)
+    assert(name and name ~= '')
+    self:leave()
+    self.version = version
+    self.name = name
+    self.password = password and password or ''
+end
+
+--- Test if the channel is configured.
+-- @return True if configured, false otherwise.
+function GwChannel:isConfigured()
+    return self.name and self.name ~= ''
 end
 
 --- Join a bridge channel.
 -- @return True if connection success, false otherwise.
 function GwChannel:join()
+
+    if not self:configured() then
+        return false
+    end
 
     local number = GetChannelName(self.name)
     
@@ -104,8 +119,8 @@ function GwChannel:join()
         -- Hide the channel
         --
         for i = 1, 10 do
-            GwChannel.ChatWindowTable = { GetChatWindowMessages(i) }
-            for j, v in ipairs(GwChannel.ChatWindowTable) do
+            GwChannel.frame_table = { GetChatWindowMessages(i) }
+            for j, v in ipairs(GwChannel.frame_table) do
                 if v == self.name then
                     local frame = format('ChatFrame%d', i)
                     if _G[frame] then
@@ -121,18 +136,19 @@ function GwChannel:join()
 
     end
 
-    return false
-
 end
 
 --- Leave a bridge channel.
+-- @return True if a disconnection occurred, false otherwise.
 function GwChannel:leave()
     if self:isConnected() then
         gw.Debug(GW_LOG_INFO, 'chan_leave: name=<<%04X>>, number=%d', crc.Hash(self.name), self.number)
         LeaveChannelByName(self.name)
         self.stats.leave = self.stats.leave + 1
         self.number = 0
-        self.dirty = false
+        return true
+    else
+        return false
     end
 end
 
@@ -141,52 +157,44 @@ end
 function GwChannel:isConnected()
     if self.name then
         local number = GetChannelName(self.name)
-        gw.Debug(GW_LOG_DEBUG, 'conn_check: chan_name=<<%04X>>, chan_id=%d',
-                crc.Hash(self.name), number)
+        gw.Debug(GW_LOG_DEBUG, 'conn_check: chan_name=<<%04X>>, chan_id=%d', crc.Hash(self.name), number)
         if number ~= 0 then
             self.number = number
-            return true
         end
+        return true
     end
     return false            
 end
 
---- Find channel roles for a player.
--- @param player Name of the player to check.
--- @return True if target is the channel owner, false otherwise.
--- @return True if target is a channel moderator, false otherwise.
-function GwChannel:getRoles(player)
-    assert(player ~= nil)
-    if self.number ~= 0 then
-        local _, _, _, _, count = GetChannelDisplayInfo(self.number)
-        for i = 1, count do
-            local target, town, tmod = GetChannelRosterInfo(self.number, i)
-            if target == player then
-                return town, tmod
-            end
-        end
-    end
-    return
+--- Sends an encoded message on the shared channel.
+-- @param type The message type.
+--   Accepted values are: 
+--     GW_CTYPE_CHAT
+--     GW_CTYPE_ACHIEVEMENT
+--     GW_CTYPE_BROADCAST
+--     GW_CTYPE_NOTICE
+--     GW_CTYPE_REQUEST
+--     GW_CTYPE_ADDON
+-- @param message Text of the message.
+function GwChannel:send(type, ...)
+    -- Apply adaptation layer encoding
+    local message = self:al_encode(type, unpack(arg))
+    gw.Debug(GW_LOG_DEBUG, 'channel_send: channel=%d, type=%d, message=%s', self.number, type, message)
+    return self:tl_send(type, message)
 end
 
---- Sends an encoded message on the shared channel.
--- @param message Text of the message.
--- @param type (optional) The message type.
--- Accepted values are: GW_CTYPE_CHAT, GW_CTYPE_ACHIEVEMENT, GW_CTYPE_BROADCAST, GW_CTYPE_NOTICE, GW_CTYPE_REQUEST, GW_CTYPE_ADDON.
--- Default is GW_CTYPE_CHAT.
-function GwChannel:send(message, type)
-
-    if type == nil then
-        type = GW_CTYPE_CHAT
+function GwChannel:al_encode(type, ...)
+    local message
+    if type == GW_CTYPE_BROADCAST then
+        assert(#arg == 3)
+        return strjoin(':', tostring(arg[1]), tostring(arg[2]), tostring(arg[3]))
+    else
+        assert(#arg == 1)
+        return arg[1]
     end
+end
 
-    gw.Debug(GW_LOG_DEBUG, 'coguild_msg: type=%d, message=%s', type, message)
-
-    if not self:isConnected() then
-        gw.Debug(GW_LOG_ERROR, 'coguild_msg: not connected to channel', type)
-        return
-    end
-
+function GwChannel:tl_send(type, message)
     local opcode
     if type == GW_CTYPE_CHAT then
         opcode = 'C'
@@ -201,54 +209,60 @@ function GwChannel:send(message, type)
     elseif type == GW_CTYPE_ADDON then
         opcode = 'M'
     else
-        gw.Debug(GW_LOG_WARNING, 'coguild_msg: unknown message type: %d', type)
+        gw.Debug(GW_LOG_ERROR, 'coguild_msg: unknown message type: %d', type)
         return
     end
     
-    local coguild
-    if gwContainerId == nil then
-        gw.Debug(GW_LOG_NOTICE, 'coguild_msg: missing container ID.')
-        coguild = '-'
-    else
-        coguild = gwContainerId
-    end
+    -- Format the message segment
+    local segment = strsub(strjoin('#', opcode, gw.config.guild_id, '', message), 1, GW_MAX_MESSAGE_LENGTH)
     
-    if message == nil then
-        message = ''
-    end
-    
-    -- Segment the message
-    local n = GW_MAX_MESSAGE_LENGTH - (strlen(coguild) + 5)
-    local buffer = message
-    local segment = {}
-    while strlen(buffer) > 0 do
-        tinsert(segment, strsub(buffer, 1, n))
-        buffer = strsub(buffer, n)
-    end
-    gw.Debug(GW_LOG_DEBUG, 'coguild_msg: %d segment(s)', #segment)
-        
-    
-    -- Send the message.
-    local flags = 0
-    for i = 1, #segment do
-        -- Set the EOM flag
-        if i == #segment then
-            flags = bit.band(flags, GW_MSG_END)
-        end
-        
-        -- Format the message segment
-        local payload = strsub(strjoin('#', opcode, coguild, b32h.Encode(flags), segment[i]), 1, GW_MAX_MESSAGE_LENGTH)
-        gw.Debug(GW_LOG_DEBUG, 'Tx<%d, %s>: %s', self.number, gwPlayerName, payload)
-        SendChatMessage(payload , 'CHANNEL', nil, self.number)
-
-        -- Record the hash of the outbound segment for integrity checking, keeping a count of collisions.  
-        local hash = crc.Hash(payload)
-        if self.tx_hash[hash] == nil then
-            self.tx_hash[hash] = 1
-        else
-            self.tx_hash[hash] = self.tx_hash[hash] + 1
-        end
-
-    end
-
+    -- Send the message
+    self:tl_enqueue(segment)
+    self:tl_flush()
 end
+
+--- Add a segment to the channel transmit queue.
+-- @param segment Segment to enqueue.
+-- @return Number of segments in queue after the insertion.
+function GwChannel:tl_enqueue(segment)
+    tinsert(self.queue, segment)
+    return #self.queue
+end
+
+--- Remove a segment from the channel transmit queue.
+-- @return Segment removed from the queue or nil if queue is empty.
+function GwChannel:tl_dequeue()
+    return tremove(self.queue, 1)
+end
+
+--- Transmit all messages in the channel transmit queue.
+-- @return Number of messages flushed.
+function GwChannel:tl_flush()
+    gw.Debug(GW_LOG_DEBUG, 'tl_flush[%d]: servicing transmit queue; %d message(s) queued.', self.number, #self.queue)
+    if self:isConnected() then
+        local count = 0
+        while true do
+            local segment = self:tl_dequeue()
+            if segment then
+                -- Record the segment hash
+                local hash = crc.Hash(segment)
+                if self.tx_hash[hash] == nil then
+                    self.tx_hash[hash] = 1
+                else
+                    self.tx_hash[hash] = self.tx_hash[hash] + 1
+                end
+                -- Send the segment
+                gw.Debug(GW_LOG_DEBUG, 'tl_flush[%d]: Tx<%s, %s>', self.number, gw.player, segment)
+                SendChatMessage(segment, 'CHANNEL', nil, self.number)
+                self.stats.txcnt = self.stats.txcnt + 1
+                count = count + 1
+            else
+                break
+            end
+        end
+    else
+        gw.Debug(GW_LOG_WARNING, 'tl_flush: not connected.')
+        return 0
+    end
+end
+
