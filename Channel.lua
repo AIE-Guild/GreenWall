@@ -112,7 +112,7 @@ function GwChannel:join()
 
         self.number = number
         self.stats.sconn = self.stats.sconn + 1
-        gw.Debug(GW_LOG_INFO, 'chan_join: name=<<%04X>>, number=%d', crc.Hash(self.name), self.number)
+        gw.Debug(GW_LOG_INFO, 'chan_join[%d]: name=<<%04X>>', self.number, crc.Hash(self.name))
         gw.Write('Connected to confederation on channel %d.', self.number)
               
         --
@@ -124,8 +124,8 @@ function GwChannel:join()
                 if v == self.name then
                     local frame = format('ChatFrame%d', i)
                     if _G[frame] then
-                        gw.Debug(GW_LOG_INFO, 'chan_join: hiding channel: name=<<%04X>>, number=%d, frame=%s', 
-                                crc.Hash(self.name), self.number, frame)
+                        gw.Debug(GW_LOG_INFO, 'chan_join[%d]: hiding channel: name=<<%04X>>, frame=%s', 
+                                self.number, crc.Hash(self.name), frame)
                         ChatFrame_RemoveChannel(frame, self.name)
                     end
                 end
@@ -142,7 +142,7 @@ end
 -- @return True if a disconnection occurred, false otherwise.
 function GwChannel:leave()
     if self:isConnected() then
-        gw.Debug(GW_LOG_INFO, 'chan_leave: name=<<%04X>>, number=%d', crc.Hash(self.name), self.number)
+        gw.Debug(GW_LOG_INFO, 'chan_leave[%d]: name=<<%04X>>', self.number, crc.Hash(self.name))
         LeaveChannelByName(self.name)
         self.stats.leave = self.stats.leave + 1
         self.number = 0
@@ -157,7 +157,7 @@ end
 function GwChannel:isConnected()
     if self.name then
         local number = GetChannelName(self.name)
-        gw.Debug(GW_LOG_DEBUG, 'conn_check: chan_name=<<%04X>>, chan_id=%d', crc.Hash(self.name), number)
+        gw.Debug(GW_LOG_DEBUG, 'chan_test[%d]: name=<<%04X>>, number=%d', self.number, crc.Hash(self.name), number)
         if number ~= 0 then
             self.number = number
         end
@@ -179,7 +179,7 @@ end
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
     local message = self:al_encode(type, unpack(arg))
-    gw.Debug(GW_LOG_DEBUG, 'channel_send: channel=%d, type=%d, message=%s', self.number, type, message)
+    gw.Debug(GW_LOG_DEBUG, 'channel_send[%d]: type=%d, message=%s', self.number, type, message)
     return self:tl_send(type, message)
 end
 
@@ -209,7 +209,7 @@ function GwChannel:tl_send(type, message)
     elseif type == GW_CTYPE_ADDON then
         opcode = 'M'
     else
-        gw.Debug(GW_LOG_ERROR, 'coguild_msg: unknown message type: %d', type)
+        gw.Debug(GW_LOG_ERROR, 'unknown message type: %d', type)
         return
     end
     
@@ -261,7 +261,7 @@ function GwChannel:tl_flush()
             end
         end
     else
-        gw.Debug(GW_LOG_WARNING, 'tl_flush: not connected.')
+        gw.Debug(GW_LOG_WARNING, 'tl_flush[%d]: not connected.', self.number)
         return 0
     end
 end
