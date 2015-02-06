@@ -36,14 +36,22 @@ GW_LOG_DEBUG      = 5
 
 
 --
--- Chat types
+-- Channel types
 --
-GW_CTYPE_CHAT           = 0
-GW_CTYPE_ACHIEVEMENT    = 1
-GW_CTYPE_BROADCAST      = 2
-GW_CTYPE_NOTICE         = 3
-GW_CTYPE_REQUEST        = 4
-GW_CTYPE_ADDON          = 5
+GW_CTYPE_GUILD      = 0
+GW_CTYPE_OFFICER    = 1
+GW_CTYPE_ADDON      = 2
+
+
+--
+-- Message types
+--
+GW_MTYPE_CHAT           = 0
+GW_MTYPE_ACHIEVEMENT    = 1
+GW_MTYPE_BROADCAST      = 2
+GW_MTYPE_NOTICE         = 3
+GW_MTYPE_REQUEST        = 4
+GW_MTYPE_ADDON          = 5
 
 
 --

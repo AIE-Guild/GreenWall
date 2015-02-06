@@ -44,13 +44,14 @@ GwChannel.__index = GwChannel
 
 
 --- GwChannel constructor function.
--- @param name The name of the custom channel.
--- @param password The password for the custom channel (optional). 
+-- @param type GW_CTYPE_GUILD or GW_CTYPE_OFFICER.
 -- @return An initialized GwChannel instance.
-function GwChannel:new()
+function GwChannel:new(type)
+    assert(type == GW_CTYPE_GUILD or type == GW_CTYPE_OFFICER)
     local self = {}
     setmetatable(self, GwChannel)
     self.frame_table = {}
+    self.type = type
     self.version = 0
     self.name = ''
     self.password = ''
@@ -183,12 +184,12 @@ Transmit Methods
 --- Sends an encoded message on the shared channel.
 -- @param type The message type.
 --   Accepted values are: 
---     GW_CTYPE_CHAT
---     GW_CTYPE_ACHIEVEMENT
---     GW_CTYPE_BROADCAST
---     GW_CTYPE_NOTICE
---     GW_CTYPE_REQUEST
---     GW_CTYPE_ADDON
+--     GW_MTYPE_CHAT
+--     GW_MTYPE_ACHIEVEMENT
+--     GW_MTYPE_BROADCAST
+--     GW_MTYPE_NOTICE
+--     GW_MTYPE_REQUEST
+--     GW_MTYPE_ADDON
 -- @param message Text of the message.
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
@@ -199,7 +200,7 @@ end
 
 function GwChannel:al_encode(type, ...)
     local message
-    if type == GW_CTYPE_BROADCAST then
+    if type == GW_MTYPE_BROADCAST then
         assert(#arg == 3)
         return strjoin(':', tostring(arg[1]), tostring(arg[2]), tostring(arg[3]))
     else
@@ -210,17 +211,17 @@ end
 
 function GwChannel:tl_send(type, message)
     local opcode
-    if type == GW_CTYPE_CHAT then
+    if type == GW_MTYPE_CHAT then
         opcode = 'C'
-    elseif type == GW_CTYPE_ACHIEVEMENT then
+    elseif type == GW_MTYPE_ACHIEVEMENT then
         opcode = 'A'
-    elseif type == GW_CTYPE_BROADCAST then
+    elseif type == GW_MTYPE_BROADCAST then
         opcode = 'B'
-    elseif type == GW_CTYPE_NOTICE then
+    elseif type == GW_MTYPE_NOTICE then
         opcode = 'N'
-    elseif type == GW_CTYPE_REQUEST then
+    elseif type == GW_MTYPE_REQUEST then
         opcode = 'R'
-    elseif type == GW_CTYPE_ADDON then
+    elseif type == GW_MTYPE_ADDON then
         opcode = 'M'
     else
         gw.Debug(GW_LOG_ERROR, 'unknown message type: %d', type)
@@ -266,7 +267,7 @@ function GwChannel:tl_flush()
                     self.tx_hash[hash] = self.tx_hash[hash] + 1
                 end
                 -- Send the segment
-                gw.Debug(GW_LOG_DEBUG, 'tl_flush[%d]: Tx: %s', self.number, segment)
+                gw.Debug(GW_LOG_DEBUG, 'tl_flush[%d]: Tx<%s, %s>', self.number, gw.player, segment)
                 SendChatMessage(segment, 'CHANNEL', nil, self.number)
                 self.stats.txcnt = self.stats.txcnt + 1
                 count = count + 1
@@ -288,40 +289,57 @@ Receive Methods
 --]]-----------------------------------------------------------------------
 
 --- Handler for data received on a channel.
--- @param s The data received.
--- @param f A callback function with the following prototype:
---   f(type, guild_id, ...)
+-- @param event The API event name.
+-- @param f A callback function.
+-- @param ... The API event arguments.
 -- @return The return value of f applied to the data.
-function GwChannel:receive(s, f)
-    local guild_id, type, message = self:tl_receive(s)
+function GwChannel:receive(event, f, ...)
+    local guild_id, type, message = self:tl_receive(...)
     local t = { self:al_decode(type, message) }
-    return f(type, guild_id, unpack(t))
+    return f(self.number, type, guild_id, arg, unpack(t))
 end
 
 function GwChannel:al_decode(type, message)
-    if type == GW_CTYPE_BROADCAST then
+    if type == GW_MTYPE_BROADCAST then
         return strsplit(':', message)
     else
         return message
     end
 end
 
-function GwChannel:tl_receive(segment)
-    gw.Debug(GW_LOG_DEBUG, 'tl_receive[%d]: Rx: %s', self.number, segment)
+function GwChannel:tl_receive(...)
+    local segment, sender = select(1, ...)
+    sender = gw.GlobalName(sender)
+    gw.Debug(GW_LOG_DEBUG, 'tl_receive[%d]: Rx<%s, %s>', self.number, sender, segment)
+    
+    -- Check the segment hash
+    local hash = crc.Hash(segment)
+    if self.tx_hash[hash] and self.tx_hash[hash] > 0 then
+        gw.Debug(GW_LOG_DEBUG, 'tl_receive[%d]: tx_hash[0x%04X] == %d', self.number, hash, self.tx_hash[hash])
+        self.tx_hash[hash] = self.tx_hash[hash] - 1
+        if self.tx_hash[hash] <= 0 then
+            self.tx_hash[hash] = nil
+        end
+    else
+        gw.Debug(GW_LOG_WARNING, 'tl_receive[%d]: tx_hash[0x%04X] not found', self.number, hash)
+        gw.Error('Message corruption detected.  Please disable add-ons that might modify messages on channel %d.', self.number)
+    end
+    
+    -- Process the segment
     local opcode, guild_id, _, message = strsplit('#', segment, 4)
     local type
     if opcode == 'C' then
-        type = GW_CTYPE_CHAT
+        type = GW_MTYPE_CHAT
     elseif opcode == 'A' then
-        type = GW_CTYPE_ACHIEVEMENT
+        type = GW_MTYPE_ACHIEVEMENT
     elseif opcode == 'B' then
-        type = GW_CTYPE_BROADCAST
+        type = GW_MTYPE_BROADCAST
     elseif opcode == 'N' then
-        type = GW_CTYPE_NOTICE
+        type = GW_MTYPE_NOTICE
     elseif opcode == 'R' then
-        type = GW_CTYPE_REQUEST
+        type = GW_MTYPE_REQUEST
     elseif opcode == 'M' then
-        type = GW_CTYPE_ADDON
+        type = GW_MTYPE_ADDON
     else
         gw.Debug(GW_LOG_ERROR, 'unknown segment opcode: %s', opcode)
         return
