@@ -1,8 +1,4 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
     <Script file="LibStub.lua"/>
     <Script file="CRC16-CCITT.lua"/>
-    <Script file="Base32Hex.lua"/>
-    <Script file="Base64.lua"/>
-    <Script file="SHA256.lua"/>
-    <Script file="Salsa20.lua"/>
 </Ui>
