@@ -110,7 +110,7 @@ function gw.ReplicateMessage(event, guild_id, message, arglist)
     local guid = arglist[12]
     
     if GreenWall.tag then
-        message = format('<%s> %s', container, message)
+        message = format('<%s> %s', guild_id, message)
     end
     
     local i    

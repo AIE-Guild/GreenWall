@@ -16,6 +16,7 @@ Constants.lua
 Utility.lua
 HoldDown.lua
 Config.lua
+Chat.lua
 Channel.lua
 GreenWall.lua
 GreenWall.xml

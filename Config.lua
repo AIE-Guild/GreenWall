@@ -69,27 +69,9 @@ end
 --- Initialize a GwConfig object with the default state.
 -- @return The initialized GwConfig instance.
 function GwConfig:initialize_state()
-    local function new_channel(name, password)
-        return {
-            name = name ~= nil and name or '',
-            password = password ~= nil and password or '',
-            number = 0,
-            configured = false;
-            dirty = false,
-            queue = {},
-            tx_hash = {},
-            stats = {
-                sconn = 0,
-                fconn = 0,
-                leave = 0,
-                disco = 0
-            }
-        }
-    end
-    
     self.channel = {
-        guild   = new_channel(),
-        officer = new_channel(),
+        guild   = GwChannel:new(),
+        officer = GwChannel:new(),
     }
     self.timer = {
         channel = GwHoldDown:new(GW_TIMEOUT_CHANNEL_HOLD),
@@ -208,19 +190,12 @@ function GwConfig:load()
         
             if field[1] == 'c' then
                 -- Guild channel configuration
-                if self.channel.guild.name ~= field[2] then
-                    self.channel.guild.name = field[2]
-                    self.channel.guild.configured = true
-                    self.channel.guild.dirty = true
+                if field[2] and field[2] ~= '' then
+                    self.channel.guild:configure(1, field[2], field[3])
+                else
+                    gw.Error('invalid common channel name specified')
                 end
-                if self.channel.guild.password ~= field[3] then
-                    self.channel.guild.password = field[3]
-                    self.channel.guild.configured = true
-                    self.channel.guild.dirty = true
-                end
-                gw.Debug(GW_LOG_DEBUG, 'guild_config: channel=<<%04X>>, password=<<%04X>>',
-                        crc.Hash(self.channel.guild.name),
-                        crc.Hash(self.channel.guild.password));
+
             elseif field[1] == 'p' then
                 -- Peer guild
                 local peer_name = gw.GlobalName(substitute(field[2], xlat))                
@@ -268,15 +243,11 @@ function GwConfig:load()
     
     -- Officer note
     if GreenWall.ochat then
-        local cname, cpass = string.match(get_gm_officer_note(), 'GW:?a:([%w_]+):([%w_]*)')
-        if cname ~= nil then
-            self.channel.officer.name = cname
-            self.channel.officer.password = cpass ~= nil and cpass or ''
-            self.channel.officer.configured = true
-            self.channel.officer.dirty = true
-            gw.Debug(GW_LOG_DEBUG, 'officer_config: channel=<<%04X>>, password=<<%04X>>',
-                        crc.Hash(self.channel.officer.name),
-                        crc.Hash(self.channel.officer.password));
+        local cname, cpass = string.match(get_gm_officer_note(), 'GW:?a:([%w_]*):([%w_]*)')
+        if cname and cname~= '' then
+            self.channel.officer:configure(1, cname, cpass)
+        else
+            gw.Error('invalid officer channel name specified')
         end
     end
     
@@ -343,6 +314,19 @@ function GwConfig:IsPeer(guild)
         end
     end
     return false
+end
+
+
+--- Refresh the channel state.
+function GwConfig:refreshChannels()
+    if self.timer.channel:hold() then
+        gw.Debug(GW_LOG_INFO, 'channel join blocked.')
+    else
+        gw.Debug(GW_LOG_INFO, 'refreshing channels.')
+        for k, v in pairs(self.channel) do
+            self.channel[k]:join()
+        end
+    end
 end
 
 

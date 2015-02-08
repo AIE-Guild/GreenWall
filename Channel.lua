@@ -84,6 +84,8 @@ function GwChannel:configure(version, name, password)
     self.version = version
     self.name = name
     self.password = password and password or ''
+    gw.Debug(GW_LOG_DEBUG, 'channel_conf: channel=<<%04X>>, password=<<%04X>>, version=%d',
+                        crc.Hash(self.name), crc.Hash(self.password), self.version);
 end
 
 --- Test if the channel is configured.
@@ -103,44 +105,58 @@ function GwChannel:join()
     local number = GetChannelName(self.name)
     
     if number == 0 then
+        gw.Debug(GW_LOG_DEBUG, 'channel_join: channel=<<%04X>>, password=<<%04X>>',
+                crc.Hash(self.name), crc.Hash(self.password));
         JoinTemporaryChannel(self.name, self.password)
         number = GetChannelName(self.name)
-    end
+        gw.Debug(GW_LOG_DEBUG, 'channel join result = %d', number)
+
+        if number == 0 then
     
-    if chan.number == 0 then
-
-        gw.Error('cannot create communication channel: %s', self.name)
-        self.stats.fconn = self.stats.fconn + 1
-        return false
-
-    else
-
-        self.number = number
-        self.stats.sconn = self.stats.sconn + 1
-        gw.Debug(GW_LOG_INFO, 'chan_join[%d]: name=<<%04X>>', self.number, crc.Hash(self.name))
-        gw.Write('Connected to confederation on channel %d.', self.number)
-              
-        --
-        -- Hide the channel
-        --
-        for i = 1, 10 do
-            GwChannel.frame_table = { GetChatWindowMessages(i) }
-            for j, v in ipairs(GwChannel.frame_table) do
-                if v == self.name then
-                    local frame = format('ChatFrame%d', i)
-                    if _G[frame] then
-                        gw.Debug(GW_LOG_INFO, 'chan_join[%d]: hiding channel: name=<<%04X>>, frame=%s', 
-                                self.number, crc.Hash(self.name), frame)
-                        ChatFrame_RemoveChannel(frame, self.name)
+            gw.Error('cannot create communication channel: %s', self.name)
+            self.stats.fconn = self.stats.fconn + 1
+            return false
+    
+        else
+    
+            self.number = number
+            self.stats.sconn = self.stats.sconn + 1
+            gw.Debug(GW_LOG_INFO, 'channel_join[%d]: joined name=<<%04X>>, password=<<%04X>>',
+                    self.number, crc.Hash(self.name), crc.Hash(self.password))
+            gw.Write('Connected to confederation on channel %d.', self.number)
+                  
+            --
+            -- Hide the channel
+            --
+            for i = 1, 10 do
+                GwChannel.frame_table = { GetChatWindowMessages(i) }
+                for j, v in ipairs(GwChannel.frame_table) do
+                    if v == self.name then
+                        local frame = format('ChatFrame%d', i)
+                        if _G[frame] then
+                            gw.Debug(GW_LOG_INFO, 'channel_join[%d]: hiding channel: name=<<%04X>>, frame=%s', 
+                                    self.number, crc.Hash(self.name), frame)
+                            ChatFrame_RemoveChannel(frame, self.name)
+                        end
                     end
                 end
             end
+    
+            return true
+    
         end
-
-        return true
-
+        
+    else
+    
+        gw.Debug(GW_LOG_INFO, 'channel_join[%d]: currently connected; name=<<%04X>>, password=<<%04X>>',
+                self.number, crc.Hash(self.name), crc.Hash(self.password))
+        if self.number ~= number then 
+            self.number = number
+            gw.Debug(GW_LOG_DEBUG, 'synchronizing channel number (%d)', self.number)
+        end
+        
     end
-
+    
 end
 
 --- Leave a bridge channel.
@@ -290,10 +306,10 @@ Receive Methods
 -- @param f A callback function.
 -- @param ... The API event arguments.
 -- @return The return value of f applied to the data.
-function GwChannel:receive(event, f, ...)
+function GwChannel:receive(f, ...)
     local guild_id, type, message = self:tlReceive(...)
     local content = { self:alDecode(type, message) }
-    return f(type, guild_id, content, arg)
+    return f(type, guild_id, content, {...})
 end
 
 function GwChannel:alDecode(type, message)
@@ -310,16 +326,18 @@ function GwChannel:tlReceive(...)
     gw.Debug(GW_LOG_DEBUG, 'tlReceive[%d]: Rx<%s, %s>', self.number, sender, segment)
     
     -- Check the segment hash
-    local hash = crc.Hash(segment)
-    if self.tx_hash[hash] and self.tx_hash[hash] > 0 then
-        gw.Debug(GW_LOG_DEBUG, 'tlReceive[%d]: tx_hash[0x%04X] == %d', self.number, hash, self.tx_hash[hash])
-        self.tx_hash[hash] = self.tx_hash[hash] - 1
-        if self.tx_hash[hash] <= 0 then
-            self.tx_hash[hash] = nil
+    if sender == gw.player then
+        local hash = crc.Hash(segment)
+        if self.tx_hash[hash] and self.tx_hash[hash] > 0 then
+            gw.Debug(GW_LOG_DEBUG, 'tlReceive[%d]: tx_hash[0x%04X] == %d', self.number, hash, self.tx_hash[hash])
+            self.tx_hash[hash] = self.tx_hash[hash] - 1
+            if self.tx_hash[hash] <= 0 then
+                self.tx_hash[hash] = nil
+            end
+        else
+            gw.Debug(GW_LOG_WARNING, 'tlReceive[%d]: tx_hash[0x%04X] not found', self.number, hash)
+            gw.Error('Message corruption detected.  Please disable add-ons that might modify messages on channel %d.', self.number)
         end
-    else
-        gw.Debug(GW_LOG_WARNING, 'tlReceive[%d]: tx_hash[0x%04X] not found', self.number, hash)
-        gw.Error('Message corruption detected.  Please disable add-ons that might modify messages on channel %d.', self.number)
     end
     
     -- Process the segment
