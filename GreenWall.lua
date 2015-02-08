@@ -426,8 +426,7 @@ function GreenWall_OnEvent(self, event, ...)
         if chanNum == gw.config.channel.guild.number then
             gw.config.channel.guild:receive(gw.handlerGuildChat, ...)
         elseif chanNum == gw.config.channel.officer.number then
-            gw.config.channel.officer:receive(gw.handlerOfficer/quit
-            Chat, ...)
+            gw.config.channel.officer:receive(gw.handlerOfficerChat, ...)
         end
         
     elseif event == 'CHAT_MSG_GUILD' then
