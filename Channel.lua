@@ -302,7 +302,6 @@ Receive Methods
 --]]-----------------------------------------------------------------------
 
 --- Handler for data received on a channel.
--- @param event The API event name.
 -- @param f A callback function.
 -- @param ... The API event arguments.
 -- @return The return value of f applied to the data.
