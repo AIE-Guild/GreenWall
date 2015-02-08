@@ -82,12 +82,20 @@ end
 -- @param level A positive integer specifying the debug level to display this under.
 -- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Debug(level, ...)
+    local function get_caller()
+        local s = debugstack(3, 1, 0)
+        local loc = strmatch(s, '([%a%._-]+:%d+): in function')
+        local fun = strmatch(s, 'in function \`([%a_-]+)\'')
+        return fun and loc .. '(' .. fun .. ')' or loc
+    end
+    
     local msg = string.format(unpack({...}))
     if GreenWall ~= nil then
         if level <= GreenWall.debug then
-            gw.Log(format('[DEBUG/%d] %s', level, msg))
+            local trace = format('[debug/%d@%s] %s', level, get_caller(), msg)
+            gw.Log(trace)
             if GreenWall.verbose then
-                DEFAULT_CHAT_FRAME:AddMessage(format('|cffabd473GreenWall:|r |cff778899[DEBUG/%d] %s|r', level, msg))
+                DEFAULT_CHAT_FRAME:AddMessage(format('|cffabd473GreenWall:|r |cff778899%s|r', trace))
             end
         end
     end
