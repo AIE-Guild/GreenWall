@@ -307,9 +307,11 @@ Receive Methods
 -- @param ... The API event arguments.
 -- @return The return value of f applied to the data.
 function GwChannel:receive(f, ...)
-    local guild_id, type, message = self:tlReceive(...)
-    local content = { self:alDecode(type, message) }
-    return f(type, guild_id, content, {...})
+    local sender, guild_id, type, message = self:tlReceive(...)
+    if type and sender ~= gw.player then
+        local content = { self:alDecode(type, message) }
+        return f(type, guild_id, content, {...})
+    end
 end
 
 function GwChannel:alDecode(type, message)
@@ -359,8 +361,7 @@ function GwChannel:tlReceive(...)
         type = GW_MTYPE_ADDON
     else
         gw.Debug(GW_LOG_ERROR, 'unknown segment opcode: %s', opcode)
-        return
     end
-    return guild_id, type, message
+    return sender, guild_id, type, message
 end
 

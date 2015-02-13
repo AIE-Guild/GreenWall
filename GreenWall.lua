@@ -432,34 +432,31 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'Rx<GUILD, %s>: %s', sender, message)
-        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%, message=%', event, sender, message)
         if gw.iCmp(sender, gw.player) then
-            gw.config.channel.guild:send(GW_MTYPE_CHAT, ...)
+            gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
         end
     
     elseif event == 'CHAT_MSG_OFFICER' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'Rx<OFFICER, %s>: %s', sender, message)
-        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%, message=%', event, sender, message)
         if gw.iCmp(sender, gw.player) and GreenWall.ochat then
-            gw.config.channel.officer:send(GW_MTYPE_OFFICER, ...)
+            gw.config.channel.officer:send(GW_MTYPE_CHAT, message)
         end
     
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
     
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'Rx<ACHIEVEMENT, %s>: %s', sender, message)
-        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%, message=%', event, sender, message)
         if gw.iCmp(sender, gw.player) then
-            gw.config.channel.guild:send(GW_MTYPE_ACHIEVEMENT, ...)
+            gw.config.channel.guild:send(GW_MTYPE_ACHIEVEMENT, message)
         end
     
     elseif event == 'CHAT_MSG_CHANNEL_JOIN' then
     
         local _, player, _, _, _, _, _, number = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'chan_join: channel=%s, player=%s', number, player)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, channel=%s, player=%s', event, number, player)
         
         if number == gw.config.channel.guild.number then
             if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
@@ -475,7 +472,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_CHANNEL_LEAVE' then
     
         local _, player, _, _, _, _, _, number = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'chan_leave: channel=%s, player=%s', number, player)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, channel=%s, player=%s', event, number, player)
         
         if number == gw.config.channel.guild.number then
             if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
