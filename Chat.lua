@@ -26,42 +26,37 @@ SOFTWARE.
 
 --- Callback handler for guild chat messages.
 -- @param type Message type received.
--- @param guild_id ID of the guild the mesage was received from.
+-- @param guild_id ID of the guild the message was received from.
 -- @param content Message content as a table.
 -- @param arglist API event arguments.
 function gw.handlerGuildChat(type, guild_id, content, arglist)
     gw.Debug(GW_LOG_DEBUG, 'type=%d, guild_id=%s, #content=%d, #arglist=%d', type, guild_id, #content, #arglist)
     local sender = arglist[2]
     if type == GW_MTYPE_CHAT then
-        gw.ReplicateMessage('GUILD', guild_id, content[1], arglist)
+        gw.ReplicateMessage('GUILD', content[1], guild_id, arglist)
     elseif type == GW_MTYPE_ACHIEVEMENT then
-        gw.ReplicateMessage('GUILD_ACHIEVEMENT', guild_id, content[1], arglist)
+        gw.ReplicateMessage('GUILD_ACHIEVEMENT', content[1], guild_id, arglist)
     elseif type == GW_MTYPE_BROADCAST then
         local action, target, rank = unpack(content)
         if action == 'join' then
             if GreenWall.roster then
-                gw.ReplicateMessage('SYSTEM', guild_id, 
-                        format(ERR_GUILD_JOIN_S, sender), arglist)
+                gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_JOIN_S, sender), guild_id, arglist)
             end
         elseif action == 'leave' then
             if GreenWall.roster then
-                gw.ReplicateMessage('SYSTEM', guild_id, 
-                        format(ERR_GUILD_LEAVE_S, sender), arglist)
+                gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_LEAVE_S, sender), guild_id, arglist)
             end
         elseif action == 'remove' then
             if GreenWall.rank then
-                gw.ReplicateMessage('SYSTEM', guild_id, 
-                        format(ERR_GUILD_REMOVE_SS, target, sender), arglist)
+                gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_REMOVE_SS, target, sender), guild_id, arglist)
             end
         elseif action == 'promote' then
             if GreenWall.rank then
-                gw.ReplicateMessage('SYSTEM', guild_id, 
-                        format(ERR_GUILD_PROMOTE_SSS, sender, target, rank), arglist)
+                gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_PROMOTE_SSS, sender, target, rank), guild_id, arglist)
             end
         elseif action == 'demote' then
             if GreenWall.rank then
-                gw.ReplicateMessage('SYSTEM', guild_id, 
-                        format(ERR_GUILD_DEMOTE_SSS, sender, target, rank), arglist)
+                gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_DEMOTE_SSS, sender, target, rank), guild_id, arglist)
             end
         end
     elseif type == GW_MTYPE_REQUEST then
@@ -81,7 +76,7 @@ end
 function gw.handlerOfficerChat(type, guild_id, content, arglist)
     gw.Debug(GW_LOG_DEBUG, 'type=%d, guild_id=%s, #content=%d, #arglist=%d', type, guild_id, #content, #arglist)
     if (type == GW_MTYPE_CHAT) then
-        gw.ReplicateMessage('OFFICER', guild_id, content[1], arglist)
+        gw.ReplicateMessage('OFFICER', content[1], guild_id, arglist)
     else
         gw.Debug(GW_LOG_WARNING, 'unhandled message type: %d', type)
     end
@@ -92,21 +87,23 @@ end
 -- target chat channel.
 -- @param event Chat message event to generate.
 --   Accepted values:
---     'CHAT_MSG_GUILD'
---     'CHAT_MSG_OFFICER'
---     'CHAT_MSG_GUILD_ACHIEVEMENT'
---     'CHAT_MSG_SYSTEM'
--- @param guild_id Guild ID of the sender.
+--     'GUILD'
+--     'OFFICER'
+--     'GUILD_ACHIEVEMENT'
+--     'SYSTEM'
 -- @param message The message to replicate.
--- @param arglist API event arguments.
-function gw.ReplicateMessage(event, guild_id, message, arglist)
-    local sender = arglist[2]
+-- @param guild_id (optional) Guild ID of the sender.
+-- @param arglist (optional) API event arguments.
+function gw.ReplicateMessage(event, message, guild_id, arglist)
+    guild_id = guild_id and guild_id or '-'
+    arglist = type(arglist) == 'table' and arglist or {}
+    local sender = arglist[2] and arglist[2] or ''
     local language = arglist[3]
     local target = arglist[5]
     local flags = arglist[6]
     local guid = arglist[12]
     
-    if GreenWall.tag then
+    if GreenWall.tag and event ~= 'SYSTEM' then
         message = format('<%s> %s', guild_id, message)
     end
     
@@ -134,4 +131,37 @@ function gw.ReplicateMessage(event, guild_id, message, arglist)
     end
     
 end
+
+
+--- Sends an encoded message to the rest of the same container on the add-on channel.
+-- @param type The message type.
+-- @field GW_MTYPE_CONTROL Control command.
+-- @field GW_MTYPE_REQUEST Control request.
+-- @field GW_MTYPE_RESPONSE Control response.
+-- @param message Text of the message.
+function gw.SendLocal(type, message)
+
+    gw.Debug(GW_LOG_DEBUG, 'type=%s, message=%s', type, message)
+
+    local opcode
+    if type == nil then
+        gw.Debug(GW_LOG_ERROR, 'cont_msg: missing arguments.')
+        return
+    elseif type == GW_MTYPE_CONTROL then
+        opcode = 'I'
+    elseif type == GW_MTYPE_REQUEST then
+        opcode = 'C'
+    elseif type == GW_MTYPE_RESPONSE then
+        opcode = 'R'
+    else
+        gw.Debug(GW_LOG_ERROR, 'unknown message type: %s', type)
+        return
+    end
+
+    local payload = strsub(strjoin('#', opcode, message), 1, 255)
+    gw.Debug(GW_LOG_DEBUG, 'message=%s', payload)
+    SendAddonMessage('GreenWall', payload, 'GUILD')
+    
+end
+
 

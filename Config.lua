@@ -265,12 +265,12 @@ end
 -- @return True is refresh submitted, false otherwise.
 function GwConfig:refresh()
     if self.timer.config:hold() then
-        gw.Debug(GW_LOG_DEBUG, 'config_refresh: skipping due to hold-down.')
+        gw.Debug(GW_LOG_DEBUG, 'skipping due to hold-down.')
         return false
     else
         self.valid = false
         GuildRoster()
-        gw.Debug(GW_LOG_DEBUG, 'config_refresh: roster update requested.')
+        gw.Debug(GW_LOG_DEBUG, 'roster update requested.')
         return true
     end
 end
@@ -281,13 +281,13 @@ end
 -- @return True is refresh submitted, false otherwise.
 function GwConfig:refresh()
     if self.timer.reload:hold() then
-        gw.Debug(GW_LOG_DEBUG, 'config_reload: skipping due to hold-down.')
+        gw.Debug(GW_LOG_DEBUG, 'skipping due to hold-down.')
         return false
     else
         self.valid = false
         GuildRoster()
         self.timer.reload:set()
-        gw.Debug(GW_LOG_DEBUG, 'config_reload: roster update requested.')
+        gw.Debug(GW_LOG_DEBUG, 'roster update requested.')
         return true
     end
 end
@@ -299,7 +299,12 @@ end
 function GwConfig:reset()
     self:initialize_param(true)
     GuildRoster()
-    gw.Debug(GW_LOG_DEBUG, 'config_reset: roster update requested.')
+    gw.Debug(GW_LOG_DEBUG, 'roster update requested.')
+    for k, v in pairs(self.channel) do
+        gw.Debug(GW_LOG_DEBUG, 'clearing %s channel', k)
+        v:leave()
+        self.channel[k] = GwChannel:new()
+    end
     return true
 end
 

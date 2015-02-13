@@ -142,6 +142,9 @@ function GwChannel:join()
                 end
             end
     
+            -- Gratuitous officer announcement
+            gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
+    
             return true
     
         end
@@ -281,7 +284,7 @@ function GwChannel:tlFlush()
                     self.tx_hash[hash] = self.tx_hash[hash] + 1
                 end
                 -- Send the segment
-                gw.Debug(GW_LOG_DEBUG, 'channel=%d, segment=%s', self.number, gw.player, segment)
+                gw.Debug(GW_LOG_DEBUG, 'channel=%d, segment=%s', self.number, segment)
                 SendChatMessage(segment, 'CHANNEL', nil, self.number)
                 self.stats.txcnt = self.stats.txcnt + 1
                 count = count + 1
@@ -308,7 +311,7 @@ Receive Methods
 -- @return The return value of f applied to the data.
 function GwChannel:receive(f, ...)
     local sender, guild_id, type, message = self:tlReceive(...)
-    if type and sender ~= gw.player then
+    if type and sender ~= gw.player and guild_id ~= gw.config.guild_id then
         local content = { self:alDecode(type, message) }
         return f(type, guild_id, content, {...})
     end

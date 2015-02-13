@@ -102,45 +102,6 @@ gw.config = GwConfig:new()
 
 --[[-----------------------------------------------------------------------
 
-Convenience Functions
-
---]]-----------------------------------------------------------------------
-
---- Sends an encoded message to the rest of the same container on the add-on channel.
--- @param type The message type.
--- @field request Command request.
--- @field response Command response.
--- @field info Informational message.
--- @param message Text of the message.
-local function GwSendContainerMsg(type, message)
-
-    gw.Debug(GW_LOG_DEBUG, 'cont_msg: type=%s, message=%s', type, message)
-
-    local opcode
-    
-    if type == nil then
-        gw.Debug(GW_LOG_ERROR, 'cont_msg: missing arguments.')
-        return
-    elseif type == 'request' then
-        opcode = 'C'
-    elseif type == 'response' then
-        opcode = 'R'
-    elseif type == 'info' then
-        opcode = 'I'
-    else
-        gw.Debug(GW_LOG_ERROR, 'cont_msg: unknown message type: %s', type)
-        return
-    end
-
-    local payload = strsub(strjoin('#', opcode, message), 1, 255)
-    gw.Debug(GW_LOG_DEBUG, 'Tx<ADDON/GUILD, *, %s>: %s', gw.player, payload)
-    SendAddonMessage('GreenWall', payload, 'GUILD')
-    
-end
-
-
---[[-----------------------------------------------------------------------
-
 UI Handlers
 
 --]]-----------------------------------------------------------------------
@@ -432,7 +393,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%, message=%', event, sender, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
         if gw.iCmp(sender, gw.player) then
             gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
         end
@@ -440,15 +401,45 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_OFFICER' then
     
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%, message=%', event, sender, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
         if gw.iCmp(sender, gw.player) and GreenWall.ochat then
             gw.config.channel.officer:send(GW_MTYPE_CHAT, message)
         end
     
+    elseif event == 'CHAT_MSG_ADDON' then
+    
+        local prefix, payload, dist, sender = select(1, ...)
+        if prefix == 'GreenWall' and dist == 'GUILD' then
+            if not gw.iCmp(sender, gw.player) then
+                local opcode, message = strsplit('#', payload)
+                gw.Debug(GW_LOG_DEBUG, 'opcode=%s, message=%s', opcode, message)
+                if opcode == 'C' then
+                    if message == 'officer' then
+                        if gw.IsOfficer() then
+                            gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
+                        end
+                    end
+                elseif opcode == 'R' then
+                    if message == 'officer' then
+                        if gw.IsOfficer(sender) then
+                            if gw.IsOfficer() then
+                                gw.Debug(GW_LOG_NOTICE, 'giving %s moderator status', sender)
+                                ChannelModerator(gw.config.channel.guild.name, sender)
+                            else
+                                gw.Debug(GW_LOG_NOTICE, 'giving %s owner status', sender)
+                                SetChannelOwner(gw.config.channel.guild.name, sender)
+                                ChannelUnmoderator(gw.config.channel.guild.name, gw.player)
+                            end
+                        end
+                    end
+                end 
+            end
+        end
+            
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
     
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%, message=%', event, sender, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
         if gw.iCmp(sender, gw.player) then
             gw.config.channel.guild:send(GW_MTYPE_ACHIEVEMENT, message)
         end
@@ -464,7 +455,7 @@ function GreenWall_OnEvent(self, event, ...)
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', player)
                 else
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: miss %s', player)
-                    GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_ONLINE_SS, player, player), nil, nil)
+                    gw.ReplicateMessage('SYSTEM', format(ERR_FRIEND_ONLINE_SS, player, player))
                 end
             end
         end
@@ -480,7 +471,7 @@ function GreenWall_OnEvent(self, event, ...)
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', player)
                 else
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: miss %s', player)
-                    GwReplicateMessage('SYSTEM', nil, nil, nil, nil, format(ERR_FRIEND_OFFLINE_S, player), nil, nil)
+                    gw.ReplicateMessage('SYSTEM', format(ERR_FRIEND_OFFLINE_S, player))
                 end
             end
         end
@@ -528,13 +519,13 @@ function GreenWall_OnEvent(self, event, ...)
         
         local pat_online = string.gsub(format(ERR_FRIEND_ONLINE_SS, '(.+)', '(.+)'), '%[', '%%[')
         local pat_offline = format(ERR_FRIEND_OFFLINE_S, '(.+)')
-        local pat_join = format(ERR_GUILD_JOIN_S, gw.player)
-        local pat_leave = format(ERR_GUILD_LEAVE_S, gw.player)
+        local pat_join = format(ERR_GUILD_JOIN_S, '(.+)')
+        local pat_leave = format(ERR_GUILD_LEAVE_S, '(.+)')
         local pat_quit = format(ERR_GUILD_QUIT_S, gw.player)
-        local pat_removed = format(ERR_GUILD_REMOVE_SS, gw.player, '(.+)')
-        local pat_kick = format(ERR_GUILD_REMOVE_SS, '(.+)', gw.player)
-        local pat_promote = format(ERR_GUILD_PROMOTE_SSS, gw.player, '(.+)', '(.+)')
-        local pat_demote = format(ERR_GUILD_DEMOTE_SSS, gw.player, '(.+)', '(.+)')
+        local pat_removed = format(ERR_GUILD_REMOVE_SS, '(.+)', '(.+)')
+        local pat_kick = format(ERR_GUILD_REMOVE_SS, '(.+)', '(.+)')
+        local pat_promote = format(ERR_GUILD_PROMOTE_SSS, '(.+)', '(.+)', '(.+)')
+        local pat_demote = format(ERR_GUILD_DEMOTE_SSS, '(.+)', '(.+)', '(.+)')
         
         if message:match(pat_online) then
         
@@ -552,36 +543,64 @@ function GreenWall_OnEvent(self, event, ...)
         
         elseif message:match(pat_join) then
 
-            -- We have joined the guild.
-            gw.Debug(GW_LOG_DEBUG, 'on_event: guild join detected.')
-            GwSendConfederationMsg(gw.config.channel.guild, 'broadcast', GwEncodeBroadcast('join'))
-
-        elseif message:match(pat_leave) or message:match(pat_quit) or message:match(pat_removed) then
-        
-            -- We have left the guild.
-            gw.Debug(GW_LOG_DEBUG, 'on_event: guild quit detected.')
-            GwSendConfederationMsg(gw.config.channel.guild, 'broadcast', GwEncodeBroadcast('leave'))
-            if GwIsConnected(gw.config.channel.guild) then
-                GwAbandonChannel(gw.config.channel.guild)
-                gw.config.channel.guild = GwNewChannelTable()
+            local player = message:match(pat_join)
+            if gw.GlobalName(player) == gw.player then
+                -- We have joined the guild.
+                gw.Debug(GW_LOG_DEBUG, 'on_event: guild join detected.')
+                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'join')
             end
-            if GwIsConnected(gw.config.channel.officer) then
-                GwAbandonChannel(gw.config.channel.officer)
-                gw.config.channel.officer = GwNewChannelTable()
+
+        elseif message:match(pat_leave) then
+        
+            local player = message:match(pat_leave)
+            if gw.GlobalName(player) == gw.player then
+                -- We have left the guild.
+                gw.Debug(GW_LOG_DEBUG, 'on_event: guild quit detected.')
+                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
+                gw.config:reset()
+            end
+
+        elseif message:match(pat_quit) then
+        
+            local player = message:match(pat_quit)
+            if gw.GlobalName(player) == gw.player then
+                -- We have left the guild.
+                gw.Debug(GW_LOG_DEBUG, 'on_event: guild quit detected.')
+                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
+                gw.config:reset()
+            end
+
+        elseif message:match(pat_removed) then
+        
+            local player = message:match(pat_removed)
+            if gw.GlobalName(player) == gw.player then
+                -- We have been kicked from the guild.
+                gw.Debug(GW_LOG_DEBUG, 'on_event: guild kick detected.')
+                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
+                gw.config:reset()
             end
 
         elseif message:match(pat_kick) then
             
-            GwSendConfederationMsg(gw.config.channel.guild, 'broadcast', GwEncodeBroadcast('remove', message:match(pat_kick)))
-        
+            local target, player = message:match(pat_kick)
+            if gw.GlobalName(player) == gw.player then
+                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'remove', target)
+            end
+                
         elseif message:match(pat_promote) then
             
-            GwSendConfederationMsg(gw.config.channel.guild, 'broadcast', GwEncodeBroadcast('promote', message:match(pat_promote)))
+            local player, target, rank = message:match(pat_promote)
+            if gw.GlobalName(player) == gw.player then
+                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'promote', target, rank)
+            end
         
         elseif message:match(pat_demote) then
             
-            GwSendConfederationMsg(gw.config.channel.guild, 'broadcast', GwEncodeBroadcast('demote', message:match(pat_demote)))
-        
+            local player, target, rank = message:match(pat_demote)
+            if gw.GlobalName(player) == gw.player then
+                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'demote', target, rank)
+            end
+                
         end
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
@@ -609,6 +628,14 @@ function GreenWall_OnEvent(self, event, ...)
         -- Initiate the comms
         gw.config:refresh()
         
+    end
+    
+    -- Cleanup
+    if gw.config.timer.channel:hold() then
+        if gw.WorldChannelFound() then
+            gw.config.timer.channel:clear()
+            gw.config:refreshChannels()
+        end
     end
         
 end
