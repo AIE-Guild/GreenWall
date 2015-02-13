@@ -435,7 +435,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<GUILD, %s>: %s', sender, message)
         gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
         if gw.iCmp(sender, gw.player) then
-            GwSendConfederationMsg(gw.config.channel.guild, 'chat', message)
+            gw.config.channel.guild:send(GW_MTYPE_CHAT, ...)
         end
     
     elseif event == 'CHAT_MSG_OFFICER' then
@@ -444,7 +444,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<OFFICER, %s>: %s', sender, message)
         gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
         if gw.iCmp(sender, gw.player) and GreenWall.ochat then
-            GwSendConfederationMsg(gw.config.channel.officer, 'chat', message)
+            gw.config.channel.officer:send(GW_MTYPE_OFFICER, ...)
         end
     
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
@@ -453,51 +453,9 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'Rx<ACHIEVEMENT, %s>: %s', sender, message)
         gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
         if gw.iCmp(sender, gw.player) then
-            GwSendConfederationMsg(gw.config.channel.guild, 'achievement', message)
+            gw.config.channel.guild:send(GW_MTYPE_ACHIEVEMENT, ...)
         end
     
-    elseif event == 'CHAT_MSG_ADDON' then
-    
-        local prefix, message, dist, sender = select(1, ...)
-        
-        gw.Debug(GW_LOG_DEBUG, 'on_event: event=%s, prefix=%s, sender=%s, dist=%s, message=%s',
-                event, prefix, sender, dist, message)
-        gw.Debug(GW_LOG_DEBUG, 'Rx<ADDON(%s), %s>: %s', prefix, sender, message)
-        gw.Debug(GW_LOG_DEBUG, 'sender_info: sender=%s, id=%s', sender, gw.player)
-        
-        if prefix == 'GreenWall' and dist == 'GUILD' and not gw.iCmp(sender, gw.player) then
-        
-            local type, command = strsplit('#', message)
-            
-            gw.Debug(GW_LOG_DEBUG, 'on_event: type=%s, command=%s', type, command)
-            
-            if type == 'C' then
-            
-                if command == 'officer' then
-                    if gw.IsOfficer() then
-                        -- Let 'em know you have the authoritay!
-                        GwSendContainerMsg('response', 'officer')
-                    end
-                end
-            
-            elseif type == 'R' then
-            
-                if command == 'officer' then
-                    if gwFlagOwner then
-                        -- Verify the claim
-                        if gw.IsOfficer(sender) then
-                            if gw.config.channel.guild.owner then
-                                gw.Debug(GW_LOG_INFO, 'on_event: granting owner status to $s.', sender)
-                                SetChannelOwner(gw.config.channel.guild.name, sender)
-                            end
-                        end
-                    end
-                end
-            
-            end
-            
-        end
-        
     elseif event == 'CHAT_MSG_CHANNEL_JOIN' then
     
         local _, player, _, _, _, _, _, number = select(1, ...)

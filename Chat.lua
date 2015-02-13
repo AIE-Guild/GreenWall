@@ -30,36 +30,37 @@ SOFTWARE.
 -- @param content Message content as a table.
 -- @param arglist API event arguments.
 function gw.handlerGuildChat(type, guild_id, content, arglist)
+    gw.Debug(GW_LOG_DEBUG, 'type=%d, guild_id=%s, #content=%d, #arglist=%d', type, guild_id, #content, #arglist)
     local sender = arglist[2]
     if type == GW_MTYPE_CHAT then
-        gw.ReplicateMessage('CHAT_MSG_GUILD', guild_id, content[1], arglist)
+        gw.ReplicateMessage('GUILD', guild_id, content[1], arglist)
     elseif type == GW_MTYPE_ACHIEVEMENT then
-        gw.ReplicateMessage('CHAT_MSG_GUILD_ACHIEVEMENT', guild_id, content[1], arglist)
+        gw.ReplicateMessage('GUILD_ACHIEVEMENT', guild_id, content[1], arglist)
     elseif type == GW_MTYPE_BROADCAST then
         local action, target, rank = unpack(content)
         if action == 'join' then
             if GreenWall.roster then
-                gw.ReplicateMessage('CHAT_MSG_SYSTEM', guild_id, 
+                gw.ReplicateMessage('SYSTEM', guild_id, 
                         format(ERR_GUILD_JOIN_S, sender), arglist)
             end
         elseif action == 'leave' then
             if GreenWall.roster then
-                gw.ReplicateMessage('CHAT_MSG_SYSTEM', guild_id, 
+                gw.ReplicateMessage('SYSTEM', guild_id, 
                         format(ERR_GUILD_LEAVE_S, sender), arglist)
             end
         elseif action == 'remove' then
             if GreenWall.rank then
-                gw.ReplicateMessage('CHAT_MSG_SYSTEM', guild_id, 
+                gw.ReplicateMessage('SYSTEM', guild_id, 
                         format(ERR_GUILD_REMOVE_SS, target, sender), arglist)
             end
         elseif action == 'promote' then
             if GreenWall.rank then
-                gw.ReplicateMessage('CHAT_MSG_SYSTEM', guild_id, 
+                gw.ReplicateMessage('SYSTEM', guild_id, 
                         format(ERR_GUILD_PROMOTE_SSS, sender, target, rank), arglist)
             end
         elseif action == 'demote' then
             if GreenWall.rank then
-                gw.ReplicateMessage('CHAT_MSG_SYSTEM', guild_id, 
+                gw.ReplicateMessage('SYSTEM', guild_id, 
                         format(ERR_GUILD_DEMOTE_SSS, sender, target, rank), arglist)
             end
         end
@@ -67,7 +68,7 @@ function gw.handlerGuildChat(type, guild_id, content, arglist)
         gw.Write('Received configuration reload request from %s.', sender)
         gw.config:reload()                              
     else
-        gw.Debug(GW_LOG_WARNING, 'handlerGuildChat: unhandled message type: %d', type)
+        gw.Debug(GW_LOG_WARNING, 'unhandled message type: %d', type)
     end
 end
 
@@ -78,10 +79,11 @@ end
 -- @param content Message content as a table.
 -- @param arglist API event arguments.
 function gw.handlerOfficerChat(type, guild_id, content, arglist)
+    gw.Debug(GW_LOG_DEBUG, 'type=%d, guild_id=%s, #content=%d, #arglist=%d', type, guild_id, #content, #arglist)
     if (type == GW_MTYPE_CHAT) then
-        gw.ReplicateMessage('CHAT_MSG_OFFICER', guild_id, content[1], arglist)
+        gw.ReplicateMessage('OFFICER', guild_id, content[1], arglist)
     else
-        gw.Debug(GW_LOG_WARNING, 'handlerGuildChat: unhandled message type: %d', type)
+        gw.Debug(GW_LOG_WARNING, 'unhandled message type: %d', type)
     end
 end
 
@@ -98,11 +100,6 @@ end
 -- @param message The message to replicate.
 -- @param arglist API event arguments.
 function gw.ReplicateMessage(event, guild_id, message, arglist)
-    
-    assert(event == 'CHAT_MSG_GUILD' or event == 'CHAT_MSG_OFFICER' or
-            event == 'CHAT_MSG_GUILD_ACHIEVEMENT' or event == 'CHAT_MSG_SYSTEM')
-    assert(type(guild_id) == 'string')
-            
     local sender = arglist[2]
     local language = arglist[3]
     local target = arglist[5]
@@ -121,13 +118,12 @@ function gw.ReplicateMessage(event, guild_id, message, arglist)
         local v
         for _, v in ipairs(gw.frame_table) do
                         
-            if v == target then
+            if v == event then
                     
                 local frame = 'ChatFrame' .. i
                 if _G[frame] then
-                    gw.Debug(GW_LOG_DEBUG, 'Cp<%s/%s, *, %s>: %s', frame, target, sender, message)
-                    ChatFrame_MessageEventHandler(_G[frame], event, message, sender, language, '', target, flags, 0, 0, '', 0, 0, guid)
-                    -- ChatFrame_MessageEventHandler(_G[frame], event, message, sender, language, '', '', '', 0, 0, '', 0, 0, guid)
+                    gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, messge=%s', frame, event, sender, message)
+                    ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message, sender, language, '', target, flags, 0, 0, '', 0, 0, guid)
                 end
                 break
                         

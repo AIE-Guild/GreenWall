@@ -206,12 +206,13 @@ Transmit Methods
 -- @param message Text of the message.
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
-    local message = self:alEncode(type, unpack(arg))
-    gw.Debug(GW_LOG_DEBUG, 'channel_send[%d]: type=%d, message=%s', self.number, type, message)
+    local message = self:alEncode(type, ...)
+    gw.Debug(GW_LOG_DEBUG, 'channel=%d, type=%d, message=%s', self.number, type, message)
     return self:tlSend(type, message)
 end
 
 function GwChannel:alEncode(type, ...)
+    local arg = {...}
     local message
     if type == GW_MTYPE_BROADCAST then
         assert(#arg == 3)
@@ -280,7 +281,7 @@ function GwChannel:tlFlush()
                     self.tx_hash[hash] = self.tx_hash[hash] + 1
                 end
                 -- Send the segment
-                gw.Debug(GW_LOG_DEBUG, 'tlFlush[%d]: Tx<%s, %s>', self.number, gw.player, segment)
+                gw.Debug(GW_LOG_DEBUG, 'channel=%d, segment=%s', self.number, gw.player, segment)
                 SendChatMessage(segment, 'CHANNEL', nil, self.number)
                 self.stats.txcnt = self.stats.txcnt + 1
                 count = count + 1
@@ -289,7 +290,7 @@ function GwChannel:tlFlush()
             end
         end
     else
-        gw.Debug(GW_LOG_WARNING, 'tlFlush[%d]: not connected.', self.number)
+        gw.Debug(GW_LOG_WARNING, 'channel=%d, not connected.', self.number)
         return 0
     end
 end
@@ -312,6 +313,7 @@ function GwChannel:receive(f, ...)
 end
 
 function GwChannel:alDecode(type, message)
+    gw.Debug(GW_LOG_DEBUG, 'type=%d, message=%s', type, message)
     if type == GW_MTYPE_BROADCAST then
         return strsplit(':', message)
     else
@@ -322,25 +324,26 @@ end
 function GwChannel:tlReceive(...)
     local segment, sender = select(1, ...)
     sender = gw.GlobalName(sender)
-    gw.Debug(GW_LOG_DEBUG, 'tlReceive[%d]: Rx<%s, %s>', self.number, sender, segment)
+    gw.Debug(GW_LOG_DEBUG, 'channel=%d, sender=%s, segment=%s', self.number, sender, segment)
     
     -- Check the segment hash
     if sender == gw.player then
         local hash = crc.Hash(segment)
         if self.tx_hash[hash] and self.tx_hash[hash] > 0 then
-            gw.Debug(GW_LOG_DEBUG, 'tlReceive[%d]: tx_hash[0x%04X] == %d', self.number, hash, self.tx_hash[hash])
+            gw.Debug(GW_LOG_DEBUG, 'channel=%d, tx_hash[0x%04X] == %d', self.number, hash, self.tx_hash[hash])
             self.tx_hash[hash] = self.tx_hash[hash] - 1
             if self.tx_hash[hash] <= 0 then
                 self.tx_hash[hash] = nil
             end
         else
-            gw.Debug(GW_LOG_WARNING, 'tlReceive[%d]: tx_hash[0x%04X] not found', self.number, hash)
+            gw.Debug(GW_LOG_WARNING, 'channel=%d, tx_hash[0x%04X] not found', self.number, hash)
             gw.Error('Message corruption detected.  Please disable add-ons that might modify messages on channel %d.', self.number)
         end
     end
     
     -- Process the segment
     local opcode, guild_id, _, message = strsplit('#', segment, 4)
+    gw.Debug(GW_LOG_DEBUG, 'opcode=%s, guild_id=%s, message=%s', opcode, guild_id, message)
     local type
     if opcode == 'C' then
         type = GW_MTYPE_CHAT
