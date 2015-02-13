@@ -49,9 +49,11 @@ GW_CTYPE_ADDON      = 2
 GW_MTYPE_CHAT           = 0
 GW_MTYPE_ACHIEVEMENT    = 1
 GW_MTYPE_BROADCAST      = 2
-GW_MTYPE_NOTICE         = 3
+GW_MTYPE_CONTROL        = 3
 GW_MTYPE_REQUEST        = 4
-GW_MTYPE_ADDON          = 5
+GW_MTYPE_RESPONSE       = 5
+GW_MTYPE_NOTICE         = 6
+GW_MTYPE_ADDON          = 7
 
 
 --
