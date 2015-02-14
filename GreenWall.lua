@@ -94,7 +94,7 @@ local gwUsage = [[
   logsize <length>
         -- Specify the maximum number of log entries to keep.
   admin reload
-        -- (officer only) Force a reload of the configuration by all confederation members.
+        -- (officer only) Force a reload of the configuration by all online guild members.
  
  
 ]]
