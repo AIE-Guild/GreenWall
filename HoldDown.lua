@@ -92,7 +92,7 @@ function GwHoldDownCache:hold(s)
         if self.cache[s] > t then
             rv = true
         else
-            table.remove(self.cache, s)
+            self.cache[s] = nil
         end
     end
     
