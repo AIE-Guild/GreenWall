@@ -225,8 +225,7 @@ local function GwSlashCmd(message, editbox)
                 tremove(GreenWallLog, 1)
             end
         elseif command == 'ochat' then
-            gw.config:load()
-            gw.config:refreshChannels()
+            gw.config:reload()
         end
     
     elseif command == 'reload' then
@@ -236,9 +235,8 @@ local function GwSlashCmd(message, editbox)
     
     elseif command == 'refresh' then
     
-        gw.config:refresh()
-        gw.config:refreshChannels()
-        gw.Write('Refreshed configuration.')
+        gw.Write('Reloading configuration.')
+        gw.config:reload()
     
     elseif command == 'status' then
     
@@ -485,7 +483,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_CHANNEL_NOTICE' then
 
         local action, _, _, _, _, _, type, number, name = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'chat_notice: type=%s, number=%s, name=%s, action=%s', type, number, name, action)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, type=%s, number=%s, name=%s, action=%s', event, type, number, crc.Hash(tostring(name)), action)
         
         if number == gw.config.channel.guild.number then
             
