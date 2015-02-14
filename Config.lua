@@ -252,6 +252,8 @@ function GwConfig:load()
         else
             gw.Error('invalid officer channel name specified')
         end
+    else
+        self.channel.officer:clear()
     end
     
     -- Clean up.
@@ -280,19 +282,13 @@ end
 
 
 --- Initiate a reload of the configuration.
--- This is an update initiated by a reload request.
+-- This is similar to a refresh, but is not subject to the hold-down.
 -- @return True is refresh submitted, false otherwise.
 function GwConfig:reload()
-    if self.timer.reload:hold() then
-        gw.Debug(GW_LOG_DEBUG, 'skipping due to hold-down.')
-        return false
-    else
-        self.valid = false
-        self.timer.reload:set()
-        GuildRoster()
-        gw.Debug(GW_LOG_DEBUG, 'roster update requested.')
-        return true
-    end
+    self.valid = false
+    GuildRoster()
+    gw.Debug(GW_LOG_DEBUG, 'roster update requested.')
+    return true
 end
 
 
@@ -331,8 +327,11 @@ function GwConfig:refreshChannels()
         gw.Debug(GW_LOG_INFO, 'channel join blocked.')
     else
         gw.Debug(GW_LOG_INFO, 'refreshing channels.')
-        for k, v in pairs(self.channel) do
-            self.channel[k]:join()
+        self.channel.guild:join()
+        if GreenWall.ochat then
+            self.channel.officer:join()
+        else
+            self.channel.officer:leave()
         end
     end
 end

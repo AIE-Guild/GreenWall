@@ -48,6 +48,10 @@ GwChannel.__index = GwChannel
 function GwChannel:new()
     local self = {}
     setmetatable(self, GwChannel)
+    return self:initialize()
+end
+
+function GwChannel:initialize()
     self.frame_table = {}
     self.version = 0
     self.name = ''
@@ -88,6 +92,14 @@ function GwChannel:configure(version, name, password)
                         crc.Hash(self.name), crc.Hash(self.password), self.version);
 end
 
+
+--- Clear the channel configuration.
+function GwChannel:clear()
+    self:leave()
+    self:initialize()
+end
+
+
 --- Test if the channel is configured.
 -- @return True if configured, false otherwise.
 function GwChannel:isConfigured()
@@ -97,7 +109,7 @@ end
 --- Check if a connection exists to the custom channel.
 -- @return True if connected, otherwise false.
 function GwChannel:isConnected()
-    if self.name then
+    if self:isConfigured() then
         local number = GetChannelName(self.name)
         gw.Debug(GW_LOG_DEBUG, 'number=%d, name=<<%04X>>', self.number, crc.Hash(self.name))
         if number ~= 0 then

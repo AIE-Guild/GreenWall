@@ -136,6 +136,7 @@ function GreenWallInterfaceFrame_SaveUpdates(self)
     GreenWall.rank = getglobal(self:GetName().."OptionRank"):GetChecked() and true or false
     if (gw.IsOfficer()) then
         GreenWall.ochat = getglobal(self:GetName().."OptionOfficerChat"):GetChecked() and true or false
+        gw.config:reload()
     end    
 end
 
@@ -449,10 +450,10 @@ function GreenWall_OnEvent(self, event, ...)
         
         if number == gw.config.channel.guild.number then
             if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
-                if gw.config.comember_cache:hold(player) then
-                    gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', player)
+                if gw.config.comember_cache:hold(gw.GlobalName(player)) then
+                    gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', gw.GlobalName(player))
                 else
-                    gw.Debug(GW_LOG_DEBUG, 'comember_cache: miss %s', player)
+                    gw.Debug(GW_LOG_DEBUG, 'comember_cache: miss %s', gw.GlobalName(player))
                     gw.ReplicateMessage('SYSTEM', format(ERR_FRIEND_ONLINE_SS, player, player))
                 end
             end
@@ -465,10 +466,10 @@ function GreenWall_OnEvent(self, event, ...)
         
         if number == gw.config.channel.guild.number then
             if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
-                if gw.config.comember_cache:hold(player) then
-                    gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', player)
+                if gw.config.comember_cache:hold(gw.GlobalName(player)) then
+                    gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', gw.GlobalName(player))
                 else
-                    gw.Debug(GW_LOG_DEBUG, 'comember_cache: miss %s', player)
+                    gw.Debug(GW_LOG_DEBUG, 'comember_cache: miss %s', gw.GlobalName(player))
                     gw.ReplicateMessage('SYSTEM', format(ERR_FRIEND_OFFLINE_S, player))
                 end
             end
@@ -528,6 +529,7 @@ function GreenWall_OnEvent(self, event, ...)
         if message:match(pat_online) then
         
             local _, player = message:match(pat_online)
+            player = gw.GlobalName(player)
             gw.Debug(GW_LOG_DEBUG, 'player_status: player %s online', player)
             gw.config.comember_cache:hold(player)
             gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
@@ -535,6 +537,7 @@ function GreenWall_OnEvent(self, event, ...)
         elseif message:match(pat_offline) then
         
             local player = message:match(pat_offline)
+            player = gw.GlobalName(player)
             gw.Debug(GW_LOG_DEBUG, 'player_status: player %s offline', player)
             gw.config.comember_cache:hold(player)
             gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
