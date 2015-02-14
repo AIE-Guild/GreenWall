@@ -279,7 +279,7 @@ end
 --- Initiate a reload of the configuration.
 -- This is an update initiated by a reload request.
 -- @return True is refresh submitted, false otherwise.
-function GwConfig:refresh()
+function GwConfig:reload()
     if self.timer.reload:hold() then
         gw.Debug(GW_LOG_DEBUG, 'skipping due to hold-down.')
         return false

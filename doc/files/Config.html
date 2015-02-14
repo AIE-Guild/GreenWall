@@ -38,8 +38,24 @@
 <h1>Files</h1>
 <ul>
 
+	<li>
+		<a href="../files/Channel.html">Channel.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Chat.html">Chat.lua</a>
+	</li>
+
 	<li><strong>Config.lua</strong></li>
 	
+	<li>
+		<a href="../files/Constants.html">Constants.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Globals.html">Globals.lua</a>
+	</li>
+
 	<li>
 		<a href="../files/GreenWall.html">GreenWall.lua</a>
 	</li>
@@ -85,23 +101,18 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwConfig:channelHold">GwConfig:channelHold</a>&nbsp;(flag)</td>
-	<td class="summary">Check whether the channel hold-down has expired.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#GwConfig:configHold">GwConfig:configHold</a>&nbsp;(flag)</td>
-	<td class="summary">Check whether the configuration hold-down has expired.</td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#GwConfig:dump">GwConfig:dump</a>&nbsp;(keep)</td>
 	<td class="summary">Dump configuration attributes.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwConfig:initialize">GwConfig:initialize</a>&nbsp;(soft)</td>
-	<td class="summary">Initialize a GwConfig object with the default attributes and state.</td>
+	<td class="name" nowrap><a href="#GwConfig:initialize_param">GwConfig:initialize_param</a>&nbsp;()</td>
+	<td class="summary">Initialize a GwConfig object with the default parameters.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwConfig:initialize_state">GwConfig:initialize_state</a>&nbsp;()</td>
+	<td class="summary">Initialize a GwConfig object with the default state.</td>
 	</tr>
 
 	<tr>
@@ -115,8 +126,23 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwConfig:reloadHold">GwConfig:reloadHold</a>&nbsp;(flag)</td>
-	<td class="summary">Check whether the reload hold-down has expired.</td>
+	<td class="name" nowrap><a href="#GwConfig:refresh">GwConfig:refresh</a>&nbsp;()</td>
+	<td class="summary">Initiate a refresh of the configuration.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwConfig:refreshChannels">GwConfig:refreshChannels</a>&nbsp;()</td>
+	<td class="summary">Refresh the channel state.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwConfig:reload">GwConfig:reload</a>&nbsp;()</td>
+	<td class="summary">Initiate a reload of the configuration.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwConfig:reset">GwConfig:reset</a>&nbsp;()</td>
+	<td class="summary">Initiate a reset and reload of the configuration.</td>
 	</tr>
 
 </table>
@@ -195,64 +221,6 @@ Check a guild for peer status.
 
 
 
-<dt><a name="GwConfig:channelHold"></a><strong>GwConfig:channelHold</strong>&nbsp;(flag)</dt>
-<dd>
-Check whether the channel hold-down has expired.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>flag</em></code>: (optional) True to start the hold-down, false to clear the hold-down.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the hold-down is still in effect, false if it has expired.</ul>
-
-
-
-</dd>
-
-
-
-
-<dt><a name="GwConfig:configHold"></a><strong>GwConfig:configHold</strong>&nbsp;(flag)</dt>
-<dd>
-Check whether the configuration hold-down has expired.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>flag</em></code>: (optional) True to start the hold-down, false to clear the hold-down.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the hold-down is still in effect, false if it has expired.</ul>
-
-
-
-</dd>
-
-
-
-
 <dt><a name="GwConfig:dump"></a><strong>GwConfig:dump</strong>&nbsp;(keep)</dt>
 <dd>
 Dump configuration attributes.
@@ -279,19 +247,30 @@ Dump configuration attributes.
 
 
 
-<dt><a name="GwConfig:initialize"></a><strong>GwConfig:initialize</strong>&nbsp;(soft)</dt>
+<dt><a name="GwConfig:initialize_param"></a><strong>GwConfig:initialize_param</strong>&nbsp;()</dt>
 <dd>
-Initialize a GwConfig object with the default attributes and state.
+Initialize a GwConfig object with the default parameters.
 
 
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>soft</em></code>: If true, keep state intact.
-	</li>
-	
-</ul>
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The initialized GwConfig instance.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwConfig:initialize_state"></a><strong>GwConfig:initialize_state</strong>&nbsp;()</dt>
+<dd>
+Initialize a GwConfig object with the default state.
+
 
 
 
@@ -348,19 +327,10 @@ GwConfig constructor function.
 
 
 
-<dt><a name="GwConfig:reloadHold"></a><strong>GwConfig:reloadHold</strong>&nbsp;(flag)</dt>
+<dt><a name="GwConfig:refresh"></a><strong>GwConfig:refresh</strong>&nbsp;()</dt>
 <dd>
-Check whether the reload hold-down has expired.
+Initiate a refresh of the configuration. This is a periodic or user-initiated update.
 
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>flag</em></code>: (optional) True to start the hold-down, false to clear the hold-down.
-	</li>
-	
-</ul>
 
 
 
@@ -368,7 +338,64 @@ Check whether the reload hold-down has expired.
 
 
 <h3>Return value:</h3>
-<ul>True if the hold-down is still in effect, false if it has expired.</ul>
+<ul>True is refresh submitted, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwConfig:refreshChannels"></a><strong>GwConfig:refreshChannels</strong>&nbsp;()</dt>
+<dd>
+Refresh the channel state.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwConfig:reload"></a><strong>GwConfig:reload</strong>&nbsp;()</dt>
+<dd>
+Initiate a reload of the configuration. This is an update initiated by a reload request.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True is refresh submitted, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwConfig:reset"></a><strong>GwConfig:reset</strong>&nbsp;()</dt>
+<dd>
+Initiate a reset and reload of the configuration. This is a disruptive reset of the configuration and state.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True is refresh submitted, false otherwise.</ul>
 
 
 

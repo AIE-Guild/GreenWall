@@ -40,6 +40,34 @@
 
 	<li><strong>Channel.lua</strong></li>
 	
+	<li>
+		<a href="../files/Chat.html">Chat.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Config.html">Config.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Constants.html">Constants.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Globals.html">Globals.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/GreenWall.html">GreenWall.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/HoldDown.html">HoldDown.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Utility.html">Utility.lua</a>
+	</li>
+
 </ul>
 
 
@@ -63,13 +91,13 @@
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannel:getRoles">GwChannel:getRoles</a>&nbsp;(player)</td>
-	<td class="summary">Find channel roles for a player.</td>
+	<td class="name" nowrap><a href="#GwChannel:configure">GwChannel:configure</a>&nbsp;(version, name, password)</td>
+	<td class="summary">Configure the channel.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannel:initialize">GwChannel:initialize</a>&nbsp;()</td>
-	<td class="summary">Initialize a GwChannel object with the default attributes and state.</td>
+	<td class="name" nowrap><a href="#GwChannel:isConfigured">GwChannel:isConfigured</a>&nbsp;()</td>
+	<td class="summary">Test if the channel is configured.</td>
 	</tr>
 
 	<tr>
@@ -88,13 +116,33 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannel:new">GwChannel:new</a>&nbsp;(name, password)</td>
+	<td class="name" nowrap><a href="#GwChannel:new">GwChannel:new</a>&nbsp;()</td>
 	<td class="summary">GwChannel constructor function.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannel:send">GwChannel:send</a>&nbsp;(message, type)</td>
+	<td class="name" nowrap><a href="#GwChannel:receive">GwChannel:receive</a>&nbsp;(f, ...)</td>
+	<td class="summary">Handler for data received on a channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:send">GwChannel:send</a>&nbsp;(type, ..., message)</td>
 	<td class="summary">Sends an encoded message on the shared channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:tlDequeue">GwChannel:tlDequeue</a>&nbsp;()</td>
+	<td class="summary">Remove a segment from the channel transmit queue.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:tlEnqueue">GwChannel:tlEnqueue</a>&nbsp;(segment)</td>
+	<td class="summary">Add a segment to the channel transmit queue.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:tlFlush">GwChannel:tlFlush</a>&nbsp;()</td>
+	<td class="summary">Transmit all messages in the channel transmit queue.</td>
 	</tr>
 
 </table>
@@ -115,16 +163,24 @@
 
 
 
-<dt><a name="GwChannel:getRoles"></a><strong>GwChannel:getRoles</strong>&nbsp;(player)</dt>
+<dt><a name="GwChannel:configure"></a><strong>GwChannel:configure</strong>&nbsp;(version, name, password)</dt>
 <dd>
-Find channel roles for a player.
+Configure the channel.
 
 
 <h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  <code><em>player</em></code>: Name of the player to check.
+	  <code><em>version</em></code>: Messaging version.
+	</li>
+	
+	<li>
+	  <code><em>name</em></code>: Name of the channel.
+	</li>
+	
+	<li>
+	  <code><em>password</em></code>: Password for the channel. (optional)
 	</li>
 	
 </ul>
@@ -134,15 +190,6 @@ Find channel roles for a player.
 
 
 
-<h3>Return values:</h3>
-<ol>
-	
-	<li>True if target is the channel owner, false otherwise.</li>
-	
-	<li>True if target is a channel moderator, false otherwise.</li>
-	
-</ol>
-
 
 
 </dd>
@@ -150,9 +197,9 @@ Find channel roles for a player.
 
 
 
-<dt><a name="GwChannel:initialize"></a><strong>GwChannel:initialize</strong>&nbsp;()</dt>
+<dt><a name="GwChannel:isConfigured"></a><strong>GwChannel:isConfigured</strong>&nbsp;()</dt>
 <dd>
-Initialize a GwChannel object with the default attributes and state.
+Test if the channel is configured.
 
 
 
@@ -161,7 +208,7 @@ Initialize a GwChannel object with the default attributes and state.
 
 
 <h3>Return value:</h3>
-<ul>The initialized GwChannel instance.</ul>
+<ul>True if configured, false otherwise.</ul>
 
 
 
@@ -220,6 +267,9 @@ Leave a bridge channel.
 
 
 
+<h3>Return value:</h3>
+<ul>True if a disconnection occurred, false otherwise.</ul>
+
 
 
 </dd>
@@ -227,23 +277,10 @@ Leave a bridge channel.
 
 
 
-<dt><a name="GwChannel:new"></a><strong>GwChannel:new</strong>&nbsp;(name, password)</dt>
+<dt><a name="GwChannel:new"></a><strong>GwChannel:new</strong>&nbsp;()</dt>
 <dd>
 GwChannel constructor function.
 
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>name</em></code>: The name of the custom channel.
-	</li>
-	
-	<li>
-	  <code><em>password</em></code>: The password for the custom channel (optional).
-	</li>
-	
-</ul>
 
 
 
@@ -260,20 +297,20 @@ GwChannel constructor function.
 
 
 
-<dt><a name="GwChannel:send"></a><strong>GwChannel:send</strong>&nbsp;(message, type)</dt>
+<dt><a name="GwChannel:receive"></a><strong>GwChannel:receive</strong>&nbsp;(f, ...)</dt>
 <dd>
-Sends an encoded message on the shared channel.
+Handler for data received on a channel.
 
 
 <h3>Parameters:</h3>
 <ul>
 	
 	<li>
-	  <code><em>message</em></code>: Text of the message.
+	  <code><em>f</em></code>: A callback function.
 	</li>
 	
 	<li>
-	  <code><em>type</em></code>: (optional) The message type. Accepted values are: GW_CTYPE_CHAT, GW_CTYPE_ACHIEVEMENT, GW_CTYPE_BROADCAST, GW_CTYPE_NOTICE, GW_CTYPE_REQUEST, GW_CTYPE_ADDON. Default is GW_CTYPE_CHAT.
+	  <code><em>...</em></code>: The API event arguments.
 	</li>
 	
 </ul>
@@ -282,6 +319,112 @@ Sends an encoded message on the shared channel.
 
 
 
+
+<h3>Return value:</h3>
+<ul>The return value of f applied to the data.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:send"></a><strong>GwChannel:send</strong>&nbsp;(type, ..., message)</dt>
+<dd>
+Sends an encoded message on the shared channel.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>type</em></code>: The message type. Accepted values are: GW_MTYPE_CHAT GW_MTYPE_ACHIEVEMENT GW_MTYPE_BROADCAST GW_MTYPE_NOTICE GW_MTYPE_REQUEST GW_MTYPE_ADDON
+	</li>
+	
+	<li>
+	  <code><em>...</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>message</em></code>: Text of the message.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:tlDequeue"></a><strong>GwChannel:tlDequeue</strong>&nbsp;()</dt>
+<dd>
+Remove a segment from the channel transmit queue.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Segment removed from the queue or nil if queue is empty.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:tlEnqueue"></a><strong>GwChannel:tlEnqueue</strong>&nbsp;(segment)</dt>
+<dd>
+Add a segment to the channel transmit queue.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>segment</em></code>: Segment to enqueue.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Number of segments in queue after the insertion.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:tlFlush"></a><strong>GwChannel:tlFlush</strong>&nbsp;()</dt>
+<dd>
+Transmit all messages in the channel transmit queue.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Number of messages flushed.</ul>
 
 
 
