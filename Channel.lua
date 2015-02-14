@@ -94,6 +94,21 @@ function GwChannel:isConfigured()
     return self.name and self.name ~= ''
 end
 
+--- Check if a connection exists to the custom channel.
+-- @return True if connected, otherwise false.
+function GwChannel:isConnected()
+    if self.name then
+        local number = GetChannelName(self.name)
+        gw.Debug(GW_LOG_DEBUG, 'number=%d, name=<<%04X>>', self.number, crc.Hash(self.name))
+        if number ~= 0 then
+            self.number = number
+            return true
+        else
+            return false
+        end
+    end
+end
+
 --- Join a bridge channel.
 -- @return True if connection success, false otherwise.
 function GwChannel:join()
@@ -102,18 +117,16 @@ function GwChannel:join()
         return false
     end
 
-    local number = GetChannelName(self.name)
-    
-    if number == 0 then
-        gw.Debug(GW_LOG_DEBUG, 'channel_join: channel=<<%04X>>, password=<<%04X>>',
-                crc.Hash(self.name), crc.Hash(self.password));
+    if not self:isConnected() then
+
+        gw.Debug(GW_LOG_DEBUG, 'joining channel; channel=<<%04X>>, password=<<%04X>>',
+                crc.Hash(self.name), crc.Hash(self.password))
         JoinTemporaryChannel(self.name, self.password)
-        number = GetChannelName(self.name)
-        gw.Debug(GW_LOG_DEBUG, 'channel join result = %d', number)
+        local number = GetChannelName(self.name)
 
         if number == 0 then
     
-            gw.Error('cannot create communication channel: %s', self.name)
+            gw.Error('cannot create communication channel: <<%04X>>', crc.Hash(self.name))
             self.stats.fconn = self.stats.fconn + 1
             return false
     
@@ -121,7 +134,7 @@ function GwChannel:join()
     
             self.number = number
             self.stats.sconn = self.stats.sconn + 1
-            gw.Debug(GW_LOG_INFO, 'channel_join[%d]: joined name=<<%04X>>, password=<<%04X>>',
+            gw.Debug(GW_LOG_INFO, 'joined channel; number=%d, name=<<%04X>>, password=<<%04X>>',
                     self.number, crc.Hash(self.name), crc.Hash(self.password))
             gw.Write('Connected to confederation on channel %d.', self.number)
                   
@@ -134,7 +147,7 @@ function GwChannel:join()
                     if v == self.name then
                         local frame = format('ChatFrame%d', i)
                         if _G[frame] then
-                            gw.Debug(GW_LOG_INFO, 'channel_join[%d]: hiding channel: name=<<%04X>>, frame=%s', 
+                            gw.Debug(GW_LOG_INFO, 'hiding channel: number=%d, name=<<%04X>>, frame=%s', 
                                     self.number, crc.Hash(self.name), frame)
                             ChatFrame_RemoveChannel(frame, self.name)
                         end
@@ -149,24 +162,16 @@ function GwChannel:join()
     
         end
         
-    else
-    
-        gw.Debug(GW_LOG_INFO, 'channel_join[%d]: currently connected; name=<<%04X>>, password=<<%04X>>',
-                self.number, crc.Hash(self.name), crc.Hash(self.password))
-        if self.number ~= number then 
-            self.number = number
-            gw.Debug(GW_LOG_DEBUG, 'synchronizing channel number (%d)', self.number)
-        end
-        
     end
-    
+
 end
 
 --- Leave a bridge channel.
 -- @return True if a disconnection occurred, false otherwise.
 function GwChannel:leave()
     if self:isConnected() then
-        gw.Debug(GW_LOG_INFO, 'chan_leave[%d]: name=<<%04X>>', self.number, crc.Hash(self.name))
+        gw.Debug(GW_LOG_DEBUG, 'leaving channel; number=%d, channel=<<%04X>>, password=<<%04X>>', 
+                self.number, crc.Hash(self.name), crc.Hash(self.password))
         LeaveChannelByName(self.name)
         self.stats.leave = self.stats.leave + 1
         self.number = 0
@@ -174,20 +179,6 @@ function GwChannel:leave()
     else
         return false
     end
-end
-
---- Check if a connection exists to the custom channel.
--- @return True if connected, otherwise false.
-function GwChannel:isConnected()
-    if self.name then
-        local number = GetChannelName(self.name)
-        gw.Debug(GW_LOG_DEBUG, 'chan_test[%d]: name=<<%04X>>, number=%d', self.number, crc.Hash(self.name), number)
-        if number ~= 0 then
-            self.number = number
-        end
-        return true
-    end
-    return false            
 end
 
 

@@ -113,6 +113,9 @@ function GwConfig:dump(keep)
         end
     end
     
+    gw.Write('[Options]')
+    dump_tier(GreenWall, 0)
+    gw.Write('[Configuration]')
     dump_tier(self, 0)
 end
 
@@ -285,8 +288,8 @@ function GwConfig:reload()
         return false
     else
         self.valid = false
-        GuildRoster()
         self.timer.reload:set()
+        GuildRoster()
         gw.Debug(GW_LOG_DEBUG, 'roster update requested.')
         return true
     end
@@ -298,13 +301,13 @@ end
 -- @return True is refresh submitted, false otherwise.
 function GwConfig:reset()
     self:initialize_param(true)
-    GuildRoster()
-    gw.Debug(GW_LOG_DEBUG, 'roster update requested.')
     for k, v in pairs(self.channel) do
         gw.Debug(GW_LOG_DEBUG, 'clearing %s channel', k)
         v:leave()
         self.channel[k] = GwChannel:new()
     end
+    GuildRoster()
+    gw.Debug(GW_LOG_DEBUG, 'roster update requested.')
     return true
 end
 
