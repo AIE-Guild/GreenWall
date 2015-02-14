@@ -59,14 +59,6 @@ function gw.handlerGuildChat(type, guild_id, content, arglist)
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_DEMOTE_SSS, sender, target, rank), guild_id, arglist)
             end
         end
-    elseif type == GW_MTYPE_REQUEST then
-        if gw.config.timer.reload:hold() then
-            gw.Write('Received configuration reload request from %s; hold-down in effect, skipping.', sender)
-        else
-            gw.Write('Received configuration reload request from %s.', sender)
-            gw.config:reload()
-            gw.config.timer.reload:set()
-        end                          
     else
         gw.Debug(GW_LOG_WARNING, 'unhandled message type: %d', type)
     end

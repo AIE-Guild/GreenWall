@@ -71,8 +71,8 @@ local gwUsage = [[
         -- Print configuration and state information.
   stats
         -- Print connection statistics.
-  refresh
-        -- Repair communications link.
+  reload
+        -- Reload the configuration.
   achievements <on|off>
         -- Toggle display of confederation achievements.
   roster <on|off>
@@ -93,6 +93,9 @@ local gwUsage = [[
         -- Toggle output logging to the GreenWall.lua file.
   logsize <length>
         -- Specify the maximum number of log entries to keep.
+  admin reload
+        -- (officer only) Force a reload of the configuration by all confederation members.
+ 
  
 ]]
         
@@ -232,12 +235,16 @@ local function GwSlashCmd(message, editbox)
             gw.config:reload()
         end
     
-    elseif command == 'reload' then
+    elseif command == 'admin' then
     
-        gw.config.channel.guild:send(GW_MTYPE_REQUEST, 'reload')
-        gw.Write('Broadcast configuration reload request.')
+        if argstr == 'reload' then
+            if gw.IsOfficer() then
+                gw.SendLocal(GW_MTYPE_CONTROL, 'reload')
+                gw.Write('Broadcast configuration reload request.')
+            end
+        end
     
-    elseif command == 'refresh' then
+    elseif command == 'reload' or command == 'refresh' then
     
         gw.Write('Reloading configuration.')
         gw.config:reload()
@@ -415,7 +422,19 @@ function GreenWall_OnEvent(self, event, ...)
             if not gw.iCmp(sender, gw.player) then
                 local opcode, message = strsplit('#', payload)
                 gw.Debug(GW_LOG_DEBUG, 'opcode=%s, message=%s', opcode, message)
-                if opcode == 'C' then
+                if opcode == 'I' then
+                    if message == 'reload' then
+                        if gw.IsOfficer(sender) then
+                            if gw.config.timer.reload:hold() then
+                                gw.Write('Received configuration reload request from %s; hold-down in effect, skipping.', sender)
+                            else
+                                gw.Write('Received configuration reload request from %s.', sender)
+                                gw.config:reload()
+                                gw.config.timer.reload:set()
+                            end   
+                        end
+                    end
+                elseif opcode == 'C' then
                     if message == 'officer' then
                         if gw.IsOfficer() then
                             gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
