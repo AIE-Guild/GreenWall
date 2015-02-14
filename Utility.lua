@@ -24,6 +24,14 @@ SOFTWARE.
 
 --]]-----------------------------------------------------------------------
 
+--[[-----------------------------------------------------------------------
+
+Imported Libraries
+
+--]]-----------------------------------------------------------------------
+
+local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
+
 
 ---------------------------------------------------------------------------
 -- Logic functions
@@ -107,7 +115,7 @@ end
 -- @return The string with redaction applied, if necessary.
 function gw.Redact(msg)
     if GreenWall.redact then
-        return string.format('<<%04X>>', msg)
+        return string.format('<<%04X>>', crc.Hash(msg))
     else
         return msg
     end
