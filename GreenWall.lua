@@ -52,6 +52,7 @@ local gwDefaults = {
     log             = { default=false,  desc="event logging" },
     logsize         = { default=2048,   desc="maximum log buffer size" },
     ochat           = { default=false,  desc="officer chat bridging" },
+    redact          = { default=true,   desc="obfuscate sensitive data in debug output" },  
 }
 
 local gwUsage = [[
@@ -84,6 +85,8 @@ local gwUsage = [[
         -- Enable officer chat bridging.
   debug <level>
         -- Set debugging level to integer <level>.
+  redact <on|off>
+        -- Obfuscate sensitive information in debug output.
   verbose <on|off>
         -- Toggle the display of debugging output in the chat window.
   log <on|off>

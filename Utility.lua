@@ -102,6 +102,18 @@ function gw.Debug(level, ...)
 end
 
 
+--- Print an obfuscated string if the redaction option is set.
+-- @param msg The input string
+-- @return The string with redaction applied, if necessary.
+function gw.Redact(msg)
+    if GreenWall.redact then
+        return string.format('<<%04X>>', msg)
+    else
+        return msg
+    end
+end
+
+
 ---------------------------------------------------------------------------
 -- Game functions
 ---------------------------------------------------------------------------
