@@ -84,12 +84,11 @@ Channel Management Methods
 function GwChannel:configure(version, name, password)
     assert(version == 1)
     assert(name and name ~= '')
-    self:leave()
     self.version = version
     self.name = name
     self.password = password and password or ''
-    gw.Debug(GW_LOG_DEBUG, 'channel_conf: channel=<<%04X>>, password=<<%04X>>, version=%d',
-                        crc.Hash(self.name), crc.Hash(self.password), self.version);
+    gw.Debug(GW_LOG_INFO, 'configued channel; channel=%s, password=%s, version=%d',
+            gw.Redact(self.name), gw.Redact(self.password), self.version);
 end
 
 
@@ -103,20 +102,22 @@ end
 --- Test if the channel is configured.
 -- @return True if configured, false otherwise.
 function GwChannel:isConfigured()
+    gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s, password=%s, version=%d',
+            self.number, gw.Redact(self.name), gw.Redact(self.password), self.version)
     return self.name and self.name ~= ''
 end
 
 --- Check if a connection exists to the custom channel.
 -- @return True if connected, otherwise false.
 function GwChannel:isConnected()
+    gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s', self.number, gw.Redact(self.name))
     if self:isConfigured() then
-        local number = GetChannelName(self.name)
-        gw.Debug(GW_LOG_DEBUG, 'number=%d, name=<<%04X>>', self.number, crc.Hash(self.name))
-        if number ~= 0 then
-            self.number = number
-            return true
-        else
+        self.number = GetChannelName(self.name)
+        gw.Debug(GW_LOG_DEBUG, 'set number=%d', self.number)
+        if self.number == 0 then
             return false
+        else
+            return true
         end
     end
 end
@@ -131,14 +132,14 @@ function GwChannel:join()
 
     if not self:isConnected() then
 
-        gw.Debug(GW_LOG_DEBUG, 'joining channel; channel=<<%04X>>, password=<<%04X>>',
-                crc.Hash(self.name), crc.Hash(self.password))
+        gw.Debug(GW_LOG_INFO, 'joining channel; channel=%s, password=%s',
+                gw.Redact(self.name), gw.Redact(self.password))
         JoinTemporaryChannel(self.name, self.password)
         local number = GetChannelName(self.name)
 
         if number == 0 then
     
-            gw.Error('cannot create communication channel: <<%04X>>', crc.Hash(self.name))
+            gw.Error('cannot create communication channel: %s', gw.Redact(self.name))
             self.stats.fconn = self.stats.fconn + 1
             return false
     
@@ -146,8 +147,8 @@ function GwChannel:join()
     
             self.number = number
             self.stats.sconn = self.stats.sconn + 1
-            gw.Debug(GW_LOG_INFO, 'joined channel; number=%d, name=<<%04X>>, password=<<%04X>>',
-                    self.number, crc.Hash(self.name), crc.Hash(self.password))
+            gw.Debug(GW_LOG_NOTICE, 'joined channel; number=%d, name=%s, password=%s',
+                    self.number, gw.Redact(self.name), gw.Redact(self.password))
             gw.Write('Connected to confederation on channel %d.', self.number)
                   
             --
@@ -159,8 +160,8 @@ function GwChannel:join()
                     if v == self.name then
                         local frame = format('ChatFrame%d', i)
                         if _G[frame] then
-                            gw.Debug(GW_LOG_INFO, 'hiding channel: number=%d, name=<<%04X>>, frame=%s', 
-                                    self.number, crc.Hash(self.name), frame)
+                            gw.Debug(GW_LOG_INFO, 'hiding channel: number=%d, name=%s, frame=%s', 
+                                    self.number, gw.Redact(self.name), frame)
                             ChatFrame_RemoveChannel(frame, self.name)
                         end
                     end
@@ -182,8 +183,8 @@ end
 -- @return True if a disconnection occurred, false otherwise.
 function GwChannel:leave()
     if self:isConnected() then
-        gw.Debug(GW_LOG_DEBUG, 'leaving channel; number=%d, channel=<<%04X>>, password=<<%04X>>', 
-                self.number, crc.Hash(self.name), crc.Hash(self.password))
+        gw.Debug(GW_LOG_INFO, 'leaving channel; number=%d, channel=%s, password=%s', 
+                self.number, gw.Redact(self.name), gw.Redact(self.password))
         LeaveChannelByName(self.name)
         self.stats.leave = self.stats.leave + 1
         self.number = 0
@@ -213,7 +214,7 @@ Transmit Methods
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
     local message = self:alEncode(type, ...)
-    gw.Debug(GW_LOG_DEBUG, 'channel=%d, type=%d, message=%s', self.number, type, message)
+    gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, message=%s', self.number, type, message)
     return self:tlSend(type, message)
 end
 
@@ -273,7 +274,7 @@ end
 --- Transmit all messages in the channel transmit queue.
 -- @return Number of messages flushed.
 function GwChannel:tlFlush()
-    gw.Debug(GW_LOG_DEBUG, 'tlFlush[%d]: servicing transmit queue; %d message(s) queued.', self.number, #self.tx_queue)
+    gw.Debug(GW_LOG_INFO, 'tlFlush[%d]: servicing transmit queue; %d message(s) queued.', self.number, #self.tx_queue)
     if self:isConnected() then
         local count = 0
         while true do
@@ -315,6 +316,7 @@ Receive Methods
 function GwChannel:receive(f, ...)
     local sender, guild_id, type, message = self:tlReceive(...)
     if type and sender ~= gw.player and guild_id ~= gw.config.guild_id then
+        gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, message=%s', self.number, type, sender, message)
         local content = { self:alDecode(type, message) }
         return f(type, guild_id, content, {...})
     end
