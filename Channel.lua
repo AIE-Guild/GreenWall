@@ -111,7 +111,7 @@ end
 
 --- Test if the channel is configured.
 -- @return True if configured, false otherwise.
-function GwChannel:isConfigured()
+function GwChannel:is_configured()
     gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s, password=%s, version=%d, stale=%s',
             self.number, gw.Redact(self.name), gw.Redact(self.password), self.version, tostring(self.stale))
     return self.name and self.name ~= ''
@@ -119,9 +119,9 @@ end
 
 --- Check if a connection exists to the custom channel.
 -- @return True if connected, otherwise false.
-function GwChannel:isConnected()
+function GwChannel:is_connected()
     gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s', self.number, gw.Redact(self.name))
-    if self:isConfigured() then
+    if self:is_configured() then
         self.number = GetChannelName(self.name)
         gw.Debug(GW_LOG_DEBUG, 'set number=%d', self.number)
         if self.number == 0 then
@@ -134,7 +134,7 @@ end
 
 --- Check if channel configuration is stale.
 -- @return True if stale, false otherwise.
-function GwChannel:isStale()
+function GwChannel:is_stale()
     gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s, password=%s, version=%d, stale=%s',
             self.number, gw.Redact(self.name), gw.Redact(self.password), self.version, tostring(self.stale))
     return self.stale
@@ -146,11 +146,11 @@ end
 function GwChannel:join()
 
     -- Only join if we have the channel details
-    if not self:isConfigured() then
+    if not self:is_configured() then
         return false
     end
 
-    if not self:isConnected() then
+    if not self:is_connected() then
 
         gw.Debug(GW_LOG_INFO, 'joining channel; channel=%s, password=%s',
                 gw.Redact(self.name), gw.Redact(self.password))
@@ -202,7 +202,7 @@ end
 --- Leave a bridge channel.
 -- @return True if a disconnection occurred, false otherwise.
 function GwChannel:leave()
-    if self:isConnected() then
+    if self:is_connected() then
         gw.Debug(GW_LOG_INFO, 'leaving channel; number=%d, channel=%s, password=%s', 
                 self.number, gw.Redact(self.name), gw.Redact(self.password))
         LeaveChannelByName(self.name)
@@ -233,12 +233,12 @@ Transmit Methods
 -- @param message Text of the message.
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
-    local message = self:alEncode(type, ...)
+    local message = self:al_encode(type, ...)
     gw.Debug(GW_LOG_INFO, 'channel=%d, type=%d, message=%s', self.number, type, message)
-    return self:tlSend(type, message)
+    return self:tl_send(type, message)
 end
 
-function GwChannel:alEncode(type, ...)
+function GwChannel:al_encode(type, ...)
     local arg = {...}
     local message
     if type == GW_MTYPE_BROADCAST then
@@ -251,7 +251,7 @@ function GwChannel:alEncode(type, ...)
     end
 end
 
-function GwChannel:tlSend(type, message)
+function GwChannel:tl_send(type, message)
     local opcode
     if type == GW_MTYPE_CHAT then
         opcode = 'C'
@@ -274,14 +274,14 @@ function GwChannel:tlSend(type, message)
     local segment = strsub(strjoin('#', opcode, gw.config.guild_id, '', message), 1, GW_MAX_MESSAGE_LENGTH)
     
     -- Send the message
-    self:tlEnqueue(segment)
-    self:tlFlush()
+    self:tl_enqueue(segment)
+    self:tl_flush()
 end
 
 --- Add a segment to the channel transmit queue.
 -- @param segment Segment to enqueue.
 -- @return Number of segments in queue after the insertion.
-function GwChannel:tlEnqueue(segment)
+function GwChannel:tl_enqueue(segment)
     tinsert(self.tx_queue, segment)
     gw.Debug(GW_LOG_DEBUG, 'enqueued segment: %s', segment)
     return #self.tx_queue
@@ -289,7 +289,7 @@ end
 
 --- Remove a segment from the channel transmit queue.
 -- @return Segment removed from the queue or nil if queue is empty.
-function GwChannel:tlDequeue()
+function GwChannel:tl_dequeue()
     local segment = tremove(self.tx_queue, 1)
     if segment then
         gw.Debug(GW_LOG_DEBUG, 'dequeued segment: %s', segment)
@@ -299,12 +299,12 @@ end
 
 --- Transmit all messages in the channel transmit queue.
 -- @return Number of messages flushed.
-function GwChannel:tlFlush()
-    gw.Debug(GW_LOG_INFO, 'tlFlush[%d]: servicing transmit queue; %d message(s) queued.', self.number, #self.tx_queue)
-    if self:isConnected() then
+function GwChannel:tl_flush()
+    gw.Debug(GW_LOG_INFO, 'servicing transmit queue; channel=%d, %d message(s) queued.', self.number, #self.tx_queue)
+    if self:is_connected() then
         local count = 0
         while true do
-            local segment = self:tlDequeue()
+            local segment = self:tl_dequeue()
             if segment then
                 -- Record the segment hash
                 local hash = crc.Hash(segment)
@@ -341,15 +341,15 @@ Receive Methods
 -- @param ... The API event arguments.
 -- @return The return value of f applied to the data.
 function GwChannel:receive(f, ...)
-    local sender, guild_id, type, message = self:tlReceive(...)
+    local sender, guild_id, type, message = self:tl_receive(...)
     if type and sender ~= gw.player and guild_id ~= gw.config.guild_id then
         gw.Debug(GW_LOG_INFO, 'channel=%d, type=%d, sender=%s, message=%s', self.number, type, sender, message)
-        local content = { self:alDecode(type, message) }
+        local content = { self:al_decode(type, message) }
         return f(type, guild_id, content, {...})
     end
 end
 
-function GwChannel:alDecode(type, message)
+function GwChannel:al_decode(type, message)
     gw.Debug(GW_LOG_DEBUG, 'type=%d, message=%s', type, message)
     if type == GW_MTYPE_BROADCAST then
         return strsplit(':', message)
@@ -358,7 +358,7 @@ function GwChannel:alDecode(type, message)
     end
 end
 
-function GwChannel:tlReceive(...)
+function GwChannel:tl_receive(...)
     local segment, sender = select(1, ...)
     sender = gw.GlobalName(sender)
     gw.Debug(GW_LOG_NOTICE, 'channel=%d, sender=%s, segment=%s', self.number, sender, segment)

@@ -262,7 +262,7 @@ function GwConfig:load()
     
     -- Clean up.
     for _, channel in ipairs(self.channel) do
-        if channel:isStale() then
+        if channel:is_stale() then
             channel:clear()
         end
     end
@@ -312,7 +312,7 @@ end
 --- Check a guild for peer status.
 -- @param guild The name of the guild to check.
 -- @return True if the target guild is a peer co-guild, false otherwise.
-function GwConfig:IsPeer(guild)
+function GwConfig:is_peer(guild)
     for i, v in pairs(self.peer) do
         if v == guild then
             return true
@@ -323,7 +323,7 @@ end
 
 
 --- Refresh the channel state.
-function GwConfig:refreshChannels()
+function GwConfig:refresh_channels()
     if self.timer.channel:hold() then
         gw.Debug(GW_LOG_INFO, 'channel join blocked.')
     else
@@ -341,11 +341,11 @@ end
 --- Check a guild for membership within the confederation.
 -- @param guild The name of the guild to check.
 -- @return True if the target guild is in the confederation, false otherwise.
-function GwConfig:IsContainer(guild)
+function GwConfig:is_container(guild)
     if guild == self:GetGuildName() then
         return self.guild_id ~= nil
     else
-        return self:IsPeer(guild)
+        return self:is_peer(guild)
     end
 end
 

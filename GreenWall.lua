@@ -472,7 +472,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHANNEL_UI_UPDATE' then
     
         if gw.GetGuildName() ~= nil then
-            gw.config:refreshChannels()
+            gw.config:refresh_channels()
         end
 
     elseif event == 'CHAT_MSG_CHANNEL_NOTICE' then
@@ -484,14 +484,14 @@ function GreenWall_OnEvent(self, event, ...)
             
             if action == 'YOU_LEFT' then
                 gw.config.channel.guild.stats.disco = gw.config.channel.guild.stats.disco + 1
-                gw.config:refreshChannels()
+                gw.config:refresh_channels()
             end
         
         elseif number == gw.config.channel.officer.number then
             
             if action == 'YOU_LEFT' then
                 gw.config.channel.officer.stats.disco = gw.config.channel.officer.stats.disco + 1
-                gw.config:refreshChannels()
+                gw.config:refresh_channels()
             end
         
         elseif type == 1 then
@@ -499,7 +499,7 @@ function GreenWall_OnEvent(self, event, ...)
             if action == 'YOU_JOINED' or action == 'YOU_CHANGED' then
                 gw.Debug(GW_LOG_NOTICE, 'world channel joined, unblocking reconnect.')
                 gw.config.timer.channel:clear()
-                gw.config:refreshChannels()
+                gw.config:refresh_channels()
             end
                 
         end
@@ -602,7 +602,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
         gw.config:load()
-        gw.config:refreshChannels()
+        gw.config:refresh_channels()
 
     elseif event == 'PLAYER_ENTERING_WORLD' then
     
@@ -630,7 +630,7 @@ function GreenWall_OnEvent(self, event, ...)
     if gw.config.timer.channel:hold() then
         if gw.WorldChannelFound() then
             gw.config.timer.channel:clear()
-            gw.config:refreshChannels()
+            gw.config:refresh_channels()
         end
     end
         
