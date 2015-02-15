@@ -57,6 +57,7 @@ function GwChannel:initialize()
     self.name = ''
     self.password = ''
     self.number = 0
+    self.stale = true
     self.tx_queue = {}
     self.tx_hash = {}
     self.stats = {
@@ -87,8 +88,9 @@ function GwChannel:configure(version, name, password)
     self.version = version
     self.name = name
     self.password = password and password or ''
-    gw.Debug(GW_LOG_INFO, 'configured channel; channel=%s, password=%s, version=%d',
-            gw.Redact(self.name), gw.Redact(self.password), self.version);
+    self.stale = false
+    gw.Debug(GW_LOG_INFO, 'configured channel; channel=%s, password=%s, version=%d, stale=%s',
+            gw.Redact(self.name), gw.Redact(self.password), self.version, tostring(self.stale));
 end
 
 
@@ -100,11 +102,18 @@ function GwChannel:clear()
 end
 
 
+--- Mark the channel as stale.
+function GwChannel:age()
+    self.stale = true
+    gw.Debug(GW_LOG_DEBUG, 'marked stale; number=%d, channel=%s', self.number, gw.Redact(self.name))
+end
+
+
 --- Test if the channel is configured.
 -- @return True if configured, false otherwise.
 function GwChannel:isConfigured()
-    gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s, password=%s, version=%d',
-            self.number, gw.Redact(self.name), gw.Redact(self.password), self.version)
+    gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s, password=%s, version=%d, stale=%s',
+            self.number, gw.Redact(self.name), gw.Redact(self.password), self.version, tostring(self.stale))
     return self.name and self.name ~= ''
 end
 
@@ -123,10 +132,20 @@ function GwChannel:isConnected()
     end
 end
 
+--- Check if channel configuration is stale.
+-- @return True if stale, false otherwise.
+function GwChannel:isStale()
+    gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s, password=%s, version=%d, stale=%s',
+            self.number, gw.Redact(self.name), gw.Redact(self.password), self.version, tostring(self.stale))
+    return self.stale
+end
+
+
 --- Join a bridge channel.
 -- @return True if connection success, false otherwise.
 function GwChannel:join()
 
+    -- Only join if we have the channel details
     if not self:isConfigured() then
         return false
     end

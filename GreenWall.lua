@@ -73,6 +73,8 @@ local gwUsage = [[
         -- Print connection statistics.
   reload
         -- Reload the configuration.
+  reset
+        -- Reset communications and reload the configuration.
   achievements <on|off>
         -- Toggle display of confederation achievements.
   roster <on|off>
@@ -249,6 +251,11 @@ local function GwSlashCmd(message, editbox)
         gw.Write('Reloading configuration.')
         gw.config:reload()
     
+    elseif command == 'reset' then
+    
+        gw.Write('Resetting configuration.')
+        gw.config:reset()
+
     elseif command == 'status' then
     
         gw.config:dump()
@@ -607,7 +614,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'PLAYER_GUILD_UPDATE' then
     
         -- Looks like our status has changed.
-        gw.config:reset()
+        gw.config:reload()
         
     elseif event == 'PLAYER_LOGIN' then
 

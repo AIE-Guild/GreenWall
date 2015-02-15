@@ -152,6 +152,7 @@ function GwConfig:load()
 
     -- Abort if current configuration is valid
     if self.valid then
+        gw.Debug(GW_LOG_DEBUG, 'configuration valid; skipping.')
         return false
     end
 
@@ -167,16 +168,19 @@ function GwConfig:load()
     -- Abort if configuration is not yet available
     local info = GetGuildInfoText()     -- Guild information text.
     if info == '' then
-        gw.Debug(GW_LOG_WARNING, 'guild_conf: guild configuration not available.')
+        gw.Debug(GW_LOG_WARNING, 'guild configuration not available.')
         return false
     end
     
-    gw.Debug(GW_LOG_INFO, 'guild_conf: parsing guild configuration.')
+    gw.Debug(GW_LOG_INFO, 'parsing guild configuration.')
     
 
 
     -- Soft reset of configuration
     self:initialize_param()
+    for k, channel in pairs(self.channel) do
+        channel:age()
+    end
     
     --
     -- Parse version 1 configuration
@@ -257,6 +261,11 @@ function GwConfig:load()
     end
     
     -- Clean up.
+    for _, channel in ipairs(self.channel) do
+        if channel:isStale() then
+            channel:clear()
+        end
+    end
     self.valid = true
     self.timer.config:set()
     
@@ -293,10 +302,8 @@ end
 -- @return True is refresh submitted, false otherwise.
 function GwConfig:reset()
     self:initialize_param(true)
-    for k, v in pairs(self.channel) do
-        gw.Debug(GW_LOG_INFO, 'clearing %s channel', k)
-        v:leave()
-        self.channel[k] = GwChannel:new()
+    for _, channel in pairs(self.channel) do
+        channel:clear()
     end
     return self:reload()
 end
