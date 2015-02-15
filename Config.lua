@@ -126,7 +126,7 @@ function GwConfig:load()
     local function substitute(cstr, xlat)
         local estr, count = string.gsub(cstr, '%$(%a)', function(s) return xlat[s] end)
         if count > 0 then
-            gw.Debug(GW_LOG_DEBUG, "guild_conf: expanded '%s' to '%s'", cstr, estr)
+            gw.Debug(GW_LOG_DEBUG, "expanded '%s' to '%s'", cstr, estr)
         end
         return estr
     end
@@ -141,7 +141,7 @@ function GwConfig:load()
         for i = 1, n do
             name, _, rank, _, _, _, _, note = GetGuildRosterInfo(i);
             if rank == 0 then
-                gw.Debug(GW_LOG_INFO, 'officer_config: parsing officer note for %s.', name);
+                gw.Debug(GW_LOG_INFO, 'parsing officer note for %s.', name);
                 return note;
             end
         end
@@ -158,16 +158,16 @@ function GwConfig:load()
     -- Abort if not in a guild
     local guild_name = gw.GetGuildName()
     if guild_name then
-        gw.Debug(GW_LOG_INFO, 'guild_conf: co-guild is %s', guild_name)
+        gw.Debug(GW_LOG_INFO, 'co-guild is %s', guild_name)
     else
-        gw.Debug(GW_LOG_INFO, 'guild_conf: not in a guild.')
+        gw.Debug(GW_LOG_WARNING, 'not in a guild.')
         return false
     end
     
     -- Abort if configuration is not yet available
     local info = GetGuildInfoText()     -- Guild information text.
     if info == '' then
-        gw.Debug(GW_LOG_INFO, 'guild_conf: guild configuration not available.')
+        gw.Debug(GW_LOG_WARNING, 'guild_conf: guild configuration not available.')
         return false
     end
     
@@ -205,25 +205,25 @@ function GwConfig:load()
                 local peer_id = substitute(field[3], xlat)
                 if gw.iCmp(guild_name, peer_name) then
                     self.guild_id = peer_id
-                    gw.Debug(GW_LOG_INFO, 'guild_config: guild=%s (%s)', guild_name, peer_id);
+                    gw.Debug(GW_LOG_DEBUG, 'guild=%s (%s)', guild_name, peer_id);
                 else
                     self.peer[peer_id] = peer_name
-                    gw.Debug(GW_LOG_INFO, 'guild_config: peer=%s (%s)', peer_name, peer_id);
+                    gw.Debug(GW_LOG_DEBUG, 'peer=%s (%s)', peer_name, peer_id);
                 end
             elseif field[1] == 's' then
                 local key = field[3]
                 local val = field[2]
                 if string.len(key) == 1 then
                     xlat[key] = val
-                    gw.Debug(GW_LOG_INFO, "guild_config: parser substitution added, '$%s' := '%s'", key, val)
+                    gw.Debug(GW_LOG_DEBUG, "parser substitution added, '$%s' := '%s'", key, val)
                 else
-                    gw.Debug(GW_LOG_ERROR, "guild_config: invalid parser substitution key, '$%s'", key)
+                    gw.Debug(GW_LOG_ERROR, "invalid parser substitution key, '$%s'", key)
                 end
             elseif field[1] == 'v' then
                 -- Minimum version
                 if strmatch(field[2], '^%d+%.%d+%.%d+%w*$') then
                     self.minimum = field[2];
-                    gw.Debug(GW_LOG_INFO, 'guild_config: minimum version set to %s', self.minimum);
+                    gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
                 end
             elseif field[1] == 'o' then
                 -- Deprecated option list
@@ -235,7 +235,7 @@ function GwConfig:load()
                     if key == 'mv' then
                         if strmatch(val, '^%d+%.%d+%.%d+%w*$') then
                             self.minimum = val;
-                            gw.Debug(GW_LOG_INFO, 'guild_config: minimum version set to %s', self.minimum);
+                            gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
                         end
                     end
                 end
@@ -270,12 +270,12 @@ end
 -- @return True is refresh submitted, false otherwise.
 function GwConfig:refresh()
     if self.timer.config:hold() then
-        gw.Debug(GW_LOG_DEBUG, 'skipping due to hold-down.')
+        gw.Debug(GW_LOG_WARNING, 'skipping due to hold-down.')
         return false
     else
         self.valid = false
         GuildRoster()
-        gw.Debug(GW_LOG_DEBUG, 'roster update requested.')
+        gw.Debug(GW_LOG_INFO, 'roster update requested.')
         return true
     end
 end
@@ -287,7 +287,7 @@ end
 function GwConfig:reload()
     self.valid = false
     GuildRoster()
-    gw.Debug(GW_LOG_DEBUG, 'roster update requested.')
+    gw.Debug(GW_LOG_INFO, 'roster update requested.')
     return true
 end
 
@@ -298,12 +298,12 @@ end
 function GwConfig:reset()
     self:initialize_param(true)
     for k, v in pairs(self.channel) do
-        gw.Debug(GW_LOG_DEBUG, 'clearing %s channel', k)
+        gw.Debug(GW_LOG_INFO, 'clearing %s channel', k)
         v:leave()
         self.channel[k] = GwChannel:new()
     end
     GuildRoster()
-    gw.Debug(GW_LOG_DEBUG, 'roster update requested.')
+    gw.Debug(GW_LOG_INFO, 'roster update requested.')
     return true
 end
 
