@@ -265,30 +265,26 @@ function GwConfig:load()
 end
 
 
---- Initiate a refresh of the configuration.
--- This is a periodic or user-initiated update.
--- @return True is refresh submitted, false otherwise.
-function GwConfig:refresh()
-    if self.timer.config:hold() then
-        gw.Debug(GW_LOG_WARNING, 'skipping due to hold-down.')
-        return false
-    else
-        self.valid = false
-        GuildRoster()
-        gw.Debug(GW_LOG_INFO, 'roster update requested.')
-        return true
-    end
-end
-
-
 --- Initiate a reload of the configuration.
--- This is similar to a refresh, but is not subject to the hold-down.
 -- @return True is refresh submitted, false otherwise.
 function GwConfig:reload()
     self.valid = false
     GuildRoster()
     gw.Debug(GW_LOG_INFO, 'roster update requested.')
     return true
+end
+
+
+--- Initiate a refresh of the configuration.
+-- This is a reload protected by a hold-down timer.
+-- @return True is refresh submitted, false otherwise.
+function GwConfig:refresh()
+    if self.timer.config:hold() then
+        gw.Debug(GW_LOG_WARNING, 'skipping due to hold-down.')
+        return false
+    else
+        return self:reload()
+    end
 end
 
 
@@ -302,9 +298,7 @@ function GwConfig:reset()
         v:leave()
         self.channel[k] = GwChannel:new()
     end
-    GuildRoster()
-    gw.Debug(GW_LOG_INFO, 'roster update requested.')
-    return true
+    return self:reload()
 end
 
 
