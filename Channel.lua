@@ -271,7 +271,9 @@ end
 -- @return Segment removed from the queue or nil if queue is empty.
 function GwChannel:tlDequeue()
     local segment = tremove(self.tx_queue, 1)
-    gw.Debug(GW_LOG_DEBUG, 'dequeued segment: %s', segment)
+    if segment then
+        gw.Debug(GW_LOG_DEBUG, 'dequeued segment: %s', segment)
+    end
     return segment
 end
 
