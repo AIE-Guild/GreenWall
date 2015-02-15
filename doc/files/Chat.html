@@ -91,6 +91,11 @@
 <table class="function_list">
 
 	<tr>
+	<td class="name" nowrap><a href="#gw.ReceiveLocal">gw.ReceiveLocal</a>&nbsp;(sender, message)</td>
+	<td class="summary">Parses and handles an encoded message from the add-on channel.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#gw.ReplicateMessage">gw.ReplicateMessage</a>&nbsp;(event, message, guild_id, arglist)</td>
 	<td class="summary">Copies a message received on a common channel to all chat window instances of a target chat channel.</td>
 	</tr>
@@ -125,6 +130,39 @@
 
 <h2><a name="functions"></a>Functions</h2>
 <dl class="function">
+
+
+
+<dt><a name="gw.ReceiveLocal"></a><strong>gw.ReceiveLocal</strong>&nbsp;(sender, message)</dt>
+<dd>
+Parses and handles an encoded message from the add-on channel.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>sender</em></code>: The sender of the message.
+	</li>
+	
+	<li>
+	  <code><em>message</em></code>: The encoded message.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True on successful handling, false on failure.</ul>
+
+
+
+</dd>
+
 
 
 
