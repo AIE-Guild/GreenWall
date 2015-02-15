@@ -216,7 +216,7 @@ local function GwSlashCmd(message, editbox)
     local command, argstr = message:match('^(%S*)%s*(%S*)%s*')
     command = command:lower()
     
-    gw.Debug(GW_LOG_DEBUG, 'slash_cmd: command=%s, args=%s', command, argstr)
+    gw.Debug(GW_LOG_NOTICE, 'command=%s, args=%s', command, argstr)
     
     if command == nil or command == '' or command == 'help' then
     
@@ -360,7 +360,7 @@ Frame Event Functions
 
 function GreenWall_OnEvent(self, event, ...)
 
-    gw.Debug(GW_LOG_DEBUG, 'on_event: event=%s', event)
+    gw.Debug(GW_LOG_DEBUG, 'event occurred; event=%s', event)
 
     --
     -- Addon loading check
@@ -378,7 +378,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.addon_loaded = true
         gw.Write('v%s loaded.', gw.version)
         
-        gw.Debug(GW_LOG_DEBUG, 'load_complete: name=%s, realm=%s', gw.player, gw.realm)
+        gw.Debug(GW_LOG_DEBUG, 'loading complete; name=%s, realm=%s', gw.player, gw.realm)
         
     end            
         
@@ -490,7 +490,7 @@ function GreenWall_OnEvent(self, event, ...)
         elseif type == 1 then
         
             if action == 'YOU_JOINED' or action == 'YOU_CHANGED' then
-                gw.Debug(GW_LOG_INFO, 'on_event: General joined, unblocking reconnect.')
+                gw.Debug(GW_LOG_NOTICE, 'world channel joined, unblocking reconnect.')
                 gw.config.timer.channel:clear()
                 gw.config:refreshChannels()
             end
@@ -501,7 +501,7 @@ function GreenWall_OnEvent(self, event, ...)
 
         local message = select(1, ...)
         
-        gw.Debug(GW_LOG_DEBUG, 'on_event: system message: %s', message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, message=%s', event, message)
         
         local pat_online = string.gsub(format(ERR_FRIEND_ONLINE_SS, '(.+)', '(.+)'), '%[', '%%[')
         local pat_offline = format(ERR_FRIEND_OFFLINE_S, '(.+)')
@@ -517,7 +517,6 @@ function GreenWall_OnEvent(self, event, ...)
         
             local _, player = message:match(pat_online)
             player = gw.GlobalName(player)
-            gw.Debug(GW_LOG_DEBUG, 'player_status: player %s online', player)
             gw.config.comember_cache:hold(player)
             gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
         
@@ -525,7 +524,6 @@ function GreenWall_OnEvent(self, event, ...)
         
             local player = message:match(pat_offline)
             player = gw.GlobalName(player)
-            gw.Debug(GW_LOG_DEBUG, 'player_status: player %s offline', player)
             gw.config.comember_cache:hold(player)
             gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
         
@@ -534,7 +532,7 @@ function GreenWall_OnEvent(self, event, ...)
             local player = message:match(pat_join)
             if gw.GlobalName(player) == gw.player then
                 -- We have joined the guild.
-                gw.Debug(GW_LOG_DEBUG, 'on_event: guild join detected.')
+                gw.Debug(GW_LOG_NOTICE, 'guild join detected.')
                 gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'join')
             end
 
@@ -543,7 +541,7 @@ function GreenWall_OnEvent(self, event, ...)
             local player = message:match(pat_leave)
             if gw.GlobalName(player) == gw.player then
                 -- We have left the guild.
-                gw.Debug(GW_LOG_DEBUG, 'on_event: guild quit detected.')
+                gw.Debug(GW_LOG_NOTICE, 'guild quit detected.')
                 gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
                 gw.config:reset()
             end
@@ -553,7 +551,7 @@ function GreenWall_OnEvent(self, event, ...)
             local player = message:match(pat_quit)
             if gw.GlobalName(player) == gw.player then
                 -- We have left the guild.
-                gw.Debug(GW_LOG_DEBUG, 'on_event: guild quit detected.')
+                gw.Debug(GW_LOG_NOTICE, 'guild quit detected.')
                 gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
                 gw.config:reset()
             end
@@ -563,7 +561,7 @@ function GreenWall_OnEvent(self, event, ...)
             local player = message:match(pat_removed)
             if gw.GlobalName(player) == gw.player then
                 -- We have been kicked from the guild.
-                gw.Debug(GW_LOG_DEBUG, 'on_event: guild kick detected.')
+                gw.Debug(GW_LOG_NOTICE, 'guild kick detected.')
                 gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
                 gw.config:reset()
             end
@@ -572,6 +570,7 @@ function GreenWall_OnEvent(self, event, ...)
             
             local target, player = message:match(pat_kick)
             if gw.GlobalName(player) == gw.player then
+                gw.Debug(GW_LOG_NOTICE, 'you kicked %s', target)
                 gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'remove', target)
             end
                 
@@ -579,6 +578,7 @@ function GreenWall_OnEvent(self, event, ...)
             
             local player, target, rank = message:match(pat_promote)
             if gw.GlobalName(player) == gw.player then
+                gw.Debug(GW_LOG_NOTICE, 'you promoted %s to %s', target, rank)
                 gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'promote', target, rank)
             end
         
@@ -586,6 +586,7 @@ function GreenWall_OnEvent(self, event, ...)
             
             local player, target, rank = message:match(pat_demote)
             if gw.GlobalName(player) == gw.player then
+                gw.Debug(GW_LOG_NOTICE, 'you demoted %s to %s', target, rank)
                 gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'demote', target, rank)
             end
                 
