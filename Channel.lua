@@ -87,13 +87,14 @@ function GwChannel:configure(version, name, password)
     self.version = version
     self.name = name
     self.password = password and password or ''
-    gw.Debug(GW_LOG_INFO, 'configued channel; channel=%s, password=%s, version=%d',
+    gw.Debug(GW_LOG_INFO, 'configured channel; channel=%s, password=%s, version=%d',
             gw.Redact(self.name), gw.Redact(self.password), self.version);
 end
 
 
 --- Clear the channel configuration.
 function GwChannel:clear()
+    gw.Debug(GW_LOG_INFO, 'clearing channel; number=%d, channel=%s', self.number, gw.Redact(self.name))
     self:leave()
     self:initialize()
 end
@@ -214,7 +215,7 @@ Transmit Methods
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
     local message = self:alEncode(type, ...)
-    gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, message=%s', self.number, type, message)
+    gw.Debug(GW_LOG_INFO, 'channel=%d, type=%d, message=%s', self.number, type, message)
     return self:tlSend(type, message)
 end
 
@@ -262,13 +263,16 @@ end
 -- @return Number of segments in queue after the insertion.
 function GwChannel:tlEnqueue(segment)
     tinsert(self.tx_queue, segment)
+    gw.Debug(GW_LOG_DEBUG, 'enqueued segment: %s', segment)
     return #self.tx_queue
 end
 
 --- Remove a segment from the channel transmit queue.
 -- @return Segment removed from the queue or nil if queue is empty.
 function GwChannel:tlDequeue()
-    return tremove(self.tx_queue, 1)
+    local segment = tremove(self.tx_queue, 1)
+    gw.Debug(GW_LOG_DEBUG, 'dequeued segment: %s', segment)
+    return segment
 end
 
 --- Transmit all messages in the channel transmit queue.
@@ -288,7 +292,7 @@ function GwChannel:tlFlush()
                     self.tx_hash[hash] = self.tx_hash[hash] + 1
                 end
                 -- Send the segment
-                gw.Debug(GW_LOG_DEBUG, 'channel=%d, segment=%s', self.number, segment)
+                gw.Debug(GW_LOG_NOTICE, 'channel=%d, segment=%s', self.number, segment)
                 SendChatMessage(segment, 'CHANNEL', nil, self.number)
                 self.stats.txcnt = self.stats.txcnt + 1
                 count = count + 1
@@ -296,6 +300,7 @@ function GwChannel:tlFlush()
                 break
             end
         end
+        return count
     else
         gw.Debug(GW_LOG_WARNING, 'channel=%d, not connected.', self.number)
         return 0
@@ -316,7 +321,7 @@ Receive Methods
 function GwChannel:receive(f, ...)
     local sender, guild_id, type, message = self:tlReceive(...)
     if type and sender ~= gw.player and guild_id ~= gw.config.guild_id then
-        gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, message=%s', self.number, type, sender, message)
+        gw.Debug(GW_LOG_INFO, 'channel=%d, type=%d, sender=%s, message=%s', self.number, type, sender, message)
         local content = { self:alDecode(type, message) }
         return f(type, guild_id, content, {...})
     end
@@ -334,7 +339,8 @@ end
 function GwChannel:tlReceive(...)
     local segment, sender = select(1, ...)
     sender = gw.GlobalName(sender)
-    gw.Debug(GW_LOG_DEBUG, 'channel=%d, sender=%s, segment=%s', self.number, sender, segment)
+    gw.Debug(GW_LOG_NOTICE, 'channel=%d, sender=%s, segment=%s', self.number, sender, segment)
+    self.stats.rxcnt = self.stats.rxcnt + 1
     
     -- Check the segment hash
     if sender == gw.player then
