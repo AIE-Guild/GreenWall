@@ -223,8 +223,9 @@ function GwChannel:alEncode(type, ...)
     local arg = {...}
     local message
     if type == GW_MTYPE_BROADCAST then
-        assert(#arg == 3)
-        return strjoin(':', tostring(arg[1]), tostring(arg[2]), tostring(arg[3]))
+        assert(#arg >= 1)
+        assert(#arg <= 3)
+        return strjoin(':', arg[1], arg[2] or '', arg[3] or '')
     else
         assert(#arg == 1)
         return arg[1]
