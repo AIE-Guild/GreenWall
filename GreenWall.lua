@@ -471,7 +471,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_CHANNEL_NOTICE' then
 
         local action, _, _, _, _, _, type, number, name = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, type=%s, number=%s, name=%s, action=%s', event, type, number, crc.Hash(tostring(name)), action)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, type=%s, number=%s, name=%s, action=%s', event, type, number, gw.Redact(tostring(name)), action)
         
         if number == gw.config.channel.guild.number then
             
