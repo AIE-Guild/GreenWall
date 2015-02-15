@@ -419,42 +419,7 @@ function GreenWall_OnEvent(self, event, ...)
     
         local prefix, payload, dist, sender = select(1, ...)
         if prefix == 'GreenWall' and dist == 'GUILD' then
-            if not gw.iCmp(sender, gw.player) then
-                local opcode, message = strsplit('#', payload)
-                gw.Debug(GW_LOG_DEBUG, 'opcode=%s, message=%s', opcode, message)
-                if opcode == 'I' then
-                    if message == 'reload' then
-                        if gw.IsOfficer(sender) then
-                            if gw.config.timer.reload:hold() then
-                                gw.Write('Received configuration reload request from %s; hold-down in effect, skipping.', sender)
-                            else
-                                gw.Write('Received configuration reload request from %s.', sender)
-                                gw.config:reload()
-                                gw.config.timer.reload:set()
-                            end   
-                        end
-                    end
-                elseif opcode == 'C' then
-                    if message == 'officer' then
-                        if gw.IsOfficer() then
-                            gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
-                        end
-                    end
-                elseif opcode == 'R' then
-                    if message == 'officer' then
-                        if gw.IsOfficer(sender) then
-                            if gw.IsOfficer() then
-                                gw.Debug(GW_LOG_NOTICE, 'giving %s moderator status', sender)
-                                ChannelModerator(gw.config.channel.guild.name, sender)
-                            else
-                                gw.Debug(GW_LOG_NOTICE, 'giving %s owner status', sender)
-                                SetChannelOwner(gw.config.channel.guild.name, sender)
-                                ChannelUnmoderator(gw.config.channel.guild.name, gw.player)
-                            end
-                        end
-                    end
-                end 
-            end
+            gw.ReceiveLocal(sender, payload)
         end
             
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then

@@ -100,6 +100,8 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
     local flags = arglist[6]
     local guid = arglist[12]
     
+    gw.Debug(GW_LOG_INFO, 'event=%s, guild_id=%s, message=%s', event, guild_id, message)
+    
     if GreenWall.tag and event ~= 'SYSTEM' then
         message = format('<%s> %s', guild_id, message)
     end
@@ -138,7 +140,7 @@ end
 -- @param message Text of the message.
 function gw.SendLocal(type, message)
 
-    gw.Debug(GW_LOG_DEBUG, 'type=%s, message=%s', type, message)
+    gw.Debug(GW_LOG_INFO, 'type=%s, message=%s', type, message)
 
     local opcode
     if type == nil then
@@ -161,4 +163,65 @@ function gw.SendLocal(type, message)
     
 end
 
+--- Parses and handles an encoded message from the add-on channel.
+-- @param sender The sender of the message.
+-- @param message The encoded message.
+-- @return True on successful handling, false on failure.
+function gw.ReceiveLocal(sender, message)
+
+    gw.Debug(GW_LOG_INFO, 'sender=%s, message=%s', sender, message)
+    
+    if not gw.iCmp(gw.GlobalName(sender), gw.player) then
+
+        local opcode, payload = strsplit('#', message)
+        gw.Debug(GW_LOG_DEBUG, 'opcode=%s, payload=%s', opcode, payload)
+    
+        if opcode == 'I' then
+    
+            if message == 'reload' then
+                if gw.IsOfficer(sender) then
+                    if gw.config.timer.reload:hold() then
+                        gw.Write('Received configuration reload request from %s; hold-down in effect, skipping.', sender)
+                    else
+                        gw.Write('Received configuration reload request from %s.', sender)
+                        gw.config:reload()
+                        gw.config.timer.reload:set()
+                    end   
+                end
+            end
+    
+        elseif opcode == 'C' then
+    
+            if message == 'officer' then
+                -- A query for officers
+                if gw.IsOfficer() then
+                    gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
+                end
+            end
+    
+        elseif opcode == 'R' then
+    
+            if message == 'officer' then
+                -- A response to the officer query
+                if gw.IsOfficer(sender) then
+                    if gw.IsOfficer() then
+                        gw.Debug(GW_LOG_NOTICE, 'giving %s moderator status', sender)
+                        ChannelModerator(gw.config.channel.guild.name, sender)
+                    else
+                        gw.Debug(GW_LOG_NOTICE, 'giving %s owner status', sender)
+                        SetChannelOwner(gw.config.channel.guild.name, sender)
+                        ChannelUnmoderator(gw.config.channel.guild.name, gw.player)
+                    end
+                else
+                    gw.Debug(GW_LOG_WARNING, 'officer spoofing attempt from %s', sender)
+                end
+            end
+    
+        end
+    
+    end
+    
+    return true
+    
+end
 
