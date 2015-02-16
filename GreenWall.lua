@@ -601,8 +601,9 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
     
-        gw.config:load()
-        gw.config:refresh_channels()
+        if gw.config:load() then
+            gw.config:refresh_channels()
+        end
 
     elseif event == 'PLAYER_ENTERING_WORLD' then
     
@@ -613,8 +614,12 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'PLAYER_GUILD_UPDATE' then
     
-        -- Looks like our status has changed.
-        gw.config:reload()
+        local new_status = gw.GetGuildStatus()
+        if gw.guild_status ~= new_status then
+            -- Looks like our status has changed.
+            gw.config:reset()
+            gw.guild_status = new_status
+        end
         
     elseif event == 'PLAYER_LOGIN' then
 

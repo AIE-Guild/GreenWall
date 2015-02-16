@@ -168,6 +168,18 @@ function gw.GetGuildName(target)
 end
 
 
+--- Get a string with the player's fully-qualified guild name and numeric rank.
+-- @return A string identifier, the empty string if not in a guild.
+function gw.GetGuildStatus()
+    local name, _, rank, realm = GetGuildInfo('Player')
+    if name == nil then
+        return ''
+    else
+        return string.format('%s-%d', gw.GlobalName(name, realm), rank)
+    end
+end
+
+
 --- Check a target player for officer status in the same container guild.
 -- @param target The name of the player to check.
 -- @return True if the target has at least read access to officer chat and officer notes, false otherwise.
