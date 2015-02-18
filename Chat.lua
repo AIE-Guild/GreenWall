@@ -174,6 +174,7 @@ function gw.ReceiveLocal(sender, message)
     if not gw.iCmp(gw.GlobalName(sender), gw.player) then
 
         local opcode, payload = strsplit('#', message)
+        payload = payload or ''
         gw.Debug(GW_LOG_DEBUG, 'opcode=%s, payload=%s', opcode, payload)
     
         if opcode == 'I' then

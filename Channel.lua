@@ -381,7 +381,10 @@ function GwChannel:tl_receive(...)
     
     -- Process the segment
     local opcode, guild_id, _, message = strsplit('#', segment, 4)
+    guild_id = guild_id or '-'
+    message = message or ''
     gw.Debug(GW_LOG_DEBUG, 'opcode=%s, guild_id=%s, message=%s', opcode, guild_id, message)
+    
     local type
     if opcode == 'C' then
         type = GW_MTYPE_CHAT
