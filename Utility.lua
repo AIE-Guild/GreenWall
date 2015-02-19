@@ -218,10 +218,11 @@ end
 --- Check if player is currently in any world channels.
 -- @return True is the player has joined any world channels, false otherwise.
 function gw.WorldChannelFound()
+    gw.Debug(GW_LOG_DEBUG, 'scanning for world channels')
     for i, v in pairs({GetChannelList()}) do
         local name, header, _, _, _, _, category = GetChannelDisplayInfo(i)
         if not header then
-            if category == CHANNEL_CATEGORY_WORLD then
+            if category == 'CHANNEL_CATEGORY_WORLD' then
                 gw.Debug(GW_LOG_DEBUG, 'world channel found: %s', name)
                 return true
             end
