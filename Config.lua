@@ -119,6 +119,15 @@ function GwConfig:dump(keep)
     dump_tier(self, 0)
 end
 
+--- Dump a status summary.
+function GwConfig:dump_status()
+    gw.Write('configuration: version=%d, valid=%s', self.version, tostring(self.valid))
+    self.channel.guild:dump_status('guild bridge')
+    if gw.IsOfficer() then
+        self.channel.officer:dump_status('officer bridge')
+    end
+end
+
 
 --- Parse the guild information page to gather configuration information.
 -- @return True if successful, false otherwise.

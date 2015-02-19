@@ -218,6 +218,23 @@ end
 
 --[[-----------------------------------------------------------------------
 
+Informational Methods
+
+--]]-----------------------------------------------------------------------
+
+--- Dump the channel status.
+-- @param label An identifier for the channel.
+function GwChannel:dump_status(label)
+    label = label or 'channel'
+    gw.Write('%s: connected=%s, number=%d, channel=%s, password=%s, stale=%s (sconn=%d, fconn=%d, leave=%d, disco=%d)', 
+                tostring(self:is_connected()), label, self.number, gw.Redact(self.name),
+                gw.Redact(self.password), tostring(self:is_stale()),
+                self.stats.sconn, self.stats.fconn, self.stats.leave, self.stats.disco)
+end
+
+
+--[[-----------------------------------------------------------------------
+
 Transmit Methods
 
 --]]-----------------------------------------------------------------------

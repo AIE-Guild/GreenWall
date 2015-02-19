@@ -68,9 +68,7 @@ local gwUsage = [[
   version
         -- Print the add-on version.
   status
-        -- Print configuration and state information.
-  stats
-        -- Print connection statistics.
+        -- Print connection status.
   reload
         -- Reload the configuration.
   reset
@@ -85,6 +83,8 @@ local gwUsage = [[
         -- Show co-guild identifier in messages.
   ochat <on|off>
         -- Enable officer chat bridging.
+  dump
+        -- Print configuration and state information.
   debug <level>
         -- Set debugging level to integer <level>.
   redact <on|off>
@@ -256,21 +256,14 @@ local function GwSlashCmd(message, editbox)
         gw.Write('Resetting configuration.')
         gw.config:reset()
 
-    elseif command == 'status' then
+    elseif command == 'dump' then
     
         gw.config:dump()
     
-    elseif command == 'stats' then
+    elseif command == 'status' then
     
-        gw.Write('common: %d sconn, %d fconn, %d leave, %d disco', 
-                gw.config.channel.guild.stats.sconn, gw.config.channel.guild.stats.fconn,
-                gw.config.channel.guild.stats.leave, gw.config.channel.guild.stats.disco)
-        if GreenWall.ochat then
-            gw.Write('officer: %d sconn, %d fconn, %d leave, %d disco', 
-                    gw.config.channel.officer.stats.sconn, gw.config.channel.officer.stats.fconn,
-                    gw.config.channel.officer.stats.leave, gw.config.channel.officer.stats.disco)
-        end
-    
+        gw.config:dump_status()
+            
     elseif command == 'version' then
 
         gw.Write('GreenWall version %s.', gw.version)
