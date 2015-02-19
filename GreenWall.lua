@@ -40,69 +40,6 @@ local _
 
 
 --
--- Default configuration values
---
-local gwDefaults = {
-    tag             = { default=true,   desc="co-guild tagging" },
-    achievements    = { default=false,  desc="co-guild achievement announcements" },
-    roster          = { default=true,   desc="co-guild roster announcements" },
-    rank            = { default=false,  desc="co-guild rank announcements" },
-    debug           = { default=GW_LOG_NONE, desc="debugging level" },
-    verbose         = { default=false,  desc="verbose debugging" },
-    log             = { default=false,  desc="event logging" },
-    logsize         = { default=2048,   desc="maximum log buffer size" },
-    ochat           = { default=false,  desc="officer chat bridging" },
-    redact          = { default=true,   desc="obfuscate sensitive data in debug output" },  
-}
-
-local gwUsage = [[
- 
-  Usage:
-  
-  /greenwall <command>  or  /gw <command>
-  
-  Commands:
-  
-  help 
-        -- Print this message.
-  version
-        -- Print the add-on version.
-  status
-        -- Print connection status.
-  reload
-        -- Reload the configuration.
-  reset
-        -- Reset communications and reload the configuration.
-  achievements <on|off>
-        -- Toggle display of confederation achievements.
-  roster <on|off>
-        -- Toggle display of confederation online, offline, join, and leave messages.
-  rank <on|off>
-        -- Toggle display of confederation promotion and demotion messages.
-  tag <on|off>
-        -- Show co-guild identifier in messages.
-  ochat <on|off>
-        -- Enable officer chat bridging.
-  dump
-        -- Print configuration and state information.
-  debug <level>
-        -- Set debugging level to integer <level>.
-  redact <on|off>
-        -- Obfuscate sensitive information in debug output.
-  verbose <on|off>
-        -- Toggle the display of debugging output in the chat window.
-  log <on|off>
-        -- Toggle output logging to the GreenWall.lua file.
-  logsize <length>
-        -- Specify the maximum number of log entries to keep.
-  admin reload
-        -- (officer only) Force a reload of the configuration by all online guild members.
- 
- 
-]]
-        
-
---
 -- Global objects
 --
 gw.config = GwConfig:new()
@@ -149,11 +86,11 @@ function GreenWallInterfaceFrame_SaveUpdates(self)
 end
 
 function GreenWallInterfaceFrame_SetDefaults(self)
-    GreenWall.tag = gwDefaults['tag']['default']
-    GreenWall.achievements = gwDefaults['achievements']['default']
-    GreenWall.roster = gwDefaults['roster']['default']
-    GreenWall.rank = gwDefaults['rank']['default']
-    GreenWall.ochat = gwDefaults['ochat']['default']
+    GreenWall.tag = gw.defaults['tag']['default']
+    GreenWall.achievements = gw.defaults['achievements']['default']
+    GreenWall.roster = gw.defaults['roster']['default']
+    GreenWall.rank = gw.defaults['rank']['default']
+    GreenWall.ochat = gw.defaults['ochat']['default']
 end
 
 
@@ -171,9 +108,9 @@ local function GwCmdConfig(key, val)
     if key == nil then
         return false
     else
-        if gwDefaults[key] ~= nil then
-            local default = gwDefaults[key]['default']
-            local desc = gwDefaults[key]['desc']
+        if gw.defaults[key] ~= nil then
+            local default = gw.defaults[key]['default']
+            local desc = gw.defaults[key]['desc']
             if type(default) == 'boolean' then
                 if val == nil or val == '' then
                     if GreenWall[key] then
@@ -222,7 +159,7 @@ local function GwSlashCmd(message, editbox)
     
     if command == nil or command == '' or command == 'help' then
     
-        for line in string.gmatch(gwUsage, '([^\n]*)\n') do
+        for line in string.gmatch(gw.usage, '([^\n]*)\n') do
             gw.Write(line)
         end
     
@@ -338,7 +275,7 @@ local function GwSetDefaults(soft)
         GreenWall = {}
     end
 
-    for k, p in pairs(gwDefaults) do
+    for k, p in pairs(gw.defaults) do
         if not soft or GreenWall[k] == nil then
             GreenWall[k] = p['default']
         end

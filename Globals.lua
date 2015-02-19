@@ -39,3 +39,64 @@ gw.version      = GetAddOnMetadata('GreenWall', 'Version')
 gw.realm        = GetRealmName()
 gw.player       = UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
 gw.guild_status = ''
+
+--
+-- Default configuration values
+--
+gw.defaults = {
+    tag             = { default=true,   desc="co-guild tagging" },
+    achievements    = { default=false,  desc="co-guild achievement announcements" },
+    roster          = { default=true,   desc="co-guild roster announcements" },
+    rank            = { default=false,  desc="co-guild rank announcements" },
+    debug           = { default=GW_LOG_NONE, desc="debugging level" },
+    verbose         = { default=false,  desc="verbose debugging" },
+    log             = { default=false,  desc="event logging" },
+    logsize         = { default=2048,   desc="maximum log buffer size" },
+    ochat           = { default=false,  desc="officer chat bridging" },
+    redact          = { default=true,   desc="obfuscate sensitive data in debug output" },  
+}
+
+gw.usage = [[
+ 
+  Usage:
+  
+  /greenwall <command>  or  /gw <command>
+  
+  Commands:
+  
+  help 
+        -- Print this message.
+  version
+        -- Print the add-on version.
+  status
+        -- Print connection status.
+  reload
+        -- Reload the configuration.
+  reset
+        -- Reset communications and reload the configuration.
+  achievements <on|off>
+        -- Toggle display of confederation achievements.
+  roster <on|off>
+        -- Toggle display of confederation online, offline, join, and leave messages.
+  rank <on|off>
+        -- Toggle display of confederation promotion and demotion messages.
+  tag <on|off>
+        -- Show co-guild identifier in messages.
+  ochat <on|off>
+        -- Enable officer chat bridging.
+  dump
+        -- Print configuration and state information.
+  debug <level>
+        -- Set debugging level to integer <level>.
+  redact <on|off>
+        -- Obfuscate sensitive information in debug output.
+  verbose <on|off>
+        -- Toggle the display of debugging output in the chat window.
+  log <on|off>
+        -- Toggle output logging to the GreenWall.lua file.
+  logsize <length>
+        -- Specify the maximum number of log entries to keep.
+  admin reload
+        -- (officer only) Force a reload of the configuration by all online guild members.
+ 
+]]
