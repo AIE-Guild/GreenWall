@@ -31,6 +31,7 @@ GwHoldDown.__index = GwHoldDown
 -- @param interval The length, in seconds, of the hold-down interval.
 -- @return An initialized GwHoldDown instance.
 function GwHoldDown:new(interval)
+    assert(type(interval) == 'number')
     local self = {}
     setmetatable(self, GwHoldDown)
     self.interval = interval
@@ -70,6 +71,9 @@ GwHoldDownCache.__index = GwHoldDownCache
 -- @param hard_max Limit on table size.
 -- @return An initialized GwHoldDownCache instance.
 function GwHoldDownCache:new(interval, soft_max, hard_max)
+    assert(type(interval) == 'number')
+    assert(type(soft_max) == 'number')
+    assert(type(hard_max) == 'number')
     local self = {}
     setmetatable(self, GwHoldDownCache)
     self.interval = interval
