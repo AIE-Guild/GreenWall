@@ -278,6 +278,13 @@ function GwConfig:load()
     self.valid = true
     self.timer.config:set()
     
+    --
+    -- Version check
+    --
+    if strmatch(info, 'GW%l=".*"') then
+        gw.Error('Guild configuration uses a format not supported by this version. An upgrade to the current version of GreenWall is recommended.')
+    end
+    
     return true;
     
 end
