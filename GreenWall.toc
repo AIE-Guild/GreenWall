@@ -11,8 +11,8 @@
 ## X-Date: 2015-02-19
 
 Lib\Load.xml
-Globals.lua
 Constants.lua
+Globals.lua
 Utility.lua
 HoldDown.lua
 Config.lua
