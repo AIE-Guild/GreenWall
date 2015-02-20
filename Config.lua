@@ -269,7 +269,9 @@ function GwConfig:load()
         self.channel.officer:clear()
     end
     
+    --
     -- Clean up.
+    --
     for _, channel in ipairs(self.channel) do
         if channel:is_stale() then
             channel:clear()
