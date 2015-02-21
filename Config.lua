@@ -235,7 +235,7 @@ function GwConfig:load()
             elseif field[1] == 'v' then
                 -- Minimum version
                 if strmatch(field[2], '^%d+%.%d+%.%d+%w*$') then
-                    self.minimum = field[2];
+                    self.minimum = tostring(GwVersion(field[2]));
                     gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
                 end
             elseif field[1] == 'o' then
@@ -247,7 +247,7 @@ function GwConfig:load()
                     val = strlower(val)
                     if key == 'mv' then
                         if strmatch(val, '^%d+%.%d+%.%d+%w*$') then
-                            self.minimum = val;
+                            self.minimum = tostring(GwVersion(val));
                             gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
                         end
                     end
@@ -283,8 +283,11 @@ function GwConfig:load()
     --
     -- Version check
     --
-    if strmatch(info, 'GW%l=".*"') then
-        gw.Error('Guild configuration uses a format not supported by this version. An upgrade to the current version of GreenWall is recommended.')
+    if GwVersion(gw.version) < GwVersion(self.minimum) then
+        gw.Error('Guild configuration specifies a minimum version of %s (%s currently installed).', self.minimum, gw.version)
+    end
+    if strmatch(info, 'GW%a=".*"') then
+        gw.Error('Guild configuration uses a format not supported by this version.')
     end
     
     return true;
