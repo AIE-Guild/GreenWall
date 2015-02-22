@@ -184,33 +184,50 @@ end
 -- @param target The name of the player to check.
 -- @return True if the target has at least read access to officer chat and officer notes, false otherwise.
 function gw.IsOfficer(target)
-    local rank;
+    local function get_rank(target)
+        local name, rank
+        if target == nil or gw.GlobalName(target) == gw.player then
+            _, name, rank = GetGuildInfo('player')
+            gw.Debug(GW_LOG_DEBUG, 'target=%s, rank=%s (%s)', gw.player, rank, name)
+            return rank + 1
+        else
+            local n = GetNumGuildMembers()
+            for i = 1, n do
+                local candidate
+                candidate, name, rank = GetGuildRosterInfo(i)
+                if gw.GlobalName(candidate) == gw.GlobalName(target) then
+                    gw.Debug(GW_LOG_DEBUG, 'target=%s, rank=%s (%s)', target, rank, name)
+                    return rank + 1
+                end
+            end
+        end
+        return
+    end
+
     local see_chat = false
     local see_note = false
+    local rank = get_rank(target)
 
-    if target == nil then
-        target = 'Player'
-    end
-    _, _, rank = GetGuildInfo(target);
+    if rank then
 
-    if rank == 0 then
-        see_chat = true
-        see_note = true
-    else
+        local name = GuildControlGetRankName(rank)
+    
         GuildControlSetRank(rank);
         for i, v in ipairs({GuildControlGetRankFlags()}) do
             local flag = _G["GUILDCONTROL_OPTION"..i]
+            gw.Debug(GW_LOG_DEBUG, 'flag=%s (%s), value=%s, (%s)', tostring(flag), type(flag), tostring(v), type(v))
             if flag == 'Officerchat Listen' then
-                see_chat = true
+                see_chat = v
             elseif flag == 'View Officer Note' then
-                see_note = true
+                see_note = v
             end
         end
+
     end
 
     local result = see_chat and see_note
-    gw.Debug(GW_LOG_INFO, 'is_officer: %s; rank=%d, chat=%s, note=%s',
-            tostring(result), rank, tostring(see_chat), tostring(see_note));
+    gw.Debug(GW_LOG_INFO, 'is_officer: %s; rank=%d, see_chat=%s, see_note=%s',
+            tostring(result), tostring(rank), tostring(see_chat), tostring(see_note))
     return result
 end
 
