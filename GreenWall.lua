@@ -200,7 +200,6 @@ local function GwSlashCmd(message, editbox)
     elseif command == 'status' then
     
         gw.config:dump_status()
-        gw.Error('%s', tostring(GwVersion(gw.version) == GwVersion(gw.version)))
             
     elseif command == 'version' then
 
