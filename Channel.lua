@@ -130,6 +130,8 @@ function GwChannel:is_connected()
         else
             return true
         end
+    else
+        return false
     end
 end
 
