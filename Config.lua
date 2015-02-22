@@ -59,7 +59,7 @@ end
 function GwConfig:initialize_param()
     self.valid = false
     self.major_version = 0
-    self.minimum = 0
+    self.minimum = ''
     self.guild_id = ''
     self.peer = {}
     return self
@@ -286,10 +286,14 @@ function GwConfig:load()
     self.timer.config:set()
     
     --
-    -- Version check
+    -- Version checks
     --
-    if GwVersion(gw.version) < GwVersion(self.minimum) then
-        gw.Error('Guild configuration specifies a minimum version of %s (%s currently installed).', self.minimum, gw.version)
+    local min = GwVersion(self.minimum)
+    local cur = GwVersion(gw.version)
+    if min then
+        if cur < min then
+            gw.Error('Guild configuration specifies a minimum version of %s (%s currently installed).', tostring(min), tostring(cur))
+        end
     end
     if strmatch(info, 'GW%a=".*"') then
         gw.Error('Guild configuration uses a format not supported by this version.')
