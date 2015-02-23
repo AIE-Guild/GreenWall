@@ -176,11 +176,13 @@ local function GwSlashCmd(message, editbox)
     
     elseif command == 'admin' then
     
-        if argstr == 'reload' then
-            if gw.IsOfficer() then
+        if gw.IsOfficer() then
+            if argstr == 'reload' then
                 gw.SendLocal(GW_MTYPE_CONTROL, 'reload')
                 gw.Write('Broadcast configuration reload request.')
             end
+        else
+            gw.Error('The admin command may only be issued by an officer.')
         end
     
     elseif command == 'reload' or command == 'refresh' then
