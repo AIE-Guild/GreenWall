@@ -58,7 +58,7 @@ end
 -- @return The initialized GwConfig instance.
 function GwConfig:initialize_param()
     self.valid = false
-    self.major_version = 0
+    self.cversion = 0
     self.minimum = ''
     self.guild_id = ''
     self.peer = {}
@@ -121,7 +121,7 @@ end
 
 --- Dump a status summary.
 function GwConfig:dump_status()
-    gw.Write('configuration: version=%d, valid=%s', self.version, tostring(self.valid))
+    gw.Write('version=%s, cversion=%d, configured=%s', gw.version, self.cversion, tostring(self.valid))
     self.channel.guild:dump_status('guild bridge')
     if gw.IsOfficer() then
         self.channel.officer:dump_status('officer bridge')
@@ -192,69 +192,80 @@ function GwConfig:load()
     end
     
     --
-    -- Parse version 1 configuration
+    -- Check configuration version
     --
+    if strmatch(info, 'GWc=".*"') then
+        gw.Error('Guild configuration uses a format not supported by this version.')
+    end
+    if strmatch(info, 'GW:?c:') then
+        self.cversion = 1
+    end
     
-    -- Guild info
-    for buffer in gmatch(info, 'GW:?(%l:[^\n]*)') do
+    if self.cversion == 1 then
+        --
+        -- Parse version 1 configuration
+        --
+        for buffer in gmatch(info, 'GW:?(%l:[^\n]*)') do
+        
+            if buffer ~= nil then
+            
+                self.cversion = 1
+                buffer = strtrim(buffer)
+                local field = { strsplit(':', buffer) }
+            
+                if field[1] == 'c' then
+                    -- Guild channel configuration
+                    if field[2] and field[2] ~= '' then
+                        self.channel.guild:configure(1, field[2], field[3])
+                    else
+                        gw.Error('invalid common channel name specified')
+                    end
     
-        if buffer ~= nil then
-        
-            self.major_version = 1
-            buffer = strtrim(buffer)
-            local field = { strsplit(':', buffer) }
-        
-            if field[1] == 'c' then
-                -- Guild channel configuration
-                if field[2] and field[2] ~= '' then
-                    self.channel.guild:configure(1, field[2], field[3])
-                else
-                    gw.Error('invalid common channel name specified')
-                end
-
-            elseif field[1] == 'p' then
-                -- Peer guild
-                local peer_name = gw.GlobalName(substitute(field[2], xlat))                
-                local peer_id = substitute(field[3], xlat)
-                if gw.iCmp(guild_name, peer_name) then
-                    self.guild_id = peer_id
-                    gw.Debug(GW_LOG_DEBUG, 'guild=%s (%s)', guild_name, peer_id);
-                else
-                    self.peer[peer_id] = peer_name
-                    gw.Debug(GW_LOG_DEBUG, 'peer=%s (%s)', peer_name, peer_id);
-                end
-            elseif field[1] == 's' then
-                local key = field[3]
-                local val = field[2]
-                if string.len(key) == 1 then
-                    xlat[key] = val
-                    gw.Debug(GW_LOG_DEBUG, "parser substitution added, '$%s' := '%s'", key, val)
-                else
-                    gw.Debug(GW_LOG_ERROR, "invalid parser substitution key, '$%s'", key)
-                end
-            elseif field[1] == 'v' then
-                -- Minimum version
-                if strmatch(field[2], '^%d+%.%d+%.%d+%w*$') then
-                    self.minimum = tostring(GwVersion(field[2]));
-                    gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
-                end
-            elseif field[1] == 'o' then
-                -- Deprecated option list
-                local optlist = { strsplit(',', gsub(field[2], '%s+', '')) }
-                for i, opt in ipairs(optlist) do
-                    local key, val = strsplit('=', opt)
-                    key = strlower(key)
-                    val = strlower(val)
-                    if key == 'mv' then
-                        if strmatch(val, '^%d+%.%d+%.%d+%w*$') then
-                            self.minimum = tostring(GwVersion(val));
-                            gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
+                elseif field[1] == 'p' then
+                    -- Peer guild
+                    local peer_name = gw.GlobalName(substitute(field[2], xlat))                
+                    local peer_id = substitute(field[3], xlat)
+                    if gw.iCmp(guild_name, peer_name) then
+                        self.guild_id = peer_id
+                        gw.Debug(GW_LOG_DEBUG, 'guild=%s (%s)', guild_name, peer_id);
+                    else
+                        self.peer[peer_id] = peer_name
+                        gw.Debug(GW_LOG_DEBUG, 'peer=%s (%s)', peer_name, peer_id);
+                    end
+                elseif field[1] == 's' then
+                    local key = field[3]
+                    local val = field[2]
+                    if string.len(key) == 1 then
+                        xlat[key] = val
+                        gw.Debug(GW_LOG_DEBUG, "parser substitution added, '$%s' := '%s'", key, val)
+                    else
+                        gw.Debug(GW_LOG_ERROR, "invalid parser substitution key, '$%s'", key)
+                    end
+                elseif field[1] == 'v' then
+                    -- Minimum version
+                    if strmatch(field[2], '^%d+%.%d+%.%d+%w*$') then
+                        self.minimum = tostring(GwVersion(field[2]));
+                        gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
+                    end
+                elseif field[1] == 'o' then
+                    -- Deprecated option list
+                    local optlist = { strsplit(',', gsub(field[2], '%s+', '')) }
+                    for i, opt in ipairs(optlist) do
+                        local key, val = strsplit('=', opt)
+                        key = strlower(key)
+                        val = strlower(val)
+                        if key == 'mv' then
+                            if strmatch(val, '^%d+%.%d+%.%d+%w*$') then
+                                self.minimum = tostring(GwVersion(val));
+                                gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
+                            end
                         end
                     end
                 end
             end
         end
-    
+
+        self.valid = true
     end
     
     -- Officer note
@@ -275,18 +286,7 @@ function GwConfig:load()
     end
     
     --
-    -- Clean up.
-    --
-    for _, channel in ipairs(self.channel) do
-        if channel:is_stale() then
-            channel:clear()
-        end
-    end
-    self.valid = true
-    self.timer.config:set()
-    
-    --
-    -- Version checks
+    -- Version check
     --
     local min = GwVersion(self.minimum)
     local cur = GwVersion(gw.version)
@@ -295,8 +295,17 @@ function GwConfig:load()
             gw.Error('Guild configuration specifies a minimum version of %s (%s currently installed).', tostring(min), tostring(cur))
         end
     end
-    if strmatch(info, 'GW%a=".*"') then
-        gw.Error('Guild configuration uses a format not supported by this version.')
+    
+    --
+    -- Clean up.
+    --
+    for _, channel in ipairs(self.channel) do
+        if channel:is_stale() then
+            channel:clear()
+        end
+    end
+    if self.valid then
+        self.timer.config:set()
     end
     
     return true;

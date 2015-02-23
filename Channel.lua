@@ -53,7 +53,7 @@ end
 
 function GwChannel:initialize()
     self.frame_table = {}
-    self.version = 0
+    self.cversion = 0
     self.name = ''
     self.password = ''
     self.number = 0
@@ -80,18 +80,18 @@ Channel Management Methods
 --]]-----------------------------------------------------------------------
 
 --- Configure the channel.
--- @param version Messaging version.
+-- @param cversion Configuration version.
 -- @param name Name of the channel.
 -- @param password Password for the channel. (optional)
-function GwChannel:configure(version, name, password)
-    assert(version == 1)
+function GwChannel:configure(cversion, name, password)
+    assert(cversion == 1)
     assert(name and name ~= '')
-    self.version = version
+    self.cversion = cversion
     self.name = name
     self.password = password and password or ''
     self.stale = false
-    gw.Debug(GW_LOG_INFO, 'configured channel; channel=%s, password=%s, version=%d, stale=%s',
-            gw.Redact(self.name), gw.Redact(self.password), self.version, tostring(self.stale));
+    gw.Debug(GW_LOG_INFO, 'configured channel; channel=%s, password=%s, cversion=%d, stale=%s',
+            gw.Redact(self.name), gw.Redact(self.password), self.cversion, tostring(self.stale));
 end
 
 
@@ -113,8 +113,8 @@ end
 --- Test if the channel is configured.
 -- @return True if configured, false otherwise.
 function GwChannel:is_configured()
-    gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s, password=%s, version=%d, stale=%s',
-            self.number, gw.Redact(self.name), gw.Redact(self.password), self.version, tostring(self.stale))
+    gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s, password=%s, cversion=%d, stale=%s',
+            self.number, gw.Redact(self.name), gw.Redact(self.password), self.cversion, tostring(self.stale))
     return self.name and self.name ~= ''
 end
 
@@ -138,8 +138,8 @@ end
 --- Check if channel configuration is stale.
 -- @return True if stale, false otherwise.
 function GwChannel:is_stale()
-    gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s, password=%s, version=%d, stale=%s',
-            self.number, gw.Redact(self.name), gw.Redact(self.password), self.version, tostring(self.stale))
+    gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s, password=%s, cversion=%d, stale=%s',
+            self.number, gw.Redact(self.name), gw.Redact(self.password), self.cversion, tostring(self.stale))
     return self.stale
 end
 
@@ -229,7 +229,7 @@ Informational Methods
 function GwChannel:dump_status(label)
     label = label or 'channel'
     gw.Write('%s: connected=%s, number=%d, channel=%s, password=%s, stale=%s (sconn=%d, fconn=%d, leave=%d, disco=%d)', 
-                tostring(self:is_connected()), label, self.number, gw.Redact(self.name),
+                label, tostring(self:is_connected()), self.number, gw.Redact(self.name),
                 gw.Redact(self.password), tostring(self:is_stale()),
                 self.stats.sconn, self.stats.fconn, self.stats.leave, self.stats.disco)
 end
