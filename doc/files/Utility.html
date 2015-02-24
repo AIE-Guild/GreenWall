@@ -1,0 +1,492 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li>
+		<a href="../files/Channel.html">Channel.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Chat.html">Chat.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Config.html">Config.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Constants.html">Constants.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Globals.html">Globals.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/GreenWall.html">GreenWall.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/HoldDown.html">HoldDown.lua</a>
+	</li>
+
+	<li><strong>Utility.lua</strong></li>
+	
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>Utility.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.Debug">gw.Debug</a>&nbsp;(level, ...)</td>
+	<td class="summary">Write a debugging message to the default chat frame with a detail level.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.Error">gw.Error</a>&nbsp;(...)</td>
+	<td class="summary">Write an error message to the default chat frame.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.GetGuildName">gw.GetGuildName</a>&nbsp;(target)</td>
+	<td class="summary">Get the player's fully-qualified guild name.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.GetPlayerName">gw.GetPlayerName</a>&nbsp;(target)</td>
+	<td class="summary">Get the player's fully-qualified name.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.GlobalName">gw.GlobalName</a>&nbsp;(name, realm)</td>
+	<td class="summary">Format name for cross-realm addressing.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.IsOfficer">gw.IsOfficer</a>&nbsp;(target)</td>
+	<td class="summary">Check a target player for officer status in the same container guild.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.Log">gw.Log</a>&nbsp;(msg)</td>
+	<td class="summary">Add a message to the log file </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.Redact">gw.Redact</a>&nbsp;(msg)</td>
+	<td class="summary">Print an obfuscated string if the redaction option is set.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.WorldChannelFound">gw.WorldChannelFound</a>&nbsp;()</td>
+	<td class="summary">Check if player is currently in any world channels.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.Write">gw.Write</a>&nbsp;(...)</td>
+	<td class="summary">Write a message to the default chat frame.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.iCmp">gw.iCmp</a>&nbsp;(a, b)</td>
+	<td class="summary">Case insensitive string comparison.</td>
+	</tr>
+
+</table>
+
+
+
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="gw.Debug"></a><strong>gw.Debug</strong>&nbsp;(level, ...)</dt>
+<dd>
+Write a debugging message to the default chat frame with a detail level. Messages will be filtered with the "/greenwall debug <level>" command.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>level</em></code>: A positive integer specifying the debug level to display this under.
+	</li>
+	
+	<li>
+	  <code><em>...</em></code>: A list of the string and arguments for substitution using the syntax of string.format.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.Error"></a><strong>gw.Error</strong>&nbsp;(...)</dt>
+<dd>
+Write an error message to the default chat frame.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>...</em></code>: A list of the string and arguments for substitution using the syntax of string.format.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.GetGuildName"></a><strong>gw.GetGuildName</strong>&nbsp;(target)</dt>
+<dd>
+Get the player's fully-qualified guild name.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>target</em></code>: (optional) unit ID, default is 'Player'.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>A qualified guild name or nil if the player is not in a guild.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.GetPlayerName"></a><strong>gw.GetPlayerName</strong>&nbsp;(target)</dt>
+<dd>
+Get the player's fully-qualified name.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>target</em></code>: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>A qualified player name.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.GlobalName"></a><strong>gw.GlobalName</strong>&nbsp;(name, realm)</dt>
+<dd>
+Format name for cross-realm addressing.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Character name or guild name.
+	</li>
+	
+	<li>
+	  <code><em>realm</em></code>: Name of the realm.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>A formatted cross-realm address.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.IsOfficer"></a><strong>gw.IsOfficer</strong>&nbsp;(target)</dt>
+<dd>
+Check a target player for officer status in the same container guild.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>target</em></code>: The name of the player to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the target has at least read access to officer chat and officer notes, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.Log"></a><strong>gw.Log</strong>&nbsp;(msg)</dt>
+<dd>
+Add a message to the log file
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>msg</em></code>: A string to write to the log.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.Redact"></a><strong>gw.Redact</strong>&nbsp;(msg)</dt>
+<dd>
+Print an obfuscated string if the redaction option is set.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>msg</em></code>: The input string
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The string with redaction applied, if necessary.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.WorldChannelFound"></a><strong>gw.WorldChannelFound</strong>&nbsp;()</dt>
+<dd>
+Check if player is currently in any world channels.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True is the player has joined any world channels, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.Write"></a><strong>gw.Write</strong>&nbsp;(...)</dt>
+<dd>
+Write a message to the default chat frame.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>...</em></code>: A list of the string and arguments for substitution using the syntax of string.format.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.iCmp"></a><strong>gw.iCmp</strong>&nbsp;(a, b)</dt>
+<dd>
+Case insensitive string comparison.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>a</em></code>: A string
+	</li>
+	
+	<li>
+	  <code><em>b</em></code>: A string
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the strings match in all respects except case, false otherwise.</ul>
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li><strong>Channel.lua</strong></li>
+	
+	<li>
+		<a href="../files/Chat.html">Chat.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Config.html">Config.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Constants.html">Constants.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Globals.html">Globals.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/GreenWall.html">GreenWall.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/HoldDown.html">HoldDown.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Utility.html">Utility.lua</a>
+	</li>
+
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>Channel.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:clear">GwChannel:clear</a>&nbsp;()</td>
+	<td class="summary">Clear the channel configuration.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:configure">GwChannel:configure</a>&nbsp;(version, name, password)</td>
+	<td class="summary">Configure the channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:isConfigured">GwChannel:isConfigured</a>&nbsp;()</td>
+	<td class="summary">Test if the channel is configured.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:isConnected">GwChannel:isConnected</a>&nbsp;()</td>
+	<td class="summary">Check if a connection exists to the custom channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:join">GwChannel:join</a>&nbsp;()</td>
+	<td class="summary">Join a bridge channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:leave">GwChannel:leave</a>&nbsp;()</td>
+	<td class="summary">Leave a bridge channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:new">GwChannel:new</a>&nbsp;()</td>
+	<td class="summary">GwChannel constructor function.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:receive">GwChannel:receive</a>&nbsp;(f, ...)</td>
+	<td class="summary">Handler for data received on a channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:send">GwChannel:send</a>&nbsp;(type, ..., message)</td>
+	<td class="summary">Sends an encoded message on the shared channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:tlDequeue">GwChannel:tlDequeue</a>&nbsp;()</td>
+	<td class="summary">Remove a segment from the channel transmit queue.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:tlEnqueue">GwChannel:tlEnqueue</a>&nbsp;(segment)</td>
+	<td class="summary">Add a segment to the channel transmit queue.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:tlFlush">GwChannel:tlFlush</a>&nbsp;()</td>
+	<td class="summary">Transmit all messages in the channel transmit queue.</td>
+	</tr>
+
+</table>
+
+
+
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="GwChannel:clear"></a><strong>GwChannel:clear</strong>&nbsp;()</dt>
+<dd>
+Clear the channel configuration.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:configure"></a><strong>GwChannel:configure</strong>&nbsp;(version, name, password)</dt>
+<dd>
+Configure the channel.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>version</em></code>: Messaging version.
+	</li>
+	
+	<li>
+	  <code><em>name</em></code>: Name of the channel.
+	</li>
+	
+	<li>
+	  <code><em>password</em></code>: Password for the channel. (optional)
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:isConfigured"></a><strong>GwChannel:isConfigured</strong>&nbsp;()</dt>
+<dd>
+Test if the channel is configured.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if configured, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:isConnected"></a><strong>GwChannel:isConnected</strong>&nbsp;()</dt>
+<dd>
+Check if a connection exists to the custom channel.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if connected, otherwise false.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:join"></a><strong>GwChannel:join</strong>&nbsp;()</dt>
+<dd>
+Join a bridge channel.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if connection success, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:leave"></a><strong>GwChannel:leave</strong>&nbsp;()</dt>
+<dd>
+Leave a bridge channel.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if a disconnection occurred, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:new"></a><strong>GwChannel:new</strong>&nbsp;()</dt>
+<dd>
+GwChannel constructor function.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>An initialized GwChannel instance.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:receive"></a><strong>GwChannel:receive</strong>&nbsp;(f, ...)</dt>
+<dd>
+Handler for data received on a channel.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>f</em></code>: A callback function.
+	</li>
+	
+	<li>
+	  <code><em>...</em></code>: The API event arguments.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The return value of f applied to the data.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:send"></a><strong>GwChannel:send</strong>&nbsp;(type, ..., message)</dt>
+<dd>
+Sends an encoded message on the shared channel.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>type</em></code>: The message type. Accepted values are: GW_MTYPE_CHAT GW_MTYPE_ACHIEVEMENT GW_MTYPE_BROADCAST GW_MTYPE_NOTICE GW_MTYPE_REQUEST GW_MTYPE_ADDON
+	</li>
+	
+	<li>
+	  <code><em>...</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>message</em></code>: Text of the message.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:tlDequeue"></a><strong>GwChannel:tlDequeue</strong>&nbsp;()</dt>
+<dd>
+Remove a segment from the channel transmit queue.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Segment removed from the queue or nil if queue is empty.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:tlEnqueue"></a><strong>GwChannel:tlEnqueue</strong>&nbsp;(segment)</dt>
+<dd>
+Add a segment to the channel transmit queue.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>segment</em></code>: Segment to enqueue.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Number of segments in queue after the insertion.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:tlFlush"></a><strong>GwChannel:tlFlush</strong>&nbsp;()</dt>
+<dd>
+Transmit all messages in the channel transmit queue.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Number of messages flushed.</ul>
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>
