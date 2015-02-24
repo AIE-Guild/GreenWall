@@ -185,11 +185,16 @@ end
 -- @return True if the target has at least read access to officer chat and officer notes, false otherwise.
 function gw.IsOfficer(target)
     local function get_rank(target)
-        local name, rank
+        local guild, name, rank
         if target == nil or gw.GlobalName(target) == gw.player then
-            _, name, rank = GetGuildInfo('player')
-            gw.Debug(GW_LOG_DEBUG, 'target=%s, rank=%s (%s)', gw.player, rank, name)
-            return rank + 1
+            guild, name, rank = GetGuildInfo('player')
+            if guild then
+                gw.Debug(GW_LOG_DEBUG, 'target=%s, rank=%s (%s)', gw.player, rank, name)
+                return rank + 1
+            else
+                gw.Debug(GW_LOG_DEBUG, 'target=%s not in a guild', gw.player)
+                return
+            end
         else
             local n = GetNumGuildMembers()
             for i = 1, n do
@@ -201,6 +206,7 @@ function gw.IsOfficer(target)
                 end
             end
         end
+        gw.Debug(GW_LOG_DEBUG, 'target=%s not in a guild', target)
         return
     end
 
