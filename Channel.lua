@@ -364,7 +364,8 @@ function GwChannel:receive(f, ...)
     local sender, guild_id, type, message = self:tl_receive(...)
     if message ~= nil then
         if gw.GlobalName(sender) ~= gw.player and guild_id ~= gw.config.guild_id then
-            gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, message=%s', self.number, type, sender, message)
+            gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, guild=%s, message=%s',
+                    self.number, type, sender, guild_id, message)
             local content = { self:al_decode(type, message) }
             return f(type, guild_id, content, {...})
         end
