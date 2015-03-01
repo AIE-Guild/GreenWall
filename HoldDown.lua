@@ -40,10 +40,27 @@ function GwHoldDown:new(interval)
 end
 
 --- Set the start of the hold-down interval.
+-- @param f (optional) A callback function that will be called when the timer expires.
 -- @return The time at which the interval will end.
-function GwHoldDown:set()
+function GwHoldDown:set(f)
+    local function handler(frame, elapsed)
+        if not self:hold() then
+            gw.Debug(GW_LOG_NOTICE, 'hold-down expired; timer=%s', tostring(self))
+            if type(f) == 'function' then
+                gw.Debug(GW_LOG_NOTICE, 'triggered hold-down callback; function=%s', tostring(f))
+                f()
+            end
+            frame:SetScript('OnUpdate', nil)
+        end
+    end
+
     local t = time()
     self.expiry = t + self.interval
+    
+    local frame = CreateFrame('frame')
+    frame:SetScript('OnUpdate', handler)
+    
+    gw.Debug(GW_LOG_NOTICE, 'hold-down set; timer=%s, function=%s', tostring(self), tostring(f))
     return self.expiry
 end
 
@@ -51,6 +68,7 @@ end
 -- @return The time at which the interval will end.
 function GwHoldDown:clear()
     self.expiry = 0
+    gw.Debug(GW_LOG_NOTICE, 'hold-down cleared; timer=%s', tostring(self))
     return self.expiry
 end
 
