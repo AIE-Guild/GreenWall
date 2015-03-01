@@ -35,7 +35,9 @@ function gw.handlerGuildChat(type, guild_id, content, arglist)
     if type == GW_MTYPE_CHAT then
         gw.ReplicateMessage('GUILD', content[1], guild_id, arglist)
     elseif type == GW_MTYPE_ACHIEVEMENT then
-        gw.ReplicateMessage('GUILD_ACHIEVEMENT', content[1], guild_id, arglist)
+        if GreenWall.achievements then
+            gw.ReplicateMessage('GUILD_ACHIEVEMENT', content[1], guild_id, arglist)
+        end
     elseif type == GW_MTYPE_BROADCAST then
         local action, target, rank = unpack(content)
         if action == 'join' then
