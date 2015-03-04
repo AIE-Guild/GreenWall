@@ -116,12 +116,40 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					<OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Rank Announcements");</OnLoad>
 				</Scripts>
 			</CheckButton>
+			<Slider name="$parentOptionChannelHolddown" inherits="OptionsSliderTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentOptionRank" relativeFrom="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="8" y="-64" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentLabel" inherits="GameFontHighlight" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="128" y="16" />
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT">
+									<Offset>
+										<AbsDimension x="0" y="0" />
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>getglobal(self:GetName().."Text"):SetText("Channel Holddown Timer");</OnLoad>
+				</Scripts>
+			</Slider>			
 			<CheckButton name="$parentOptionOfficerChat" inherits="InterfaceOptionsCheckButtonTemplate">
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentOptionRank"
+					<Anchor point="TOPLEFT" relativeTo="$parentOptionChannelHolddown"
                         relativePoint="BOTTOMLEFT">
 						<Offset>
-							<AbsDimension x="0" y="-8"/>
+							<AbsDimension x="-8" y="-32"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
