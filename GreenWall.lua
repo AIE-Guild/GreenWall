@@ -84,6 +84,10 @@ function GreenWallInterfaceFrame_SaveUpdates(self)
     GreenWall.achievements = getglobal(self:GetName().."OptionAchievements"):GetChecked() and true or false
     GreenWall.roster = getglobal(self:GetName().."OptionRoster"):GetChecked() and true or false
     GreenWall.rank = getglobal(self:GetName().."OptionRank"):GetChecked() and true or false
+
+    GreenWall.joindelay = getglobal(self:GetName().."OptionJoinDelay"):GetValue()
+    gw.config.timer.channel:set(GreenWall.joindelay)
+
     if (gw.IsOfficer()) then
         GreenWall.ochat = getglobal(self:GetName().."OptionOfficerChat"):GetChecked() and true or false
         gw.config:reload()
@@ -95,6 +99,10 @@ function GreenWallInterfaceFrame_SetDefaults(self)
     GreenWall.achievements = gw.defaults['achievements']['default']
     GreenWall.roster = gw.defaults['roster']['default']
     GreenWall.rank = gw.defaults['rank']['default']
+
+    GreenWall.joindelay = gw.defaults['joindelay']['default']
+    gw.config.timer.channel:set(GreenWall.joindelay)
+
     GreenWall.ochat = gw.defaults['ochat']['default']
 end
 

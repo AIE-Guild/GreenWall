@@ -35,7 +35,7 @@ function GwHoldDown:new(interval)
     local self = {}
     setmetatable(self, GwHoldDown)
     self.interval = interval
-    self.expiry = 0
+    self.timestamp = 0
     return self
 end
 
@@ -44,6 +44,7 @@ end
 -- @return The GwHoldDown instance.
 function GwHoldDown:set(interval)
     assert(type(interval) == 'number')
+    gw.Debug(GW_LOG_DEBUG, 'hold-down set; timer=%s, interval=%d', tostring(self), interval)
     self.interval = interval
     return self
 end
@@ -64,28 +65,28 @@ function GwHoldDown:start(f)
     end
 
     local t = time()
-    self.expiry = t + self.interval
+    local expiry = t + self.interval
+    self.timestamp = t
     
     local frame = CreateFrame('frame')
     frame:SetScript('OnUpdate', handler)
     
-    gw.Debug(GW_LOG_NOTICE, 'hold-down set; timer=%s, function=%s', tostring(self), tostring(f))
-    return self.expiry
+    gw.Debug(GW_LOG_NOTICE, 'hold-down start; timer=%s, timestamp=%d, expiry=%d, function=%s', 
+            tostring(self), self.timestamp, expiry, tostring(f))
+    return expiry
 end
 
 --- Clear the hold-down timer.
--- @return The time at which the interval will end.
 function GwHoldDown:clear()
-    self.expiry = 0
+    self.timestamp = 0
     gw.Debug(GW_LOG_NOTICE, 'hold-down cleared; timer=%s', tostring(self))
-    return self.expiry
 end
 
 --- Test the hold-down status.
 -- @return True if a hold-down is in effect, false otherwise.
 function GwHoldDown:hold()
     local t = time()
-    return self.expiry > t
+    return self.timestamp + self.interval > t
 end
 
 
