@@ -119,20 +119,24 @@ function GwHoldDownCache:hold(s)
     
     -- Check for hold-down
     if self.cache[s] == nil then
-        self.cache[s] = t + self.interval
+        self.cache[s] = t
+        gw.Debug(GW_LOG_DEBUG, 'cache miss; target=%s, cache=%s', s, tostring(self))
     else
-        if self.cache[s] > t then
+        gw.Debug(GW_LOG_DEBUG, 'cache hit; target=%s, cache=%s', s, tostring(self))
+        if self.cache[s] > t + self.interval then
             rv = true
         else
             self.cache[s] = nil
+            gw.Debug(GW_LOG_DEBUG, 'cache expire; target=%s, cache=%s', s, tostring(self))
         end
     end
     
     -- Prune if necessary
     if #self.cache > self.soft_max then
         for k, v in pairs(self.cache) do
-            if v > t then
+            if v > t + self.interval then
                 table.remove(self.cache, k)
+                gw.Debug(GW_LOG_DEBUG, 'cache soft prune; target=%s, cache=%s', k, tostring(self))
             end
         end
     end
@@ -146,6 +150,7 @@ function GwHoldDownCache:hold(s)
         table.sort(index, function(a, b) return a[1] < b [1] end)
         for i = self.hard_max, #index do
             table.remove(self.cache, index[i][2])
+            gw.Debug(GW_LOG_DEBUG, 'cache hard prune; target=%s, cache=%s', index[i][2], tostring(self))
         end
     end
     
