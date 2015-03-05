@@ -57,12 +57,17 @@ function GreenWallInterfaceFrame_OnShow(self)
         self:Hide()
         return
     end
+
+    -- Initialize widgets
+    getglobal(self:GetName().."OptionJoinDelay"):SetMinMaxValues(GW_JOIN_DELAY_MIN, GW_JOIN_DELAY_MAX)
+    getglobal(self:GetName().."OptionJoinDelay"):SetValueStep(GW_JOIN_DELAY_STEP)
     
     -- Populate interface panel.
     getglobal(self:GetName().."OptionTag"):SetChecked(GreenWall.tag)
     getglobal(self:GetName().."OptionAchievements"):SetChecked(GreenWall.achievements)
     getglobal(self:GetName().."OptionRoster"):SetChecked(GreenWall.roster)
     getglobal(self:GetName().."OptionRank"):SetChecked(GreenWall.rank)
+    getglobal(self:GetName().."OptionJoinDelay"):SetValue(GreenWall.joindelay)
     if (gw.IsOfficer()) then
         getglobal(self:GetName().."OptionOfficerChat"):SetChecked(GreenWall.ochat)
         getglobal(self:GetName().."OptionOfficerChatText"):SetTextColor(1, 1, 1)
@@ -93,6 +98,16 @@ function GreenWallInterfaceFrame_SetDefaults(self)
     GreenWall.ochat = gw.defaults['ochat']['default']
 end
 
+function GreenWallInterfaceFrameOptionJoinDelay_OnValueChanged(self, value)
+    -- Fix for 5.4.0, see http://www.wowwiki.com/Patch_5.4.0/API_changes
+    if not self._onsetting then 
+        self._onsetting = true
+        self:SetValue(self:GetValue())
+        value = self:GetValue()
+        self._onsetting = false
+    else return end
+    getglobal(self:GetName().."Text"):SetText(value)
+end
 
 --[[-----------------------------------------------------------------------
 

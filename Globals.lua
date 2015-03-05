@@ -53,7 +53,8 @@ gw.defaults = {
     log             = { default=false,  desc="event logging" },
     logsize         = { default=2048,   desc="maximum log buffer size" },
     ochat           = { default=false,  desc="officer chat bridging" },
-    redact          = { default=true,   desc="obfuscate sensitive data in debug output" },  
+    redact          = { default=true,   desc="obfuscate sensitive data in debug output" },
+    joindelay       = { default=GW_JOIN_DELAY_DEFAULT, desc="channel join delay"}
 }
 
 gw.usage = [[

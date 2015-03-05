@@ -116,7 +116,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					<OnLoad>getglobal(self:GetName().."Text"):SetText("Show Co-Guild Rank Announcements");</OnLoad>
 				</Scripts>
 			</CheckButton>
-			<Slider name="$parentOptionChannelHolddown" inherits="OptionsSliderTemplate">
+			<Slider name="$parentOptionJoinDelay" inherits="OptionsSliderTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentOptionRank" relativeFrom="BOTTOMLEFT">
 						<Offset>
@@ -126,14 +126,14 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
-						<FontString name="$parentLabel" inherits="GameFontHighlight" justifyH="LEFT">
+						<FontString name="$parentLabel" inherits="GameFontHighlight" justifyH="LEFT" text="Channel Join Delay (seconds)">
 							<Size>
-								<AbsDimension x="128" y="16" />
+								<AbsDimension x="1024" y="16" />
 							</Size>
 							<Anchors>
-								<Anchor point="RIGHT" relativePoint="LEFT">
+								<Anchor point="LEFT" relativePoint="RIGHT">
 									<Offset>
-										<AbsDimension x="0" y="0" />
+										<AbsDimension x="16" y="0" />
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -141,12 +141,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</Layer>
 				</Layers>
 				<Scripts>
-					<OnLoad>getglobal(self:GetName().."Text"):SetText("Channel Holddown Timer");</OnLoad>
+					<OnValueChanged>
+						GreenWallInterfaceFrameOptionJoinDelay_OnValueChanged(self, value)
+          			</OnValueChanged>
 				</Scripts>
-			</Slider>			
+			</Slider>
+						
 			<CheckButton name="$parentOptionOfficerChat" inherits="InterfaceOptionsCheckButtonTemplate">
 				<Anchors>
-					<Anchor point="TOPLEFT" relativeTo="$parentOptionChannelHolddown"
+					<Anchor point="TOPLEFT" relativeTo="$parentOptionJoinDelay"
                         relativePoint="BOTTOMLEFT">
 						<Offset>
 							<AbsDimension x="-8" y="-32"/>
