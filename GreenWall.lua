@@ -571,7 +571,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'PLAYER_LOGIN' then
 
         -- Defer joining to allow General to grab slot 1
-        gw.config.timer.channel:set(function () gw.config:refresh_channels() end )
+        gw.config.timer.channel:start(function () gw.config:refresh_channels() end )
 
         -- Initiate the comms
         gw.config:refresh()

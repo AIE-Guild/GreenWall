@@ -188,7 +188,7 @@ function gw.ReceiveLocal(sender, message)
                     else
                         gw.Write('Received configuration reload request from %s.', sender)
                         gw.config:reload()
-                        gw.config.timer.reload:set()
+                        gw.config.timer.reload:start()
                     end   
                 end
             end

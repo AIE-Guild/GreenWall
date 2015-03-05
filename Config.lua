@@ -305,7 +305,7 @@ function GwConfig:load()
         end
     end
     if self.valid then
-        self.timer.config:set()
+        self.timer.config:start()
     end
     
     return true;

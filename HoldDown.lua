@@ -39,10 +39,19 @@ function GwHoldDown:new(interval)
     return self
 end
 
---- Set the start of the hold-down interval.
+--- Update the timer interval.
+-- @param interval The length, in seconds, of the hold-down interval.
+-- @return The GwHoldDown instance.
+function GwHoldDown:set(interval)
+    assert(type(interval) == 'number')
+    self.interval = interval
+    return self
+end
+
+--- Start the hold-down interval.
 -- @param f (optional) A callback function that will be called when the timer expires.
 -- @return The time at which the interval will end.
-function GwHoldDown:set(f)
+function GwHoldDown:start(f)
     local function handler(frame, elapsed)
         if not self:hold() then
             gw.Debug(GW_LOG_NOTICE, 'hold-down expired; timer=%s', tostring(self))
