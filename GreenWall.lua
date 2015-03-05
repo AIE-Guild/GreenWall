@@ -193,6 +193,8 @@ local function GwSlashCmd(message, editbox)
             while # GreenWallLog > GreenWall.logsize do
                 tremove(GreenWallLog, 1)
             end
+        elseif command == 'joindelay' then
+            gw.config.timer.channel:set(GreenWall.joindelay)
         elseif command == 'ochat' then
             gw.config:reload()
         end
