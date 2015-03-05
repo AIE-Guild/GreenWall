@@ -59,8 +59,8 @@ function GreenWallInterfaceFrame_OnShow(self)
     end
 
     -- Initialize widgets
-    getglobal(self:GetName().."OptionJoinDelay"):SetMinMaxValues(GW_JOIN_DELAY_MIN, GW_JOIN_DELAY_MAX)
-    getglobal(self:GetName().."OptionJoinDelay"):SetValueStep(GW_JOIN_DELAY_STEP)
+    getglobal(self:GetName().."OptionJoinDelay"):SetMinMaxValues(gw.option.joindelay.min, gw.option.joindelay.max)
+    getglobal(self:GetName().."OptionJoinDelay"):SetValueStep(gw.option.joindelay.step)
     
     -- Populate interface panel.
     getglobal(self:GetName().."OptionTag"):SetChecked(GreenWall.tag)
@@ -95,15 +95,15 @@ function GreenWallInterfaceFrame_SaveUpdates(self)
 end
 
 function GreenWallInterfaceFrame_SetDefaults(self)
-    GreenWall.tag = gw.defaults['tag']['default']
-    GreenWall.achievements = gw.defaults['achievements']['default']
-    GreenWall.roster = gw.defaults['roster']['default']
-    GreenWall.rank = gw.defaults['rank']['default']
+    GreenWall.tag = gw.option['tag']['default']
+    GreenWall.achievements = gw.option['achievements']['default']
+    GreenWall.roster = gw.option['roster']['default']
+    GreenWall.rank = gw.option['rank']['default']
 
-    GreenWall.joindelay = gw.defaults['joindelay']['default']
+    GreenWall.joindelay = gw.option['joindelay']['default']
     gw.config.timer.channel:set(GreenWall.joindelay)
 
-    GreenWall.ochat = gw.defaults['ochat']['default']
+    GreenWall.ochat = gw.option['ochat']['default']
 end
 
 function GreenWallInterfaceFrameOptionJoinDelay_OnValueChanged(self, value)
@@ -131,9 +131,9 @@ local function GwCmdConfig(key, val)
     if key == nil then
         return false
     else
-        if gw.defaults[key] ~= nil then
-            local default = gw.defaults[key]['default']
-            local desc = gw.defaults[key]['desc']
+        if gw.option[key] ~= nil then
+            local default = gw.option[key]['default']
+            local desc = gw.option[key]['desc']
             if type(default) == 'boolean' then
                 if val == nil or val == '' then
                     if GreenWall[key] then
@@ -156,9 +156,15 @@ local function GwCmdConfig(key, val)
                     if GreenWall[key] then
                         gw.Write('%s set to %d.', desc, GreenWall[key])
                     end
-                elseif val:match('^%d+$') then
-                    GreenWall[key] = val + 0
-                    gw.Write('%s set to %d.', desc, GreenWall[key])
+                elseif val:match('^-?%d+$') then
+                    local x = val + 0
+                    if gw.option[key].min and gw.option[key].min <= x and gw.option[key].max and gw.option[key].max >= x then
+                        GreenWall[key] = x
+                        gw.Write('%s set to %d.', desc, GreenWall[key])
+                    else
+                        gw.Error('argument out of range for %s: %s (range = [%s, %s])', desc, val,
+                                tostring(gw.option[key].min), tostring(gw.option[key].max))
+                    end
                 else
                     gw.Error('invalid argument for %s: %s', desc, val)
                 end
@@ -302,7 +308,7 @@ local function GwSetDefaults(soft)
         GreenWall = {}
     end
 
-    for k, p in pairs(gw.defaults) do
+    for k, p in pairs(gw.option) do
         if not soft or GreenWall[k] == nil then
             GreenWall[k] = p['default']
         end
