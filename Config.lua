@@ -74,7 +74,7 @@ function GwConfig:initialize_state()
         officer = GwChannel:new(),
     }
     self.timer = {
-        channel = GwHoldDown:new(GW_TIMEOUT_CHANNEL_HOLD),
+        channel = GwHoldDown:new(gw.option.joindelay.default),
         config  = GwHoldDown:new(GW_TIMEOUT_CONFIG_HOLD),
         reload  = GwHoldDown:new(GW_TIMEOUT_RELOAD_HOLD),
     }
@@ -191,6 +191,9 @@ function GwConfig:load()
         channel:age()
     end
     
+    -- Update the channel hold-down
+    self.timer.channel:set(GreenWall.joindelay)
+    
     --
     -- Check configuration version
     --
@@ -305,7 +308,7 @@ function GwConfig:load()
         end
     end
     if self.valid then
-        self.timer.config:set()
+        self.timer.config:start()
     end
     
     return true;

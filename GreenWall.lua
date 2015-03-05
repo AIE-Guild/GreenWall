@@ -57,12 +57,17 @@ function GreenWallInterfaceFrame_OnShow(self)
         self:Hide()
         return
     end
+
+    -- Initialize widgets
+    getglobal(self:GetName().."OptionJoinDelay"):SetMinMaxValues(gw.option.joindelay.min, gw.option.joindelay.max)
+    getglobal(self:GetName().."OptionJoinDelay"):SetValueStep(gw.option.joindelay.step)
     
     -- Populate interface panel.
     getglobal(self:GetName().."OptionTag"):SetChecked(GreenWall.tag)
     getglobal(self:GetName().."OptionAchievements"):SetChecked(GreenWall.achievements)
     getglobal(self:GetName().."OptionRoster"):SetChecked(GreenWall.roster)
     getglobal(self:GetName().."OptionRank"):SetChecked(GreenWall.rank)
+    getglobal(self:GetName().."OptionJoinDelay"):SetValue(GreenWall.joindelay)
     if (gw.IsOfficer()) then
         getglobal(self:GetName().."OptionOfficerChat"):SetChecked(GreenWall.ochat)
         getglobal(self:GetName().."OptionOfficerChatText"):SetTextColor(1, 1, 1)
@@ -79,6 +84,10 @@ function GreenWallInterfaceFrame_SaveUpdates(self)
     GreenWall.achievements = getglobal(self:GetName().."OptionAchievements"):GetChecked() and true or false
     GreenWall.roster = getglobal(self:GetName().."OptionRoster"):GetChecked() and true or false
     GreenWall.rank = getglobal(self:GetName().."OptionRank"):GetChecked() and true or false
+
+    GreenWall.joindelay = getglobal(self:GetName().."OptionJoinDelay"):GetValue()
+    gw.config.timer.channel:set(GreenWall.joindelay)
+
     if (gw.IsOfficer()) then
         GreenWall.ochat = getglobal(self:GetName().."OptionOfficerChat"):GetChecked() and true or false
         gw.config:reload()
@@ -86,13 +95,27 @@ function GreenWallInterfaceFrame_SaveUpdates(self)
 end
 
 function GreenWallInterfaceFrame_SetDefaults(self)
-    GreenWall.tag = gw.defaults['tag']['default']
-    GreenWall.achievements = gw.defaults['achievements']['default']
-    GreenWall.roster = gw.defaults['roster']['default']
-    GreenWall.rank = gw.defaults['rank']['default']
-    GreenWall.ochat = gw.defaults['ochat']['default']
+    GreenWall.tag = gw.option['tag']['default']
+    GreenWall.achievements = gw.option['achievements']['default']
+    GreenWall.roster = gw.option['roster']['default']
+    GreenWall.rank = gw.option['rank']['default']
+
+    GreenWall.joindelay = gw.option['joindelay']['default']
+    gw.config.timer.channel:set(GreenWall.joindelay)
+
+    GreenWall.ochat = gw.option['ochat']['default']
 end
 
+function GreenWallInterfaceFrameOptionJoinDelay_OnValueChanged(self, value)
+    -- Fix for 5.4.0, see http://www.wowwiki.com/Patch_5.4.0/API_changes
+    if not self._onsetting then 
+        self._onsetting = true
+        self:SetValue(self:GetValue())
+        value = self:GetValue()
+        self._onsetting = false
+    else return end
+    getglobal(self:GetName().."Text"):SetText(value)
+end
 
 --[[-----------------------------------------------------------------------
 
@@ -108,9 +131,9 @@ local function GwCmdConfig(key, val)
     if key == nil then
         return false
     else
-        if gw.defaults[key] ~= nil then
-            local default = gw.defaults[key]['default']
-            local desc = gw.defaults[key]['desc']
+        if gw.option[key] ~= nil then
+            local default = gw.option[key]['default']
+            local desc = gw.option[key]['desc']
             if type(default) == 'boolean' then
                 if val == nil or val == '' then
                     if GreenWall[key] then
@@ -133,9 +156,15 @@ local function GwCmdConfig(key, val)
                     if GreenWall[key] then
                         gw.Write('%s set to %d.', desc, GreenWall[key])
                     end
-                elseif val:match('^%d+$') then
-                    GreenWall[key] = val + 0
-                    gw.Write('%s set to %d.', desc, GreenWall[key])
+                elseif val:match('^-?%d+$') then
+                    local x = val + 0
+                    if gw.option[key].min and gw.option[key].min <= x and gw.option[key].max and gw.option[key].max >= x then
+                        GreenWall[key] = x
+                        gw.Write('%s set to %d.', desc, GreenWall[key])
+                    else
+                        gw.Error('argument out of range for %s: %s (range = [%s, %s])', desc, val,
+                                tostring(gw.option[key].min), tostring(gw.option[key].max))
+                    end
                 else
                     gw.Error('invalid argument for %s: %s', desc, val)
                 end
@@ -170,6 +199,8 @@ local function GwSlashCmd(message, editbox)
             while # GreenWallLog > GreenWall.logsize do
                 tremove(GreenWallLog, 1)
             end
+        elseif command == 'joindelay' then
+            gw.config.timer.channel:set(GreenWall.joindelay)
         elseif command == 'ochat' then
             gw.config:reload()
         end
@@ -277,7 +308,7 @@ local function GwSetDefaults(soft)
         GreenWall = {}
     end
 
-    for k, p in pairs(gw.defaults) do
+    for k, p in pairs(gw.option) do
         if not soft or GreenWall[k] == nil then
             GreenWall[k] = p['default']
         end
@@ -556,19 +587,11 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'PLAYER_LOGIN' then
 
         -- Defer joining to allow General to grab slot 1
-        gw.config.timer.channel:set()
+        gw.config.timer.channel:start(function () gw.config:refresh_channels() end )
 
         -- Initiate the comms
         gw.config:refresh()
         
-    end
-    
-    -- Cleanup
-    if gw.config.timer.channel:hold() then
-        if gw.WorldChannelFound() then
-            gw.config.timer.channel:clear()
-            gw.config:refresh_channels()
-        end
     end
         
 end
