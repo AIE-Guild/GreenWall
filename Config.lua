@@ -31,6 +31,7 @@ Imported Libraries
 --]]-----------------------------------------------------------------------
 
 local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
+local semver = LibStub:GetLibrary("SemanticVersion-1.0")
 
 
 --[[-----------------------------------------------------------------------
@@ -247,7 +248,7 @@ function GwConfig:load()
                 elseif field[1] == 'v' then
                     -- Minimum version
                     if strmatch(field[2], '^%d+%.%d+%.%d+%w*$') then
-                        self.minimum = tostring(GwVersion(field[2]));
+                        self.minimum = tostring(semver(field[2]));
                         gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
                     end
                 elseif field[1] == 'o' then
@@ -259,7 +260,7 @@ function GwConfig:load()
                         val = strlower(val)
                         if key == 'mv' then
                             if strmatch(val, '^%d+%.%d+%.%d+%w*$') then
-                                self.minimum = tostring(GwVersion(val));
+                                self.minimum = tostring(semver(val));
                                 gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
                             end
                         end
@@ -291,8 +292,8 @@ function GwConfig:load()
     --
     -- Version check
     --
-    local min = GwVersion(self.minimum)
-    local cur = GwVersion(gw.version)
+    local min = semver(self.minimum)
+    local cur = semver(gw.version)
     if min then
         if cur < min then
             gw.Error('Guild configuration specifies a minimum version of %s (%s currently installed).', tostring(min), tostring(cur))

@@ -18,7 +18,6 @@ HoldDown.lua
 Config.lua
 Chat.lua
 Channel.lua
-Version.lua
 GreenWall.lua
 GreenWall.xml
 
