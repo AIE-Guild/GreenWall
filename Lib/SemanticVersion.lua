@@ -24,11 +24,21 @@ SOFTWARE.
 
 --]]--------------------------------------------------------------------------
 
-GwVersion = {}
-GwVersion.__index = GwVersion
-GwVersion.__tostring = GwVersion.string
+----------------------------------------------------------------------------
+-- Package Definition
+----------------------------------------------------------------------------
 
-setmetatable(GwVersion, {
+local VERSION_MAJOR = "SemanticVersion-1.0"
+local VERSION_MINOR = 1
+local SemVer = LibStub:NewLibrary(VERSION_MAJOR, VERSION_MINOR)
+if not SemVer then
+    return
+end
+
+SemVer.__index = SemVer
+SemVer.__tostring = SemVer.string
+
+setmetatable(SemVer, {
     __call = function (cls, ...)
         return cls.new(...)
     end,
@@ -37,7 +47,7 @@ setmetatable(GwVersion, {
 --- Constructor method.
 -- @param s The version string.
 -- @return The semantic version object.
-function GwVersion.new(s)
+function SemVer.new(s)
     local function split(s)
         local tab = {}
         for token in s:gmatch('%w+') do
@@ -54,7 +64,7 @@ function GwVersion.new(s)
         return tab
     end
     
-    local self = setmetatable({}, GwVersion)
+    local self = setmetatable({}, SemVer)
     local major, minor, patch, suffix = s:match('^(%d+)%.(%d+)%.(%d+)(.*)')
     
     if major == nil then
@@ -84,7 +94,7 @@ function GwVersion.new(s)
 end
 
 
-GwVersion.__tostring = function (self)
+SemVer.__tostring = function (self)
     local function join(sep, ...)
         local arg = {...}
         for i = 1, #arg do
@@ -150,15 +160,15 @@ local function cmp_version(lhs, rhs)
     return 0
 end
 
-GwVersion.__eq = function (lhs, rhs)
+SemVer.__eq = function (lhs, rhs)
     return cmp_version(lhs, rhs) == 0
 end
 
-GwVersion.__lt = function (lhs, rhs)
+SemVer.__lt = function (lhs, rhs)
     return cmp_version(lhs, rhs) < 0
 end
 
-GwVersion.__le = function (lhs, rhs)
+SemVer.__le = function (lhs, rhs)
     return cmp_version(lhs, rhs) < 1
 end
 

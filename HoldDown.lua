@@ -35,14 +35,24 @@ function GwHoldDown:new(interval)
     local self = {}
     setmetatable(self, GwHoldDown)
     self.interval = interval
-    self.expiry = 0
+    self.timestamp = 0
     return self
 end
 
---- Set the start of the hold-down interval.
+--- Update the timer interval.
+-- @param interval The length, in seconds, of the hold-down interval.
+-- @return The GwHoldDown instance.
+function GwHoldDown:set(interval)
+    assert(type(interval) == 'number')
+    gw.Debug(GW_LOG_DEBUG, 'hold-down set; timer=%s, interval=%d', tostring(self), interval)
+    self.interval = interval
+    return self
+end
+
+--- Start the hold-down interval.
 -- @param f (optional) A callback function that will be called when the timer expires.
 -- @return The time at which the interval will end.
-function GwHoldDown:set(f)
+function GwHoldDown:start(f)
     local function handler(frame, elapsed)
         if not self:hold() then
             gw.Debug(GW_LOG_NOTICE, 'hold-down expired; timer=%s', tostring(self))
@@ -55,28 +65,28 @@ function GwHoldDown:set(f)
     end
 
     local t = time()
-    self.expiry = t + self.interval
+    local expiry = t + self.interval
+    self.timestamp = t
     
     local frame = CreateFrame('frame')
     frame:SetScript('OnUpdate', handler)
     
-    gw.Debug(GW_LOG_NOTICE, 'hold-down set; timer=%s, function=%s', tostring(self), tostring(f))
-    return self.expiry
+    gw.Debug(GW_LOG_NOTICE, 'hold-down start; timer=%s, timestamp=%d, expiry=%d, function=%s', 
+            tostring(self), self.timestamp, expiry, tostring(f))
+    return expiry
 end
 
 --- Clear the hold-down timer.
--- @return The time at which the interval will end.
 function GwHoldDown:clear()
-    self.expiry = 0
+    self.timestamp = 0
     gw.Debug(GW_LOG_NOTICE, 'hold-down cleared; timer=%s', tostring(self))
-    return self.expiry
 end
 
 --- Test the hold-down status.
 -- @return True if a hold-down is in effect, false otherwise.
 function GwHoldDown:hold()
     local t = time()
-    return self.expiry > t
+    return self.timestamp + self.interval > t
 end
 
 
@@ -109,20 +119,24 @@ function GwHoldDownCache:hold(s)
     
     -- Check for hold-down
     if self.cache[s] == nil then
-        self.cache[s] = t + self.interval
+        self.cache[s] = t
+        gw.Debug(GW_LOG_DEBUG, 'cache miss; target=%s, cache=%s', s, tostring(self))
     else
-        if self.cache[s] > t then
+        gw.Debug(GW_LOG_DEBUG, 'cache hit; target=%s, cache=%s', s, tostring(self))
+        if self.cache[s] > t + self.interval then
             rv = true
         else
             self.cache[s] = nil
+            gw.Debug(GW_LOG_DEBUG, 'cache expire; target=%s, cache=%s', s, tostring(self))
         end
     end
     
     -- Prune if necessary
     if #self.cache > self.soft_max then
         for k, v in pairs(self.cache) do
-            if v > t then
+            if v > t + self.interval then
                 table.remove(self.cache, k)
+                gw.Debug(GW_LOG_DEBUG, 'cache soft prune; target=%s, cache=%s', k, tostring(self))
             end
         end
     end
@@ -136,6 +150,7 @@ function GwHoldDownCache:hold(s)
         table.sort(index, function(a, b) return a[1] < b [1] end)
         for i = self.hard_max, #index do
             table.remove(self.cache, index[i][2])
+            gw.Debug(GW_LOG_DEBUG, 'cache hard prune; target=%s, cache=%s', index[i][2], tostring(self))
         end
     end
     
