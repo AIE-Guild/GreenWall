@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>CHANGELOG</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+/* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
+/* Author: Nicolas Hery - http://nicolashery.com */
+/* Version: 29d1c5bc36da364ad5aa86946d420b7bbc54a253 */
+/* Source: https://github.com/nicolahery/markdownpad-github */
+
+/* RESET
+=============================================================================*/
+
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* BODY
+=============================================================================*/
+
+body {
+  font-family: Helvetica, arial, freesans, clean, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+body>*:first-child {
+  margin-top: 0 !important;
+}
+
+body>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* BLOCKS
+=============================================================================*/
+
+p, blockquote, ul, ol, dl, table, pre {
+  margin: 15px 0;
+}
+
+/* HEADERS
+=============================================================================*/
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 20px 0 10px;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 tt, h1 code, h2 tt, h2 code, h3 tt, h3 code, h4 tt, h4 code, h5 tt, h5 code, h6 tt, h6 code {
+  font-size: inherit;
+}
+
+h1 {
+  font-size: 28px;
+  color: #000;
+}
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #ccc;
+  color: #000;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  font-size: 16px;
+}
+
+h5 {
+  font-size: 14px;
+}
+
+h6 {
+  color: #777;
+  font-size: 14px;
+}
+
+body>h2:first-child, body>h1:first-child, body>h1:first-child+h2, body>h3:first-child, body>h4:first-child, body>h5:first-child, body>h6:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+h1+p, h2+p, h3+p, h4+p, h5+p, h6+p {
+  margin-top: 10px;
+}
+
+/* LINKS
+=============================================================================*/
+
+a {
+  color: #4183C4;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* LISTS
+=============================================================================*/
+
+ul, ol {
+  padding-left: 30px;
+}
+
+ul li > :first-child, 
+ol li > :first-child, 
+ul li ul:first-of-type, 
+ol li ol:first-of-type, 
+ul li ol:first-of-type, 
+ol li ul:first-of-type {
+  margin-top: 0px;
+}
+
+ul ul, ul ol, ol ol, ol ul {
+  margin-bottom: 0;
+}
+
+dl {
+  padding: 0;
+}
+
+dl dt {
+  font-size: 14px;
+  font-weight: bold;
+  font-style: italic;
+  padding: 0;
+  margin: 15px 0 5px;
+}
+
+dl dt:first-child {
+  padding: 0;
+}
+
+dl dt>:first-child {
+  margin-top: 0px;
+}
+
+dl dt>:last-child {
+  margin-bottom: 0px;
+}
+
+dl dd {
+  margin: 0 0 15px;
+  padding: 0 15px;
+}
+
+dl dd>:first-child {
+  margin-top: 0px;
+}
+
+dl dd>:last-child {
+  margin-bottom: 0px;
+}
+
+/* CODE
+=============================================================================*/
+
+pre, code, tt {
+  font-size: 12px;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+code, tt {
+  margin: 0 0px;
+  padding: 0px 0px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+}
+
+pre>code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent;
+}
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #ccc;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  padding: 6px 10px;
+  border-radius: 3px;
+}
+
+pre code, pre tt {
+  background-color: transparent;
+  border: none;
+}
+
+/* QUOTES
+=============================================================================*/
+
+blockquote {
+  border-left: 4px solid #DDD;
+  padding: 0 15px;
+  color: #777;
+}
+
+blockquote>:first-child {
+  margin-top: 0px;
+}
+
+blockquote>:last-child {
+  margin-bottom: 0px;
+}
+
+/* HORIZONTAL RULES
+=============================================================================*/
+
+hr {
+  clear: both;
+  margin: 15px 0;
+  height: 0px;
+  overflow: hidden;
+  border: none;
+  background: transparent;
+  border-bottom: 4px solid #ddd;
+  padding: 0;
+}
+
+/* TABLES
+=============================================================================*/
+
+table th {
+  font-weight: bold;
+}
+
+table th, table td {
+  border: 1px solid #ccc;
+  padding: 6px 13px;
+}
+
+table tr {
+  border-top: 1px solid #ccc;
+  background-color: #fff;
+}
+
+table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+/* IMAGES
+=============================================================================*/
+
+img {
+  max-width: 100%
+}
+</style>
+<style type="text/css">
+.highlight  { background: #ffffff; }
+.highlight .c { color: #999988; font-style: italic } /* Comment */
+.highlight .err { color: #a61717; background-color: #e3d2d2 } /* Error */
+.highlight .k { font-weight: bold } /* Keyword */
+.highlight .o { font-weight: bold } /* Operator */
+.highlight .cm { color: #999988; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #999999; font-weight: bold } /* Comment.Preproc */
+.highlight .c1 { color: #999988; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #999999; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #000000; background-color: #ffdddd } /* Generic.Deleted */
+.highlight .gd .x { color: #000000; background-color: #ffaaaa } /* Generic.Deleted.Specific */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #aa0000 } /* Generic.Error */
+.highlight .gh { color: #999999 } /* Generic.Heading */
+.highlight .gi { color: #000000; background-color: #ddffdd } /* Generic.Inserted */
+.highlight .gi .x { color: #000000; background-color: #aaffaa } /* Generic.Inserted.Specific */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #555555 } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #aaaaaa } /* Generic.Subheading */
+.highlight .gt { color: #aa0000 } /* Generic.Traceback */
+.highlight .kc { font-weight: bold } /* Keyword.Constant */
+.highlight .kd { font-weight: bold } /* Keyword.Declaration */
+.highlight .kp { font-weight: bold } /* Keyword.Pseudo */
+.highlight .kr { font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #445588; font-weight: bold } /* Keyword.Type */
+.highlight .m { color: #009999 } /* Literal.Number */
+.highlight .s { color: #d14 } /* Literal.String */
+.highlight .na { color: #008080 } /* Name.Attribute */
+.highlight .nb { color: #0086B3 } /* Name.Builtin */
+.highlight .nc { color: #445588; font-weight: bold } /* Name.Class */
+.highlight .no { color: #008080 } /* Name.Constant */
+.highlight .ni { color: #800080 } /* Name.Entity */
+.highlight .ne { color: #990000; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #990000; font-weight: bold } /* Name.Function */
+.highlight .nn { color: #555555 } /* Name.Namespace */
+.highlight .nt { color: #000080 } /* Name.Tag */
+.highlight .nv { color: #008080 } /* Name.Variable */
+.highlight .ow { font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mf { color: #009999 } /* Literal.Number.Float */
+.highlight .mh { color: #009999 } /* Literal.Number.Hex */
+.highlight .mi { color: #009999 } /* Literal.Number.Integer */
+.highlight .mo { color: #009999 } /* Literal.Number.Oct */
+.highlight .sb { color: #d14 } /* Literal.String.Backtick */
+.highlight .sc { color: #d14 } /* Literal.String.Char */
+.highlight .sd { color: #d14 } /* Literal.String.Doc */
+.highlight .s2 { color: #d14 } /* Literal.String.Double */
+.highlight .se { color: #d14 } /* Literal.String.Escape */
+.highlight .sh { color: #d14 } /* Literal.String.Heredoc */
+.highlight .si { color: #d14 } /* Literal.String.Interpol */
+.highlight .sx { color: #d14 } /* Literal.String.Other */
+.highlight .sr { color: #009926 } /* Literal.String.Regex */
+.highlight .s1 { color: #d14 } /* Literal.String.Single */
+.highlight .ss { color: #990073 } /* Literal.String.Symbol */
+.highlight .bp { color: #999999 } /* Name.Builtin.Pseudo */
+.highlight .vc { color: #008080 } /* Name.Variable.Class */
+.highlight .vg { color: #008080 } /* Name.Variable.Global */
+.highlight .vi { color: #008080 } /* Name.Variable.Instance */
+.highlight .il { color: #009999 } /* Literal.Number.Integer.Long */
+.pl-c {
+    color: #969896;
+}
+
+.pl-c1,.pl-mdh,.pl-mm,.pl-mp,.pl-mr,.pl-s1 .pl-v,.pl-s3,.pl-sc,.pl-sv {
+    color: #0086b3;
+}
+
+.pl-e,.pl-en {
+    color: #795da3;
+}
+
+.pl-s1 .pl-s2,.pl-smi,.pl-smp,.pl-stj,.pl-vo,.pl-vpf {
+    color: #333;
+}
+
+.pl-ent {
+    color: #63a35c;
+}
+
+.pl-k,.pl-s,.pl-st {
+    color: #a71d5d;
+}
+
+.pl-pds,.pl-s1,.pl-s1 .pl-pse .pl-s2,.pl-sr,.pl-sr .pl-cce,.pl-sr .pl-sra,.pl-sr .pl-sre,.pl-src,.pl-v {
+    color: #df5000;
+}
+
+.pl-id {
+    color: #b52a1d;
+}
+
+.pl-ii {
+    background-color: #b52a1d;
+    color: #f8f8f8;
+}
+
+.pl-sr .pl-cce {
+    color: #63a35c;
+    font-weight: bold;
+}
+
+.pl-ml {
+    color: #693a17;
+}
+
+.pl-mh,.pl-mh .pl-en,.pl-ms {
+    color: #1d3e81;
+    font-weight: bold;
+}
+
+.pl-mq {
+    color: #008080;
+}
+
+.pl-mi {
+    color: #333;
+    font-style: italic;
+}
+
+.pl-mb {
+    color: #333;
+    font-weight: bold;
+}
+
+.pl-md,.pl-mdhf {
+    background-color: #ffecec;
+    color: #bd2c00;
+}
+
+.pl-mdht,.pl-mi1 {
+    background-color: #eaffea;
+    color: #55a532;
+}
+
+.pl-mdr {
+    color: #795da3;
+    font-weight: bold;
+}
+
+.pl-mo {
+    color: #1d3e81;
+}
+.task-list {
+padding-left:10px;
+margin-bottom:0;
+}
+
+.task-list li {
+    margin-left: 20px;
+}
+
+.task-list-item {
+list-style-type:none;
+padding-left:10px;
+}
+
+.task-list-item label {
+font-weight:400;
+}
+
+.task-list-item.enabled label {
+cursor:pointer;
+}
+
+.task-list-item+.task-list-item {
+margin-top:3px;
+}
+
+.task-list-item-checkbox {
+display:inline-block;
+margin-left:-20px;
+margin-right:3px;
+vertical-align:1px;
+}
+</style>
+</head>
+<body>
+<h1>Change Log</h1>
+
+<p>This project uses to <a href="http://semver.org/">Semantic Versioning</a>.</p>
+
+<h2>Unreleased</h2>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added Markdown change log.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.6.4...v1.6.5">1.6.5</a> -- 2015-06-24</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Updated TOC for WoW 6.2.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.6.3...v1.6.4">1.6.4</a> -- 2015-03-07</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Refactored the user option validation.</li>
+<li>Modified the GwHoldDown object.  Renamed <code>GwHoldDown:set()</code> to
+<code>GwHoldDown:start()</code> and created a new 'GwHoldDown:set()' mutator to change the interval.</li>
+<li>Moved the Semantic Versioning parser to a LibStub library.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added a user option (joindelay) to control the channel join hold-down.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.6.2...v1.6.3">1.6.3</a> -- 2015-03-04</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Restored original channel hold-down timer value of 30 seconds.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.6.1...v1.6.2">1.6.2</a> -- 2015-03-01</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Removed lazy sweeper case in the event loop and replaced it with a callback
+for handling hold-down expiry.</li>
+<li>Reduced channel hold-down to 10 seconds.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.6.0...v1.6.1">1.6.1</a> -- 2015-02-28</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Added conditional to check achievements flag on receipt of achievement spam.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added guild ID to debugging output on message receipt.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.5.4...v1.6.0">1.6.0</a> -- 2015-02-24</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Comprehensive refactor to allow new features in 2.0.</li>
+<li>Refactored configuration parser.</li>
+<li>Split GreenWall_Core.lua into multiple files.</li>
+<li>Removed excess semicolons ... Lua is not Perl.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added GwConfig object to contain configuration.</li>
+<li>Added GwChannel objects for channel management, implementing transport and adaptation layers for communication.</li>
+<li>Added GwHoldDown and GwHoldDownCache objects.</li>
+<li>Added LibStub libraries for SHA256, Salsa20, CRC16-CCITT, and Base64.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.5.3...v1.5.4">1.5.4</a> -- 2014-12-12</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Corrected comparisons of character names to account for capitalization normalization in the API.</li>
+</ul>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Updated luadoc.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.5.2...v1.5.3">1.5.3</a> -- 2014-11-11</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Added comember cache updates for channel join/leave events. This stops 
+flapping roster announcements for characters in peer co-guilds.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.5.1...v1.5.2">1.5.2</a> -- 2014-10-31</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed the General chat delay lockout.</li>
+<li>Improved the tests for officer status.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.5.0...v1.5.1">1.5.1</a> -- 2014-10-15</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed regular expression for realm name in GwGlobalName.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.4.1...v1.5.0">1.5.0</a> -- 2015-10-14</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Updated for fully qualified names.</li>
+</ul>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Switched to MIT license.</li>
+<li>Minor changes to debug messages.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added support for guilds on connected realms.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.4.0...v1.4.1">1.4.1</a> -- 2014-08-10</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Corrected the processing of the reload request.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.3.6...v1.4.0">1.4.0</a> -- 2014-03-22</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Update documentation for Interface Options.</li>
+<li>Cleaned up debugging levels.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added Interface Options panel for GreenWall options.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.3.5...v1.3.6">1.3.6</a> -- 2014-02-18</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed sender identification under WoW 5.4.7.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added realm name to gwPlayerName.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.3.4...v1.3.5">1.3.5</a> -- 2014-0120</h2>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added missing roster notification functionality.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.3.3...v1.3.4">1.3.4</a> -- 2013-11-17</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Changed officer note format and updated parsing.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.3.2...v1.3.3">1.3.3</a> -- 2013-09-10</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Updated TOC for WoW 5.4.0.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.3.1...v1.3.2">1.3.2</a> -- 2013-08-07</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed message integrity checking for duplicated messages.</li>
+<li>Fixed messages generated on guild join, leave, or kick.</li>
+<li>Corrected formatting of documentation.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/release-1.3.0...v1.3.1">1.3.1</a> -- 2013-08-06</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Project moved to <a href="https://github.com/AIE-Guild/GreenWall">GitHub</a>.</li>
+<li>All text documentation has been converted to Markdown and HTML.</li>
+<li>All URLs have been updated in the TOC.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Guild configuration format documentation has been added.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/release-1.2.7...release-1.3.0">1.3.0</a> -- 2013-06-09</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed handling of a kick from a guild.</li>
+<li>Fixed variable names for input validation in GwStringHash().</li>
+</ul>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Simplified the unpacking of inter-guild messages.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added support for a newer, compact configuration format.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/release-1.2.6...release-1.2.7">1.2.7</a> -- 2013-02-27</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Updated TOC for WoW 5.2.0.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/release-1.2.5...release-1.2.6">1.2.6</a> -- 2012-12-04</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Updated TOC for WoW 5.1.0.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/release-1.2.4...release-1.2.5">1.2.5</a> -- 2012-09-01</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Localized _ to avoid the taint issues with glyphs in 5.0.4.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/release-1.2.3...release-1.2.4">1.2.4</a> -- 2012-08-29</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Updated TOC for WoW 5.0.4.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/release-1.2.2...release-1.2.3">1.2.3</a> -- 2012-08-25</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Replaced the 32-bit string hash used to obfuscate channel names in the debugging output with a standard CRC-16-CCITT implementation to avoid overflow issues with <code>string.format()</code> in MoP.</li>
+<li>Made some changes to the debugging code to improve visibility into message passing and replication.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added extra debugging information for current guild information.</li>
+<li>Added value checking for missing coguild ID in GwSendConfederationMsg().</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/release-1.2.1...release-1.2.2">1.2.2</a> -- 2012-11-12</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed officer chat bridging for the guild leader.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/release-1.2.0...release-1.2.1">1.2.1</a> -- 2011-11-29</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Updated TOC for WoW version 4.3.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added link to LemonKing's add-on in the documentation.</li>
+<li>Documented prequisites.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.1.07...release-1.2.0">1.2.0</a> -- 2011-11-26</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed unnecessary channel resets due to configuration reload.</li>
+<li>Fixed behavior during UI reload.</li>
+<li>Corrected join/leave handling.</li>
+<li>Corrected case statement for handling chat events.</li>
+</ul>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Switched to <a href="http://semver.org/">Semantic Versioning</a>.</li>
+<li>Separated guild info parsing from the <code>GwRefreshComms()</code> function.</li>
+<li>Factored out some ugly flags.</li>
+<li>Cleaned up CLI configuration.</li>
+<li>Cleaned up debugging output.</li>
+<li>Cleaned up guild info handling.</li>
+<li>Parameterized all channel control functions.</li>
+<li>Masked all channel names and passwords in debugging output.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added officer chat support.</li>
+<li>Added message queuing.</li>
+<li>Added a GwIsOfficer() check to the officer chat configuration phase to avoid pointless work.</li>
+<li>Added broadcast message type.</li>
+<li>Added broadcasts of guild join and leave events.</li>
+<li>Added broadcasts of promote and demote messages.</li>
+<li>Added hold-down for reconfiguration.</li>
+<li>Added broadcast receiver code.</li>
+<li>Added string hash to determine changes in text fields.</li>
+<li>Added error checking for officer note parsing failure.</li>
+<li>Added README.txt and GUILD_QUICKSTART.txt.</li>
+</ul>
+
+<h3>Removed</h3>
+
+<ul>
+<li>Removed channel protection code.</li>
+<li>Removed SHA1 library.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.1.06...v1.1.07">1.1.07</a> -- 2011-06-28</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Updated TOC for WoW version 4.2.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.1.05...v1.1.06">1.1.06</a> -- 2011-03-21</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Babel now disabled by default.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.1.04...v1.1.05">1.1.05</a> -- 2011-03-21</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Moved scan of chat windows to chat message event handlers.</li>
+<li>Sorted clauses in the main event switch for legibility.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added <code>GwReplicateMessage()</code> function.</li>
+<li>Added RegisterAddonMessagePrefix call for 4.1 changes.</li>
+<li>Added Babel.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.1.03...v1.1.04">1.1.04</a> -- 2011-01-15</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Minor updates for Curse packager.</li>
+<li>Cleaned up status display code.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added BSD-derived license.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.1.02...v1.1.03">1.1.03</a> -- 2011-01-14</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Moved <code>GuildRoster</code> call to PLAYER_LOGIN handler.</li>
+<li>Limited conditions under which reinitialization occurred on PLAYER_GUILD_UPDATE.</li>
+<li>Renamed <code>gwPlayerGuild</code> to <code>gwGuildName</code>.</li>
+<li>Cleaned up prep/refresh/join flow for connecting to the common channel.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added a delay mechanism to prevent hijacking of general channel.</li>
+<li>Added connection statistics gathering.</li>
+<li>Added LuaDoc data for functions and procedures.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.1.01...v1.1.02">1.1.02</a> -- 2010-12-11</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed missing assignment of channel number on join.</li>
+</ul>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Redacted sensitive data in the status output.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added hold-downs for join and configuration messages.</li>
+<li>Added a configuration flag to enable replication of achievement messages.</li>
+<li>Added frame identifier to Tx debug messages.</li>
+<li>Added help text with command listing.</li>
+</ul>
+
+<h3>Removed</h3>
+
+<ul>
+<li>Removed tabs from the source code!</li>
+<li>Removed event registration for channel leave events.</li>
+<li>Removed squelch message on reload flood.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.1.00...v1.1.01">1.1.01</a> -- 2010-12-06</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed status output when no channel has been configured.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added co-guild tagging.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.18...v1.1.00">1.1.00</a> -- 2010-12-05</h2>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added announcement flag check for logout announcements.</li>
+</ul>
+
+<h3>Removed</h3>
+
+<ul>
+<li>Removed unused moderation release code.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.17...v1.0.18">1.0.18</a> -- 2010-12-04</h2>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added options line to configuration.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.16...v1.0.17">1.0.17</a> -- 2010-12-04</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed SavedVariables processing.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.15...v1.0.16">1.0.16</a> -- 2010-12-04</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Removed moderator handling and switched to better handling of owner status.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.14...v1.0.15">1.0.15</a> -- 2010-12-03</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Removed faulty <code>tContains()</code> for <code>gwPeerTable</code> checks to stop prolific kicking.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.13...v1.0.14">1.0.14</a> -- 2010-12-03</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed missing argument to <code>GetGuildInfo()</code>.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.12...v1.0.13">1.0.13</a> -- 2010-12-03</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Updated guild change/update handling.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.11...v1.0.12">1.0.12</a> -- 2010-12-03</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed /who and channel join event processing.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.10...v1.0.11">1.0.11</a> -- 2010-12-03</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Limited handling of channel owner/moderator changes to the common channel.</li>
+</ul>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Simplified and improved <code>GwIsConnected()</code>.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added a nil result check for the system message regex.</li>
+<li>Added gratuitous container officer response on channel join.</li>
+<li>Suspend confederation messages until container ID is known.</li>
+<li>Limit scope of the channel debugging.</li>
+</ul>
+
+<h3>Removed</h3>
+
+<ul>
+<li>Removed proactive channel leave before a join.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.09...v1.0.10">1.0.10</a> -- 2010-11-22</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Rewrote guild lookups.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added extra slash commands.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.08...v1.0.09">1.0.09</a> -- 2010-11-21</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Missing negation in channel defense code.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.07...v1.0.08">1.0.08</a> -- 2010-11-21</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Corrected guild join handling.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added more debugging code.</li>
+</ul>
+
+<h3>Removed</h3>
+
+<ul>
+<li>Removed channel bans.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.06...v1.0.07">1.0.07</a> -- 2010-11-17</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Typos in variable names.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.05...v1.0.06">1.0.06</a> -- 2010-11-13</h2>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added online/offline notices.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.04...v1.0.05">1.0.05</a> -- 2010-11-13</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed the placement and use of <code>GwLeaveChannel()</code>.</li>
+</ul>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Changed container messaging system to generalize the request message type.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.03...v1.0.04">1.0.04</a> -- 2010-11-13</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed container recognition in configuration processing.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added debugging output to slash command handling.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.02...v1.0.03">1.0.03</a> -- 2010-11-12</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Changed configuration to support common configurations across co-guilds.</li>
+<li>Refactored configuration parsing.</li>
+<li>Cleaned up slash command handling.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added variable field to the saved variables.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.01...v1.0.02">1.0.02</a> -- 2010-11-12</h2>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added container IDs to channel messages to avoid duplicates within the same co-guild.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v1.0.00...v1.0.01">1.0.01</a> -- 2010-11-12</h2>
+
+<h3>Added</h3>
+
+<ul>
+<li>Brought back GUILD_ROSTER_UPDATE to get around the guild info loading delay.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v0.9.02...v1.0.00">1.0.00</a> -- 2010-11-11</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Cleaned up debugging statements.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added moderator/owner status handling.</li>
+<li>Added kick/ban handling for interlopers.</li>
+<li>Added channel leave if player leaves the guild.</li>
+<li>Finished defensive ownership/moderation handling.</li>
+<li>Added handling for guild achievements.</li>
+<li>Added forced reload.</li>
+</ul>
+
+<h3>Removed</h3>
+
+<p>-Removed GUILD_ROSTER_UPDATE event handling.</p>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v0.9.01...v0.9.02">0.9.02</a> -- 2010-11-06</h2>
+
+<h3>Fixed</h3>
+
+<ul>
+<li>Fixed parsing of peer entries in configuration.</li>
+</ul>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Expanded debugging code.</li>
+</ul>
+
+<h3>Removed</h3>
+
+<ul>
+<li>Removed slash command code, left stub.</li>
+</ul>
+
+<h2>
+<a href="https://github.com/AIE-Guild/GreenWall/compare/v0.9.00...v0.9.01">0.9.01</a> -- 2010-11-06</h2>
+
+<h3>Changed</h3>
+
+<ul>
+<li>Abstracted several functions.</li>
+</ul>
+
+<h3>Added</h3>
+
+<ul>
+<li>Added peer configuration entries.</li>
+</ul>
+
+<h2>0.9.00 -- 2010-11-01</h2>
+
+<p>Initial commit.</p>
+</body>
+</html>
+<!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->

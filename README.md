@@ -9,9 +9,6 @@ This add-on replicates guild chat and achievement spam between multiple guilds.
  
 The add-on's functionality is very close to LemonKing's Cross Guild Chat, but the management interface (or lack of one in GreenWall's case) is very different.
  
-[http://wow.curse.com/downloads/wow-addons/details/crossguildchat_lk.aspx](http://wow.curse.com/downloads/wow-addons/details/crossguildchat_lk.aspx)
-
- 
 - Do I need to be a member of Alea Iacta Est to use it?
 
 No, it was written to be guild-agnostic.  While it addresses a specific need that we had, it was designed to work for any guild that's larger than the limit.
@@ -26,17 +23,16 @@ No, you don't. But guild chat will be very, very frustrating for you if you don'
 
 The latest version is available at the following locations.
 
-[https://github.com/AIE-Guild/GreenWall/releases](https://github.com/AIE-Guild/GreenWall/releases)
-
-[http://wow.curse.com/downloads/wow-addons/details/greenwall.aspx](http://wow.curse.com/downloads/wow-addons/details/greenwall.aspx)
+- [GitHub](https://github.com/AIE-Guild/GreenWall/releases)
+- [Curse](http://www.curse.com/addons/wow/greenwall)
 
 It is also mirrored in WoWMatrix, but we make no guarantees about how frequently WoWMatrix updates or the integrity of the files that it provides.
 
-[http://www.wowmatrix.com/](http://www.wowmatrix.com/)
+ - [WoWMatrix](http://www.wowmatrix.com/)
 
 You can also check out the latest version from the GitHub repository, if you are technically inclined and foolhardy enough to run pre-release code.
 
-[https://github.com/AIE-Guild/GreenWall](https://github.com/AIE-Guild/GreenWall)
+[GitHub](https://github.com/AIE-Guild/GreenWall)
 
 
 ## Prerequisites ##
