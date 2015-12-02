@@ -153,7 +153,12 @@ function GwChannel:join()
         return false
     end
 
-    if not self:is_connected() then
+    if self:is_connected() then
+    
+        -- Already connected
+        return true
+    
+    else
 
         gw.Debug(GW_LOG_INFO, 'joining channel; channel=%s, password=%s',
                 gw.Redact(self.name), gw.Redact(self.password))
