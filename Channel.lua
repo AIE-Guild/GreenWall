@@ -196,8 +196,10 @@ function GwChannel:join()
                 end
             end
     
-            -- Gratuitous officer announcement
-            gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
+            -- Gratuitous officer announcement, veracity of the claim should be verified by the receiver.
+            if gw.IsOfficer() then
+                gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
+            end
     
             return true
     

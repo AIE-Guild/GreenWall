@@ -3,6 +3,9 @@
 This project uses to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+### Fixed
+- A check is now done for officer status before sending a gratuitious officer announcement.
+
 ### Added
 - Added Markdown change log.
 
