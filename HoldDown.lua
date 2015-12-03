@@ -92,6 +92,10 @@ end
 
 --- Continue the hold down, scaling the interval.
 function GwHoldDown:continue()
+    if self.timestamp == 0 then
+        return self:start()
+    end
+    
     local interval = self.interval * 2 ^ (self.scale + 1)
     if interval > self.limit then
         interval = interval / 2
