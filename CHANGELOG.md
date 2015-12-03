@@ -5,9 +5,11 @@ This project uses to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 ### Fixed
 - A check is now done for officer status before sending a gratuitious officer announcement.
+- Added officer note data validation before parsing.
 
 ### Added
 - Added Markdown change log.
+- Added channel-specific hold downs for join failures.
 
 ## [1.6.5] -- 2015-06-24
 ### Changed
