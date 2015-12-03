@@ -29,10 +29,12 @@ GwHoldDown.__index = GwHoldDown
 
 --- GwHoldDown constructor function.
 -- @param interval The length, in seconds, of the hold-down interval.
--- @param limit The maximum hold time when the continue method is invoked.
+-- @param limit The maximum hold time when the continue method is invoked.  
+-- If no value is supplied, the interval value is used.
 -- @return An initialized GwHoldDown instance.
 function GwHoldDown:new(interval, limit)
     assert(type(interval) == 'number')
+    assert(type(limit) == 'number' or limit == nil)
     local self = {}
     setmetatable(self, GwHoldDown)
     self.interval = interval
@@ -92,21 +94,24 @@ end
 
 --- Continue the hold down, scaling the interval.
 function GwHoldDown:continue()
+    -- Pass-through for first invocation
     if self.timestamp == 0 then
         return self:start()
     end
     
-    local interval = self.interval * 2 ^ (self.scale + 1)
-    if interval > self.limit then
-        interval = interval / 2
-    else
+    -- Increase scaling factor
+    if self.interval * 2 ^ (self.scale + 1) <= self.limit then
         self.scale = self.scale + 1
     end
+    
+    -- Set the timer
     local t = time()
-    local expiry = t + interval
+    local expiry = t + self.interval * 2 ^ self.scale
     self.timestamp = t
+    
     gw.Debug(GW_LOG_NOTICE, 'hold-down continue; timer=%s, timestamp=%d, scale=%d, expiry=%d',
             tostring(self), self.timestamp, self.scale, expiry)
+
     return expiry
 end
 
