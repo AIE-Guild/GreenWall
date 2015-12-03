@@ -275,9 +275,9 @@ function GwConfig:load()
     -- Officer note
     if GreenWall.ochat then
         local note = get_gm_officer_note()
-        if note then
+        if note and note ~= '' then
             local cname, cpass = string.match(note, 'GW:?a:([%w_]*):([%w_]*)')
-            if cname and cname~= '' then
+            if cname and cname ~= '' then
                 self.channel.officer:configure(1, cname, cpass)
             else
                 gw.Error('invalid officer channel name specified')
