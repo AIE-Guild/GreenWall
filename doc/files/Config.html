@@ -91,18 +91,13 @@
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><a href="#GwConfig:IsContainer">GwConfig:IsContainer</a>&nbsp;(guild)</td>
-	<td class="summary">Check a guild for membership within the confederation.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#GwConfig:IsPeer">GwConfig:IsPeer</a>&nbsp;(guild)</td>
-	<td class="summary">Check a guild for peer status.</td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#GwConfig:dump">GwConfig:dump</a>&nbsp;(keep)</td>
 	<td class="summary">Dump configuration attributes.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwConfig:dump_status">GwConfig:dump_status</a>&nbsp;()</td>
+	<td class="summary">Dump a status summary.</td>
 	</tr>
 
 	<tr>
@@ -113,6 +108,16 @@
 	<tr>
 	<td class="name" nowrap><a href="#GwConfig:initialize_state">GwConfig:initialize_state</a>&nbsp;()</td>
 	<td class="summary">Initialize a GwConfig object with the default state.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwConfig:is_container">GwConfig:is_container</a>&nbsp;(guild)</td>
+	<td class="summary">Check a guild for membership within the confederation.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwConfig:is_peer">GwConfig:is_peer</a>&nbsp;(guild)</td>
+	<td class="summary">Check a guild for peer status.</td>
 	</tr>
 
 	<tr>
@@ -131,7 +136,7 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwConfig:refreshChannels">GwConfig:refreshChannels</a>&nbsp;()</td>
+	<td class="name" nowrap><a href="#GwConfig:refresh_channels">GwConfig:refresh_channels</a>&nbsp;()</td>
 	<td class="summary">Refresh the channel state.</td>
 	</tr>
 
@@ -163,64 +168,6 @@
 
 
 
-<dt><a name="GwConfig:IsContainer"></a><strong>GwConfig:IsContainer</strong>&nbsp;(guild)</dt>
-<dd>
-Check a guild for membership within the confederation.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>guild</em></code>: The name of the guild to check.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the target guild is in the confederation, false otherwise.</ul>
-
-
-
-</dd>
-
-
-
-
-<dt><a name="GwConfig:IsPeer"></a><strong>GwConfig:IsPeer</strong>&nbsp;(guild)</dt>
-<dd>
-Check a guild for peer status.
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>guild</em></code>: The name of the guild to check.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the target guild is a peer co-guild, false otherwise.</ul>
-
-
-
-</dd>
-
-
-
-
 <dt><a name="GwConfig:dump"></a><strong>GwConfig:dump</strong>&nbsp;(keep)</dt>
 <dd>
 Dump configuration attributes.
@@ -234,6 +181,23 @@ Dump configuration attributes.
 	</li>
 	
 </ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwConfig:dump_status"></a><strong>GwConfig:dump_status</strong>&nbsp;()</dt>
+<dd>
+Dump a status summary.
+
 
 
 
@@ -287,6 +251,64 @@ Initialize a GwConfig object with the default state.
 
 
 
+<dt><a name="GwConfig:is_container"></a><strong>GwConfig:is_container</strong>&nbsp;(guild)</dt>
+<dd>
+Check a guild for membership within the confederation.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>guild</em></code>: The name of the guild to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the target guild is in the confederation, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwConfig:is_peer"></a><strong>GwConfig:is_peer</strong>&nbsp;(guild)</dt>
+<dd>
+Check a guild for peer status.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>guild</em></code>: The name of the guild to check.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if the target guild is a peer co-guild, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
 <dt><a name="GwConfig:load"></a><strong>GwConfig:load</strong>&nbsp;()</dt>
 <dd>
 Parse the guild information page to gather configuration information.
@@ -329,7 +351,7 @@ GwConfig constructor function.
 
 <dt><a name="GwConfig:refresh"></a><strong>GwConfig:refresh</strong>&nbsp;()</dt>
 <dd>
-Initiate a refresh of the configuration. This is a periodic or user-initiated update.
+Initiate a refresh of the configuration. This is a reload protected by a hold-down timer.
 
 
 
@@ -347,7 +369,7 @@ Initiate a refresh of the configuration. This is a periodic or user-initiated up
 
 
 
-<dt><a name="GwConfig:refreshChannels"></a><strong>GwConfig:refreshChannels</strong>&nbsp;()</dt>
+<dt><a name="GwConfig:refresh_channels"></a><strong>GwConfig:refresh_channels</strong>&nbsp;()</dt>
 <dd>
 Refresh the channel state.
 
@@ -366,7 +388,7 @@ Refresh the channel state.
 
 <dt><a name="GwConfig:reload"></a><strong>GwConfig:reload</strong>&nbsp;()</dt>
 <dd>
-Initiate a reload of the configuration. This is similar to a refresh, but is not subject to the hold-down.
+Initiate a reload of the configuration.
 
 
 

@@ -266,7 +266,7 @@ Transmit Methods
 --     GW_MTYPE_NOTICE
 --     GW_MTYPE_REQUEST
 --     GW_MTYPE_ADDON
--- @param message Text of the message.
+-- @param ... Text of the message.
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
     local message = self:al_encode(type, ...)
