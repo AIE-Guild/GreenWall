@@ -1,6 +1,6 @@
 # Change Log
 
-This project uses to [Semantic Versioning](http://semver.org/).
+This project uses [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 ### Fixed
