@@ -29,23 +29,38 @@ GwHoldDown.__index = GwHoldDown
 
 --- GwHoldDown constructor function.
 -- @param interval The length, in seconds, of the hold-down interval.
+-- @param limit The maximum hold time when the continue method is invoked.  
+-- If no value is supplied, the interval value is used.
 -- @return An initialized GwHoldDown instance.
-function GwHoldDown:new(interval)
+function GwHoldDown:new(interval, limit)
     assert(type(interval) == 'number')
+    assert(type(limit) == 'number' or limit == nil)
     local self = {}
     setmetatable(self, GwHoldDown)
     self.interval = interval
+    if limit then
+        self.limit = limit
+    else
+        self.limit = interval
+    end
     self.timestamp = 0
+    self.scale = 0
     return self
 end
 
 --- Update the timer interval.
 -- @param interval The length, in seconds, of the hold-down interval.
+-- @param limit The maximum hold time when the continue method is invoked.
 -- @return The GwHoldDown instance.
-function GwHoldDown:set(interval)
+function GwHoldDown:set(interval, limit)
     assert(type(interval) == 'number')
-    gw.Debug(GW_LOG_DEBUG, 'hold-down set; timer=%s, interval=%d', tostring(self), interval)
+    gw.Debug(GW_LOG_DEBUG, 'hold-down set; timer=%s, interval=%d, limit=%s', tostring(self), interval, tostring(limit))
     self.interval = interval
+    if limit then
+        self.limit = limit
+    else
+        self.limit = interval
+    end
     return self
 end
 
@@ -67,6 +82,7 @@ function GwHoldDown:start(f)
     local t = time()
     local expiry = t + self.interval
     self.timestamp = t
+    self.scale = 0
     
     local frame = CreateFrame('frame')
     frame:SetScript('OnUpdate', handler)
@@ -76,9 +92,33 @@ function GwHoldDown:start(f)
     return expiry
 end
 
+--- Continue the hold down, scaling the interval.
+function GwHoldDown:continue()
+    -- Pass-through for first invocation
+    if self.timestamp == 0 then
+        return self:start()
+    end
+    
+    -- Increase scaling factor
+    if self.interval * 2 ^ (self.scale + 1) <= self.limit then
+        self.scale = self.scale + 1
+    end
+    
+    -- Set the timer
+    local t = time()
+    local expiry = t + self.interval * 2 ^ self.scale
+    self.timestamp = t
+    
+    gw.Debug(GW_LOG_NOTICE, 'hold-down continue; timer=%s, timestamp=%d, scale=%d, expiry=%d',
+            tostring(self), self.timestamp, self.scale, expiry)
+
+    return expiry
+end
+
 --- Clear the hold-down timer.
 function GwHoldDown:clear()
     self.timestamp = 0
+    self.scale = 0
     gw.Debug(GW_LOG_NOTICE, 'hold-down cleared; timer=%s', tostring(self))
 end
 
@@ -86,7 +126,7 @@ end
 -- @return True if a hold-down is in effect, false otherwise.
 function GwHoldDown:hold()
     local t = time()
-    return self.timestamp + self.interval > t
+    return self.timestamp + self.interval * 2 ^ self.scale > t
 end
 
 

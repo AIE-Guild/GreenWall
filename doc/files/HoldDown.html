@@ -96,18 +96,28 @@
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#GwHoldDown:continue">GwHoldDown:continue</a>&nbsp;()</td>
+	<td class="summary">Continue the hold down, scaling the interval.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#GwHoldDown:hold">GwHoldDown:hold</a>&nbsp;()</td>
 	<td class="summary">Test the hold-down status.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwHoldDown:new">GwHoldDown:new</a>&nbsp;(interval)</td>
+	<td class="name" nowrap><a href="#GwHoldDown:new">GwHoldDown:new</a>&nbsp;(interval, limit)</td>
 	<td class="summary">GwHoldDown constructor function.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwHoldDown:set">GwHoldDown:set</a>&nbsp;()</td>
-	<td class="summary">Set the start of the hold-down interval.</td>
+	<td class="name" nowrap><a href="#GwHoldDown:set">GwHoldDown:set</a>&nbsp;(interval, limit)</td>
+	<td class="summary">Update the timer interval.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwHoldDown:start">GwHoldDown:start</a>&nbsp;(f)</td>
+	<td class="summary">Start the hold-down interval.</td>
 	</tr>
 
 	<tr>
@@ -148,8 +158,22 @@ Clear the hold-down timer.
 
 
 
-<h3>Return value:</h3>
-<ul>The time at which the interval will end.</ul>
+
+
+</dd>
+
+
+
+
+<dt><a name="GwHoldDown:continue"></a><strong>GwHoldDown:continue</strong>&nbsp;()</dt>
+<dd>
+Continue the hold down, scaling the interval.
+
+
+
+
+
+
 
 
 
@@ -178,7 +202,7 @@ Test the hold-down status.
 
 
 
-<dt><a name="GwHoldDown:new"></a><strong>GwHoldDown:new</strong>&nbsp;(interval)</dt>
+<dt><a name="GwHoldDown:new"></a><strong>GwHoldDown:new</strong>&nbsp;(interval, limit)</dt>
 <dd>
 GwHoldDown constructor function.
 
@@ -188,6 +212,10 @@ GwHoldDown constructor function.
 	
 	<li>
 	  <code><em>interval</em></code>: The length, in seconds, of the hold-down interval.
+	</li>
+	
+	<li>
+	  <code><em>limit</em></code>: The maximum hold time when the continue method is invoked. If no value is supplied, the interval value is used.
 	</li>
 	
 </ul>
@@ -207,10 +235,52 @@ GwHoldDown constructor function.
 
 
 
-<dt><a name="GwHoldDown:set"></a><strong>GwHoldDown:set</strong>&nbsp;()</dt>
+<dt><a name="GwHoldDown:set"></a><strong>GwHoldDown:set</strong>&nbsp;(interval, limit)</dt>
 <dd>
-Set the start of the hold-down interval.
+Update the timer interval.
 
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>interval</em></code>: The length, in seconds, of the hold-down interval.
+	</li>
+	
+	<li>
+	  <code><em>limit</em></code>: The maximum hold time when the continue method is invoked.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The GwHoldDown instance.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwHoldDown:start"></a><strong>GwHoldDown:start</strong>&nbsp;(f)</dt>
+<dd>
+Start the hold-down interval.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>f</em></code>: (optional) A callback function that will be called when the timer expires.
+	</li>
+	
+</ul>
 
 
 

@@ -91,23 +91,38 @@
 <table class="function_list">
 
 	<tr>
+	<td class="name" nowrap><a href="#GwChannel:age">GwChannel:age</a>&nbsp;()</td>
+	<td class="summary">Mark the channel as stale.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#GwChannel:clear">GwChannel:clear</a>&nbsp;()</td>
 	<td class="summary">Clear the channel configuration.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannel:configure">GwChannel:configure</a>&nbsp;(version, name, password)</td>
+	<td class="name" nowrap><a href="#GwChannel:configure">GwChannel:configure</a>&nbsp;(cversion, name, password)</td>
 	<td class="summary">Configure the channel.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannel:isConfigured">GwChannel:isConfigured</a>&nbsp;()</td>
+	<td class="name" nowrap><a href="#GwChannel:dump_status">GwChannel:dump_status</a>&nbsp;(label)</td>
+	<td class="summary">Dump the channel status.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:is_configured">GwChannel:is_configured</a>&nbsp;()</td>
 	<td class="summary">Test if the channel is configured.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannel:isConnected">GwChannel:isConnected</a>&nbsp;()</td>
+	<td class="name" nowrap><a href="#GwChannel:is_connected">GwChannel:is_connected</a>&nbsp;()</td>
 	<td class="summary">Check if a connection exists to the custom channel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:is_stale">GwChannel:is_stale</a>&nbsp;()</td>
+	<td class="summary">Check if channel configuration is stale.</td>
 	</tr>
 
 	<tr>
@@ -131,22 +146,22 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannel:send">GwChannel:send</a>&nbsp;(type, ..., message)</td>
+	<td class="name" nowrap><a href="#GwChannel:send">GwChannel:send</a>&nbsp;(type, ...)</td>
 	<td class="summary">Sends an encoded message on the shared channel.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannel:tlDequeue">GwChannel:tlDequeue</a>&nbsp;()</td>
+	<td class="name" nowrap><a href="#GwChannel:tl_dequeue">GwChannel:tl_dequeue</a>&nbsp;()</td>
 	<td class="summary">Remove a segment from the channel transmit queue.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannel:tlEnqueue">GwChannel:tlEnqueue</a>&nbsp;(segment)</td>
+	<td class="name" nowrap><a href="#GwChannel:tl_enqueue">GwChannel:tl_enqueue</a>&nbsp;(segment)</td>
 	<td class="summary">Add a segment to the channel transmit queue.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#GwChannel:tlFlush">GwChannel:tlFlush</a>&nbsp;()</td>
+	<td class="name" nowrap><a href="#GwChannel:tl_flush">GwChannel:tl_flush</a>&nbsp;()</td>
 	<td class="summary">Transmit all messages in the channel transmit queue.</td>
 	</tr>
 
@@ -168,6 +183,23 @@
 
 
 
+<dt><a name="GwChannel:age"></a><strong>GwChannel:age</strong>&nbsp;()</dt>
+<dd>
+Mark the channel as stale.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="GwChannel:clear"></a><strong>GwChannel:clear</strong>&nbsp;()</dt>
 <dd>
 Clear the channel configuration.
@@ -185,7 +217,7 @@ Clear the channel configuration.
 
 
 
-<dt><a name="GwChannel:configure"></a><strong>GwChannel:configure</strong>&nbsp;(version, name, password)</dt>
+<dt><a name="GwChannel:configure"></a><strong>GwChannel:configure</strong>&nbsp;(cversion, name, password)</dt>
 <dd>
 Configure the channel.
 
@@ -194,7 +226,7 @@ Configure the channel.
 <ul>
 	
 	<li>
-	  <code><em>version</em></code>: Messaging version.
+	  <code><em>cversion</em></code>: Configuration version.
 	</li>
 	
 	<li>
@@ -219,7 +251,33 @@ Configure the channel.
 
 
 
-<dt><a name="GwChannel:isConfigured"></a><strong>GwChannel:isConfigured</strong>&nbsp;()</dt>
+<dt><a name="GwChannel:dump_status"></a><strong>GwChannel:dump_status</strong>&nbsp;(label)</dt>
+<dd>
+Dump the channel status.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>label</em></code>: An identifier for the channel.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:is_configured"></a><strong>GwChannel:is_configured</strong>&nbsp;()</dt>
 <dd>
 Test if the channel is configured.
 
@@ -239,7 +297,7 @@ Test if the channel is configured.
 
 
 
-<dt><a name="GwChannel:isConnected"></a><strong>GwChannel:isConnected</strong>&nbsp;()</dt>
+<dt><a name="GwChannel:is_connected"></a><strong>GwChannel:is_connected</strong>&nbsp;()</dt>
 <dd>
 Check if a connection exists to the custom channel.
 
@@ -251,6 +309,26 @@ Check if a connection exists to the custom channel.
 
 <h3>Return value:</h3>
 <ul>True if connected, otherwise false.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:is_stale"></a><strong>GwChannel:is_stale</strong>&nbsp;()</dt>
+<dd>
+Check if channel configuration is stale.
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if stale, false otherwise.</ul>
 
 
 
@@ -352,7 +430,7 @@ Handler for data received on a channel.
 
 
 
-<dt><a name="GwChannel:send"></a><strong>GwChannel:send</strong>&nbsp;(type, ..., message)</dt>
+<dt><a name="GwChannel:send"></a><strong>GwChannel:send</strong>&nbsp;(type, ...)</dt>
 <dd>
 Sends an encoded message on the shared channel.
 
@@ -365,11 +443,7 @@ Sends an encoded message on the shared channel.
 	</li>
 	
 	<li>
-	  <code><em>...</em></code>: 
-	</li>
-	
-	<li>
-	  <code><em>message</em></code>: Text of the message.
+	  <code><em>...</em></code>: Text of the message.
 	</li>
 	
 </ul>
@@ -386,7 +460,7 @@ Sends an encoded message on the shared channel.
 
 
 
-<dt><a name="GwChannel:tlDequeue"></a><strong>GwChannel:tlDequeue</strong>&nbsp;()</dt>
+<dt><a name="GwChannel:tl_dequeue"></a><strong>GwChannel:tl_dequeue</strong>&nbsp;()</dt>
 <dd>
 Remove a segment from the channel transmit queue.
 
@@ -406,7 +480,7 @@ Remove a segment from the channel transmit queue.
 
 
 
-<dt><a name="GwChannel:tlEnqueue"></a><strong>GwChannel:tlEnqueue</strong>&nbsp;(segment)</dt>
+<dt><a name="GwChannel:tl_enqueue"></a><strong>GwChannel:tl_enqueue</strong>&nbsp;(segment)</dt>
 <dd>
 Add a segment to the channel transmit queue.
 
@@ -435,7 +509,7 @@ Add a segment to the channel transmit queue.
 
 
 
-<dt><a name="GwChannel:tlFlush"></a><strong>GwChannel:tlFlush</strong>&nbsp;()</dt>
+<dt><a name="GwChannel:tl_flush"></a><strong>GwChannel:tl_flush</strong>&nbsp;()</dt>
 <dd>
 Transmit all messages in the channel transmit queue.
 

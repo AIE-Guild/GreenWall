@@ -135,10 +135,7 @@ end
 
 
 --- Sends an encoded message to the rest of the same container on the add-on channel.
--- @param type The message type.
--- @field GW_MTYPE_CONTROL Control command.
--- @field GW_MTYPE_REQUEST Control request.
--- @field GW_MTYPE_RESPONSE Control response.
+-- @param type The message type: GW_MTYPE_CONTROL, GW_MTYPE_REQUEST, or GW_MTYPE_RESPONSE.
 -- @param message Text of the message.
 function gw.SendLocal(type, message)
 
