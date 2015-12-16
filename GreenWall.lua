@@ -347,8 +347,12 @@ function GreenWall_OnEvent(self, event, ...)
         --
         gw.addon_loaded = true
         gw.Write('v%s loaded.', gw.version)
-        
         gw.Debug(GW_LOG_DEBUG, 'loading complete; name=%s, realm=%s', gw.player, gw.realm)
+        
+        --
+        -- Apply compatibility workarounds
+        --
+        gw.EnableCompatibility()
         
     end            
         
