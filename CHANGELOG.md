@@ -4,7 +4,7 @@ This project uses [Semantic Versioning](http://semver.org/).
 
 ## [1.6.6] -- 2015-12-16
 ### Fixed
-- A check is now done for officer status before sending a gratuitious officer announcement.
+- A check is now done for officer status before sending a gratuitous officer announcement.
 - Added officer note data validation before parsing.
 
 ### Added
