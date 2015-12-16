@@ -30,15 +30,18 @@ Global Variables
 
 --]]-----------------------------------------------------------------------
 
+--
+-- State variables
+--
 gw = {
     frame_table     = {},
     addon_loaded    = false,
 }
-
 gw.version      = GetAddOnMetadata('GreenWall', 'Version')
 gw.realm        = GetRealmName()
 gw.player       = UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
 gw.guild_status = ''
+
 
 --
 -- Default configuration values

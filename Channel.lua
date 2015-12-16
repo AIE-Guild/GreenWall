@@ -58,6 +58,7 @@ function GwChannel:initialize()
     self.password = ''
     self.number = 0
     self.stale = true
+    self.fdelay = GwHoldDown:new(GW_CHANNEL_FAILURE_HOLD, GW_CHANNEL_FAILURE_HOLD_MAX)
     self.tx_queue = {}
     self.tx_hash = {}
     self.rx_queue = {}
@@ -148,12 +149,23 @@ end
 -- @return True if connection success, false otherwise.
 function GwChannel:join()
 
-    -- Only join if we have the channel details
+    
     if not self:is_configured() then
+    
+        -- Only join if we have the channel details
         return false
-    end
+    
+    elseif self.fdelay:hold() then
 
-    if not self:is_connected() then
+        -- Hold down in effect.
+        return false
+
+    elseif self:is_connected() then
+    
+        -- Already connected
+        return true
+    
+    else
 
         gw.Debug(GW_LOG_INFO, 'joining channel; channel=%s, password=%s',
                 gw.Redact(self.name), gw.Redact(self.password))
@@ -164,12 +176,14 @@ function GwChannel:join()
     
             gw.Error('cannot create communication channel: %s', gw.Redact(self.name))
             self.stats.fconn = self.stats.fconn + 1
+            self.fdelay:continue()
             return false
     
         else
     
             self.number = number
             self.stats.sconn = self.stats.sconn + 1
+            self.fdelay:clear()
             gw.Debug(GW_LOG_NOTICE, 'joined channel; number=%d, name=%s, password=%s',
                     self.number, gw.Redact(self.name), gw.Redact(self.password))
             gw.Write('Connected to confederation on channel %d.', self.number)
@@ -191,8 +205,10 @@ function GwChannel:join()
                 end
             end
     
-            -- Gratuitous officer announcement
-            gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
+            -- Gratuitous officer announcement, veracity of the claim should be verified by the receiver.
+            if gw.IsOfficer() then
+                gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
+            end
     
             return true
     
@@ -250,7 +266,7 @@ Transmit Methods
 --     GW_MTYPE_NOTICE
 --     GW_MTYPE_REQUEST
 --     GW_MTYPE_ADDON
--- @param message Text of the message.
+-- @param ... Text of the message.
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
     local message = self:al_encode(type, ...)

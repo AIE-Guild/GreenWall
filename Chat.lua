@@ -121,7 +121,7 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
                 local frame = 'ChatFrame' .. i
                 if _G[frame] then
                     gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%s', frame, event, sender, message)
-                    ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message, sender, language, '', target, flags, 0, 0, '', 0, 0, guid)
+                    gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message, sender, language, '', target, flags, 0, 0, '', 0, 0, guid)
                 end
                 break
                         
@@ -135,10 +135,7 @@ end
 
 
 --- Sends an encoded message to the rest of the same container on the add-on channel.
--- @param type The message type.
--- @field GW_MTYPE_CONTROL Control command.
--- @field GW_MTYPE_REQUEST Control request.
--- @field GW_MTYPE_RESPONSE Control response.
+-- @param type The message type: GW_MTYPE_CONTROL, GW_MTYPE_REQUEST, or GW_MTYPE_RESPONSE.
 -- @param message Text of the message.
 function gw.SendLocal(type, message)
 

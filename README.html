@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html>
 <head>
 <title>README</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -332,6 +332,121 @@ img {
 .highlight .vg { color: #008080 } /* Name.Variable.Global */
 .highlight .vi { color: #008080 } /* Name.Variable.Instance */
 .highlight .il { color: #009999 } /* Literal.Number.Integer.Long */
+.pl-c {
+    color: #969896;
+}
+
+.pl-c1,.pl-mdh,.pl-mm,.pl-mp,.pl-mr,.pl-s1 .pl-v,.pl-s3,.pl-sc,.pl-sv {
+    color: #0086b3;
+}
+
+.pl-e,.pl-en {
+    color: #795da3;
+}
+
+.pl-s1 .pl-s2,.pl-smi,.pl-smp,.pl-stj,.pl-vo,.pl-vpf {
+    color: #333;
+}
+
+.pl-ent {
+    color: #63a35c;
+}
+
+.pl-k,.pl-s,.pl-st {
+    color: #a71d5d;
+}
+
+.pl-pds,.pl-s1,.pl-s1 .pl-pse .pl-s2,.pl-sr,.pl-sr .pl-cce,.pl-sr .pl-sra,.pl-sr .pl-sre,.pl-src,.pl-v {
+    color: #df5000;
+}
+
+.pl-id {
+    color: #b52a1d;
+}
+
+.pl-ii {
+    background-color: #b52a1d;
+    color: #f8f8f8;
+}
+
+.pl-sr .pl-cce {
+    color: #63a35c;
+    font-weight: bold;
+}
+
+.pl-ml {
+    color: #693a17;
+}
+
+.pl-mh,.pl-mh .pl-en,.pl-ms {
+    color: #1d3e81;
+    font-weight: bold;
+}
+
+.pl-mq {
+    color: #008080;
+}
+
+.pl-mi {
+    color: #333;
+    font-style: italic;
+}
+
+.pl-mb {
+    color: #333;
+    font-weight: bold;
+}
+
+.pl-md,.pl-mdhf {
+    background-color: #ffecec;
+    color: #bd2c00;
+}
+
+.pl-mdht,.pl-mi1 {
+    background-color: #eaffea;
+    color: #55a532;
+}
+
+.pl-mdr {
+    color: #795da3;
+    font-weight: bold;
+}
+
+.pl-mo {
+    color: #1d3e81;
+}
+.task-list {
+padding-left:10px;
+margin-bottom:0;
+}
+
+.task-list li {
+    margin-left: 20px;
+}
+
+.task-list-item {
+list-style-type:none;
+padding-left:10px;
+}
+
+.task-list-item label {
+font-weight:400;
+}
+
+.task-list-item.enabled label {
+cursor:pointer;
+}
+
+.task-list-item+.task-list-item {
+margin-top:3px;
+}
+
+.task-list-item-checkbox {
+display:inline-block;
+margin-left:-20px;
+margin-right:3px;
+vertical-align:1px;
+}
 </style>
 </head>
 <body>
@@ -341,42 +456,53 @@ img {
 
 <ul>
 <li>What does GreenWall do?</li>
-</ul><p>This add-on replicates guild chat and achievement spam between multiple guilds.</p>
+</ul>
+
+<p>This add-on replicates guild chat and achievement spam between multiple guilds.</p>
 
 <p>The add-on's functionality is very close to LemonKing's Cross Guild Chat, but the management interface (or lack of one in GreenWall's case) is very different.</p>
 
-<p><a href="http://wow.curse.com/downloads/wow-addons/details/crossguildchat_lk.aspx">http://wow.curse.com/downloads/wow-addons/details/crossguildchat_lk.aspx</a></p>
-
 <ul>
 <li>Do I need to be a member of Alea Iacta Est to use it?</li>
-</ul><p>No, it was written to be guild-agnostic.  While it addresses a specific need that we had, it was designed to work for any guild that's larger than the limit.</p>
+</ul>
+
+<p>No, it was written to be guild-agnostic.  While it addresses a specific need that we had, it was designed to work for any guild that's larger than the limit.</p>
 
 <ul>
 <li>If I'm a member of Alea Iacta Est, do I need to run it?</li>
-</ul><p>No, you don't. But guild chat will be very, very frustrating for you if you don't since you will only see about 1% of the complete conversations.</p>
+</ul>
+
+<p>No, you don't. But guild chat will be very, very frustrating for you if you don't since you will only see about 1% of the complete conversations.</p>
 
 <ul>
 <li>How do I get it?</li>
-</ul><p>The latest version is available at the following locations.</p>
+</ul>
 
-<p><a href="https://github.com/AIE-Guild/GreenWall/releases">https://github.com/AIE-Guild/GreenWall/releases</a></p>
+<p>The latest version is available at the following locations.</p>
 
-<p><a href="http://wow.curse.com/downloads/wow-addons/details/greenwall.aspx">http://wow.curse.com/downloads/wow-addons/details/greenwall.aspx</a></p>
+<ul>
+<li><a href="https://github.com/AIE-Guild/GreenWall/releases">GitHub</a></li>
+<li><a href="http://www.curse.com/addons/wow/greenwall">Curse</a></li>
+</ul>
 
 <p>It is also mirrored in WoWMatrix, but we make no guarantees about how frequently WoWMatrix updates or the integrity of the files that it provides.</p>
 
-<p><a href="http://www.wowmatrix.com/">http://www.wowmatrix.com/</a></p>
+<ul>
+<li><a href="http://www.wowmatrix.com/">WoWMatrix</a></li>
+</ul>
 
 <p>You can also check out the latest version from the GitHub repository, if you are technically inclined and foolhardy enough to run pre-release code.</p>
 
-<p><a href="https://github.com/AIE-Guild/GreenWall">https://github.com/AIE-Guild/GreenWall</a></p>
+<p><a href="https://github.com/AIE-Guild/GreenWall">GitHub</a></p>
 
 <h2>Prerequisites</h2>
 
 <ul>
 <li>You must have fewer than 10 custom channels configured in-game.  You can see a listing of the custom channels by opening the "Social" window (bound to the "O" key) and selecting the "Chat" tab.</li>
 <li>You must be able to edit the Guild Information tab to configure GreenWall for the co-guild members.</li>
-</ul><h2>Installation</h2>
+</ul>
+
+<h2>Installation</h2>
 
 <ol>
 <li><p>Exit "World of Warcraft" completely</p></li>
@@ -436,7 +562,9 @@ img {
 </li>
 </ul>
 </li>
-</ol><h2>Configuration</h2>
+</ol>
+
+<h2>Configuration</h2>
 
 <p>GreenWall was designed to minimize the amount of configuration necessary by most members.  If your officers have set up the guild configuration correctly, you don't need to do anything to particiapte in the conversation between co-guilds.</p>
 
@@ -449,7 +577,9 @@ img {
 <li>Click on the <strong>Interface</strong> button.</li>
 <li>Select the <strong>AddOns</strong> tab.</li>
 <li>Click on <strong>GreenWall</strong> in the sidebar.</li>
-</ol><p>You will be able to enable or disable the following options.</p>
+</ol>
+
+<p>You will be able to enable or disable the following options.</p>
 
 <p><strong>Show Co-Guild Tags</strong></p>
 

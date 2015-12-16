@@ -24,56 +24,28 @@ SOFTWARE.
 
 --]]-----------------------------------------------------------------------
 
---
--- Debugging levels
---
-GW_LOG_NONE       = 0
-GW_LOG_ERROR      = 1
-GW_LOG_WARNING    = 2
-GW_LOG_NOTICE     = 3
-GW_LOG_INFO       = 4
-GW_LOG_DEBUG      = 5 
+--[[-----------------------------------------------------------------------
 
+Workarounds for compatibility with other addons
+
+--]]-----------------------------------------------------------------------
 
 --
--- Channel types
+-- Functions that may need to be overriden
 --
-GW_CTYPE_GUILD      = 0
-GW_CTYPE_OFFICER    = 1
-GW_CTYPE_ADDON      = 2
-
+gw.ChatFrame_MessageEventHandler = ChatFrame_MessageEventHandler
 
 --
--- Message types
+-- Apply workarounds
 --
-GW_MTYPE_NONE           = 0
-GW_MTYPE_CHAT           = 1
-GW_MTYPE_ACHIEVEMENT    = 2
-GW_MTYPE_BROADCAST      = 3
-GW_MTYPE_CONTROL        = 4
-GW_MTYPE_REQUEST        = 5
-GW_MTYPE_RESPONSE       = 6
-GW_MTYPE_NOTICE         = 7
-GW_MTYPE_ADDON          = 8
-
-
---
--- Limits
---
-GW_MAX_MESSAGE_LENGTH   = 255
-
-
---
--- Intervals, timeouts, and thresholds
---
-GW_TIMEOUT_CONFIG_HOLD      = 300
-GW_TIMEOUT_RELOAD_HOLD      = 300
-
-GW_CHANNEL_FAILURE_HOLD     = 10
-GW_CHANNEL_FAILURE_HOLD_MAX = 900
-
-GW_CACHE_COMEMBER_HOLD      = 180
-GW_CACHE_COMEMBER_SOFT_MAX  = 8
-GW_CACHE_COMEMBER_HARD_MAX  = 32
-
+function gw.EnableCompatibility()
+    if IsAddOnLoaded('ElvUI') then
+        -- Use ElvUI's event handler for sending messages to the chat windows
+        if ElvUI[3].chat.enable then
+            local ElvUIChat = ElvUI[1]:GetModule('Chat')
+            gw.ChatFrame_MessageEventHandler = ElvUIChat.ChatFrame_OnEvent
+            gw.Write('ElvUI compatibility enabled.')
+        end
+    end
+end
 
