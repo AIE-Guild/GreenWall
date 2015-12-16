@@ -16,6 +16,7 @@ Globals.lua
 Utility.lua
 HoldDown.lua
 Config.lua
+Compat.lua
 Chat.lua
 Channel.lua
 GreenWall.lua

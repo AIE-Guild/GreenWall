@@ -8,6 +8,7 @@ This project uses [Semantic Versioning](http://semver.org/).
 - Added officer note data validation before parsing.
 
 ### Added
+- Automatic ElvUI compatibility mode. 
 - Added Markdown change log.
 - Added channel-specific hold downs for join failures.
 
