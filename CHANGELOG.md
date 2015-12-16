@@ -2,7 +2,7 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## [1.6.6] -- 2015-12-16
 ### Fixed
 - A check is now done for officer status before sending a gratuitious officer announcement.
 - Added officer note data validation before parsing.
@@ -425,6 +425,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.6.6]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.5...v1.6.6
 [1.6.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.4...v1.6.5
 [1.6.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.3...v1.6.4
 [1.6.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.2...v1.6.3
