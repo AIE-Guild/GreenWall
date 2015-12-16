@@ -301,6 +301,8 @@ function GwChannel:tl_send(type, message)
         opcode = 'R'
     elseif type == GW_MTYPE_ADDON then
         opcode = 'M'
+    elseif type == GW_MTYPE_EXTERNAL then
+        opcode = 'E'
     else
         gw.Debug(GW_LOG_ERROR, 'unknown message type: %d', type)
         return
@@ -437,6 +439,8 @@ function GwChannel:tl_receive(...)
         type = GW_MTYPE_REQUEST
     elseif opcode == 'M' then
         type = GW_MTYPE_ADDON
+    elseif opcode == 'E' then
+        type = GW_MTYPE_EXTERNAL
     else
         gw.Debug(GW_LOG_ERROR, 'unknown segment opcode: %s', opcode)
     end

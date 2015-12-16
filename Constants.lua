@@ -55,6 +55,7 @@ GW_MTYPE_REQUEST        = 5
 GW_MTYPE_RESPONSE       = 6
 GW_MTYPE_NOTICE         = 7
 GW_MTYPE_ADDON          = 8
+GW_MTYPE_EXTERNAL       = 9
 
 
 --
