@@ -37,8 +37,25 @@ GreenWallAPI = {}
 function GreenWallAPI.Send(message)
 end
 
---- Receive a message from the guild confederation.
+--- Insert a handler for addon messages from the guild confederation.
 -- @param handler A callback function.
-function GreenWallAPI.Receive(handler)
+-- @param addon The name of the addon that you want to receive meaasges from
+--  (the same one used for the name of the TOC file).  If the value '*' is
+--   supplied, messages from all addons will be handled.
+-- @param priority A signed integer indicating relative priority, lower value
+--  is handled first.  The default is 0.
+-- @return The key that can be used to remove the handler. 
+function GreenWallAPI.AddHandler(handler, addon, priority)
+    -- Validate the arguments
+    assert(priority % 1 == 0)
+    if addon ~= '*' then
+        id = GetAddOnInfo(addon)
+        assert(id == addon)
+    end
+    
+    table.insert(gw.api_table, {addon, priority, handler})
+    table.sort(gw.api_table, function (a, b) return a[2] < b[2] end)
+
+    return handler
 end
 
