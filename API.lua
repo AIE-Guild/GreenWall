@@ -34,7 +34,7 @@ GreenWallAPI = {}
 
 --- Send a message to the guild confederation.
 -- @param message The message to send. Accepts 8-bit data.
-function GreenWallAPI.Send(message)
+function GreenWallAPI.SendMessage(message)
 end
 
 --- Insert a handler for addon messages from the guild confederation.
@@ -45,7 +45,7 @@ end
 -- @param priority A signed integer indicating relative priority, lower value
 --  is handled first.  The default is 0.
 -- @return The key that can be used to remove the handler. 
-function GreenWallAPI.AddHandler(handler, addon, priority)
+function GreenWallAPI.AddMessageHandler(handler, addon, priority)
     -- Validate the arguments
     assert(priority % 1 == 0)
     if addon ~= '*' then
@@ -59,3 +59,16 @@ function GreenWallAPI.AddHandler(handler, addon, priority)
     return handler
 end
 
+--- Remove an addon message handler.
+-- @param handler The callback function to remove.
+-- @return True if a matching handler is found, false otherwise.
+function GreenWallAPI.RemoveMessageHandler(handler)
+    rv = false
+    for i, e in ipairs(gw.api_table) do
+        if e[3] == handler then
+            gw.api_table[i] = nil
+            rv = true
+        end
+    end
+    return rv
+end
