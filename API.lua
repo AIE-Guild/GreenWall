@@ -30,8 +30,6 @@ An API for guild chat bridging as a transport
 
 --]]-----------------------------------------------------------------------
 
-GreenWallAPI = {}
-
 --- Send a message to the guild confederation.
 -- @param addon The addon name (the same one used for the name of the TOC
 --  file).
@@ -60,7 +58,7 @@ function GreenWallAPI.AddMessageHandler(handler, addon, priority)
         assert(id == addon)
     end
     
-    gw.Debug(GW_LOG_DEBUG, 'add API handler=%s, addon=%s, priority=%d', handler, addon, priority)
+    gw.Debug(GW_LOG_INFO, 'add API handler; addon=%s, priority=%d', addon, priority)
     
     table.insert(gw.api_table, {addon, priority, handler})
     table.sort(gw.api_table, function (a, b) return a[2] < b[2] end)
@@ -87,11 +85,29 @@ function GreenWallAPI.RemoveMessageHandler(handler, addon)
     for i, e in ipairs(gw.api_table) do
         if e[3] == handler then
             if addon == nil or addon == e[1] then
-                gw.Debug(GW_LOG_DEBUG, 'remove API handler=%s, addon=%s, priority=%d', e[3], e[1], e[2])
+                gw.Debug(GW_LOG_INFO, 'remove API handler; addon=%s, priority=%d', e[1], e[2])
                 gw.api_table[i] = nil
                 rv = true
             end
         end
     end
     return rv
+end
+
+
+--- The API handler dispatcher
+-- @param addon The sending addon
+-- @param sender The sending player
+-- @param message The message contents
+function gw.APIDispatcher(addon, sender, message)
+    local echo = (sender == gw.player and true or false)
+    gw.Debug(GW_LOG_DEBUG, 'lookup API handler; addon=%s', addon)
+    for i, entry in ipairs(gw.api_table) do
+        local tag, priority, handler = unpack(entry)
+        gw.Debug(GW_LOG_DEBUG, 'test API handler; addon=%s, priority=%d', tag, priority)
+        if tag == addon or tag == '*' then
+            gw.Debug(GW_LOG_INFO, 'dispatch API handler; addon=%s, priority=%d', tag, priority)
+            handler(addon, sender, echo, message)
+        end
+    end
 end

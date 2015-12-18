@@ -116,3 +116,8 @@ gw.usage = [[
         -- (officer only) Force a reload of the configuration by all online guild members.
  
 ]]
+
+--
+-- Global to expose API
+--
+GreenWallAPI = {}
