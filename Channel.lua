@@ -31,6 +31,7 @@ Imported Libraries
 --]]-----------------------------------------------------------------------
 
 local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
+local base64 = LibStub:GetLibrary("Encoding:Hash:Base64BCA-1.0")
 
 
 --[[-----------------------------------------------------------------------
@@ -266,6 +267,7 @@ Transmit Methods
 --     GW_MTYPE_NOTICE
 --     GW_MTYPE_REQUEST
 --     GW_MTYPE_ADDON
+--     GW_MTYPE_EXTERNAL
 -- @param ... Text of the message.
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
@@ -281,6 +283,9 @@ function GwChannel:al_encode(type, ...)
         assert(#arg >= 1)
         assert(#arg <= 3)
         return strjoin(':', arg[1], arg[2] or '', arg[3] or '')
+    elseif type == GW_MTYPE_EXTERNAL then
+        assert(#arg == 2)
+        return strjoin(':', arg[1], base64.encode(arg[2]))
     else
         assert(#arg == 1)
         return arg[1]
