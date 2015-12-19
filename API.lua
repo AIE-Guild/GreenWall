@@ -75,23 +75,52 @@ end
 -- @return True if a matching handler is found, false otherwise.
 --
 -- Note: A '*' value passed as addon is not a wildcard in this context,
--- it will only matched instances where the handler was installed with
+-- it will only matche instances where the handler was installed with
 -- '*' as the addon.
 function GreenWallAPI.RemoveMessageHandler(handler, addon)
     rv = false
     if addon ~= '*' then
         addon = GetAddOnInfo(addon)
+        assert(addon ~=nil)
     end
     for i, e in ipairs(gw.api_table) do
-        if e[3] == handler then
-            if addon == nil or addon == e[1] then
-                gw.Debug(GW_LOG_INFO, 'remove API handler; addon=%s, priority=%d', e[1], e[2])
+        local tag, priority, action = unpack(e)
+        if action == handler then
+            if addon == nil or addon == tag then
+                gw.Debug(GW_LOG_INFO, 'remove API handler; addon=%s, priority=%d', tag, priority)
                 gw.api_table[i] = nil
                 rv = true
             end
         end
     end
     return rv
+end
+
+
+--- Clear our portions or all of the dispatch table entries.
+-- @param addon Optional identifier for the addon or '*'.  If nil, 
+--  all table entries will be removed.
+--
+-- Note: A '*' value passed as addon is not a wildcard in this context,
+-- it will only matche instances where the handler was installed with
+-- '*' as the addon.
+function GreenWallAPI.ClearMessageHandlers(addon)
+    if addon == nil then
+        gw.Debug(GW_LOG_INFO, 'remove all API handlers')
+        gw.api_table = {}
+    else
+        if addon ~= '*' then
+            addon = GetAddOnInfo(addon)
+            assert(addon ~= nil)
+        end
+        for i, e in ipairs(gw.api_table) do
+            local tag, priority = unpack(e)
+            if tag == addon then
+                gw.Debug(GW_LOG_INFO, 'remove API handler; addon=%s, priority=%d', tag, priority)
+                gw.api_table[i] = nil
+            end
+        end        
+    end
 end
 
 
