@@ -46,6 +46,10 @@ function gw.EnableCompatibility()
             gw.ChatFrame_MessageEventHandler = ElvUIChat.ChatFrame_OnEvent
             gw.Write('ElvUI compatibility enabled.')
         end
+    elseif IsAddOnLoaded('Prat-3.0') then
+        -- Use Prat's event handler for sending messages to the chat windows
+        gw.ChatFrame_MessageEventHandler = function (...) Prat.Addon.ChatFrame_MessageEventHandler(Prat.Addon, ...) end
+        gw.Write('Prat-3.0 compatibility enabled.')
     end
 end
 
