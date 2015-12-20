@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Added
+- Automatic Prat-3.0 compatibility mode.
+
 ## [1.6.6] -- 2015-12-16
 ### Fixed
 - A check is now done for officer status before sending a gratuitous officer announcement.
