@@ -2,8 +2,9 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 1.7.0-alpha
 ### Added
+- Confederation bridging API for third-party add-ons.
 - Automatic Prat-3.0 compatibility mode.
 
 ## [1.6.6] -- 2015-12-16
