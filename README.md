@@ -44,38 +44,14 @@ You can also check out the latest version from the GitHub repository, if you are
 
 ## Installation ##
 
-
-1. Exit "World of Warcraft" completely
-
-2. Download the mod you want to install
- -   Make a folder on your desktop called "My Mods"
- -   Save the .zip file to this folder.
- -   If, when you try to download the file, it automatically "opens" it... you need to RIGHT click on the link and "save as..." or "Save Target As". 
-
-3. Extract the file - commonly known as 'unzipping'
-  	- Windows
-        - Windows XP has a built in ZIP extractor. Double click on the file to open it, inside should be the file or folders needed. Copy these outside to the "My Mods" folder.
-        - WinZip: You MUST make sure the option to "Use Folder Names" is CHECKED or it will just extract the files and not make the proper folders how the Authors designed 
-    - Mac OS X
-        - StuffitExpander: Double click the archive to extract it to a folder in the current directory. 
-    
-4. Verify your WoW Installation Path. That is where you are running WoW from and THAT is where you need to install your mods.
-    
-5. Move to the Addon folder
-    - Open your World of Warcraft folder. The default is `C:\Program Files (x86)\World of Warcraft\`.
-    - Go into the "Interface" folder.
-    - Go into the "AddOns" folder.
-    - In a new window, open the "My Mods" folder.
-    - The "My Mods" folder should have the "GreenWall" folder in it.
-    - Move the "GreenWall" folder into the "AddOns" folder. 
-
-6. Start World of Warcraft.
-
-7. Make sure AddOns are installed.
-    - Log in.
-    - At the Character Select screen, look in lower left corner for the "addons" button.
-        - If button is there: make sure all the mods you installed are listed and make sure "load out of date addons" is checked.
-        - If the button is NOT there: means you did not install the addons properly. 
+1. Download the compressed distribution file.
+2. Close World of Warcaft.
+3. Extract the contents of the file and place them in the World of Warcraft AddOns directory.
+  - On Windows, `C:\Program Files (x86)\World of Warcraft\Interface\AddOns` or `C:\Program Files\World of Warcraft\Interface\AddOns`.
+  - On OSX, `~/Applications/World of Warcraft/Interface/Addons`.
+4. Launch World of Warcraft.
+5. Click the __AddOns__ button on the character selection screen.
+6. Enable the add-on for your character.
 
 
 ## Configuration ##
