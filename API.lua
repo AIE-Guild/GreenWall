@@ -36,8 +36,7 @@ An API for guild chat bridging as a transport
 -- @param message The message to send. Accepts 8-bit data.
 function GreenWallAPI.SendMessage(addon, message)
     -- Validate addon id
-    local id = GetAddOnInfo(addon)
-    assert(id == addon)
+    assert(addon == GetAddOnInfo(addon))
     gw.config.channel.guild:send(GW_MTYPE_EXTERNAL, addon, message)
 end
 
@@ -49,51 +48,51 @@ end
 --  supplied, messages from all addons will be handled.
 -- @param priority A signed integer indicating relative priority, lower value
 --  is handled first.  The default is 0.
--- @return The key that can be used to remove the handler. 
+-- @return The ID that can be used to remove the handler. 
 function GreenWallAPI.AddMessageHandler(handler, addon, priority)
+    local function generate_id(handler)
+        local count = 0
+        for _, e in ipairs(gw.api_table) do
+            if handler == e[4] then
+                count = count + 1
+            end
+        end
+        return string.format('%s:%04X', tostring(handler), count)
+    end
+
     -- Validate the arguments
     assert(priority % 1 == 0)
     if addon ~= '*' then
-        local id = GetAddOnInfo(addon)
-        assert(id == addon)
+        assert(addon == GetAddOnInfo(addon))
     end
     
-    gw.Debug(GW_LOG_INFO, 'add API handler; addon=%s, priority=%d', addon, priority)
+    local id = generate_id(handler)
+    gw.Debug(GW_LOG_INFO, 'add API handler; id=%s, addon=%s, priority=%d', id, addon, priority)
     
-    table.insert(gw.api_table, {addon, priority, handler})
+    table.insert(gw.api_table, {id, addon, priority, handler})
     table.sort(gw.api_table, function (a, b) return a[2] < b[2] end)
 
-    return handler
+    return id
 end
 
 
 --- Remove an addon message handler.
--- @param handler The callback function to remove.
--- @param addon The name of an addon or '*' for which instances of the 
---  handler will be removed.  If omitted, all instances of the handler
---  will be removed.
+-- @param id The ID of the callback function to remove.
 -- @return True if a matching handler is found, false otherwise.
---
--- Note: A '*' value passed as addon is not a wildcard in this context,
--- it will only matche instances where the handler was installed with
--- '*' as the addon.
-function GreenWallAPI.RemoveMessageHandler(handler, addon)
+function GreenWallAPI.RemoveMessageHandler(id)
     rv = false
     if addon ~= '*' then
         addon = GetAddOnInfo(addon)
         assert(addon ~=nil)
     end
     for i, e in ipairs(gw.api_table) do
-        local tag, priority, action = unpack(e)
-        if action == handler then
-            if addon == nil or addon == tag then
-                gw.Debug(GW_LOG_INFO, 'remove API handler; addon=%s, priority=%d', tag, priority)
-                gw.api_table[i] = nil
-                rv = true
-            end
+        if id == e[1] then
+            gw.Debug(GW_LOG_INFO, 'remove API handler; id=%, addon=%s, priority=%d', e[1], e[2], e[3])
+            gw.api_table[i] = nil
+            return true
         end
     end
-    return rv
+    return false
 end
 
 
@@ -110,13 +109,11 @@ function GreenWallAPI.ClearMessageHandlers(addon)
         gw.api_table = {}
     else
         if addon ~= '*' then
-            addon = GetAddOnInfo(addon)
-            assert(addon ~= nil)
+            assert(addon == GetAddOnInfo(addon))
         end
         for i, e in ipairs(gw.api_table) do
-            local tag, priority = unpack(e)
-            if tag == addon then
-                gw.Debug(GW_LOG_INFO, 'remove API handler; addon=%s, priority=%d', tag, priority)
+            if addon == e[2] then
+                gw.Debug(GW_LOG_INFO, 'remove API handler; id=%, addon=%s, priority=%d', e[1], e[2], e[3])
                 gw.api_table[i] = nil
             end
         end        
@@ -130,13 +127,10 @@ end
 -- @param message The message contents
 function gw.APIDispatcher(addon, sender, message)
     local echo = (sender == gw.player and true or false)
-    gw.Debug(GW_LOG_DEBUG, 'lookup API handler; addon=%s', addon)
-    for i, entry in ipairs(gw.api_table) do
-        local tag, priority, handler = unpack(entry)
-        gw.Debug(GW_LOG_DEBUG, 'test API handler; addon=%s, priority=%d', tag, priority)
-        if tag == addon or tag == '*' then
-            gw.Debug(GW_LOG_INFO, 'dispatch API handler; addon=%s, priority=%d', tag, priority)
-            handler(addon, sender, echo, message)
+    for _, e in ipairs(gw.api_table) do
+        if addon == e[2] or addon == '*' then
+            gw.Debug(GW_LOG_INFO, 'dispatch API handler; id=%s, addon=%s, priority=%d', e[1], e[2], e[3])
+            e[4](addon, sender, echo, message)
         end
     end
 end
