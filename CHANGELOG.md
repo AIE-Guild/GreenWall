@@ -7,6 +7,9 @@ This project uses [Semantic Versioning](http://semver.org/).
 - Confederation bridging API for third-party add-ons.
 - Automatic Prat-3.0 compatibility mode.
 
+### Removed
+- Removed version number from options screen title.
+
 ## [1.6.6] -- 2015-12-16
 ### Fixed
 - A check is now done for officer status before sending a gratuitous officer announcement.

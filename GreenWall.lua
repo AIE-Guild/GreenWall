@@ -284,7 +284,7 @@ function GreenWall_OnLoad(self)
     --
     -- Add a tab to the Interface Options panel.
     --
-    self.name = 'GreenWall ' .. gw.version
+    self.name = 'GreenWall'
     self.refresh = function (self) GreenWallInterfaceFrame_OnShow(self) end
     self.okay = function (self) GreenWallInterfaceFrame_SaveUpdates(self) end
     self.cancel = function (self) return end
