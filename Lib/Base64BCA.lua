@@ -98,7 +98,7 @@ end
 -- @param char The single Base64 character.
 -- @return The 6-bit integer representing the Base64 character.
 local function toOctet(char)
-        return assert(DECODE[char], "Not a valid Base64 character: " .. tostring(char))
+    return assert(DECODE[char], "Not a valid Base64 character: " .. tostring(char))
 end
 
 

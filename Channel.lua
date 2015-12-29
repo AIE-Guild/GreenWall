@@ -388,17 +388,17 @@ function GwChannel:receive(f, ...)
     sender = gw.GlobalName(sender)
     if message ~= nil then
         local content = { self:al_decode(type, message) }
-        if sender ~= gw.player and guild_id ~= gw.config.guild_id then
-            -- Process the chat message
-            gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, guild=%s, message=%s',
-                    self.number, type, sender, guild_id, message)
-            return f(type, guild_id, content, {...})
-        elseif type == GW_MTYPE_EXTERNAL then
-            -- Handle the API traffic
+        if type == GW_MTYPE_EXTERNAL then
+            -- API traffic is handled regardless of the sender.
             local addon, api_message = unpack(content)
             if addon ~= nil and api_message ~= nil then
                 gw.APIDispatcher(addon, sender, api_message)
             end
+        elseif sender ~= gw.player and guild_id ~= gw.config.guild_id then
+            -- Process the chat message if it from another co-guild.
+            gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, guild=%s, message=%s',
+                    self.number, type, sender, guild_id, message)
+            return f(type, guild_id, content, {...})
         end
     end
 end

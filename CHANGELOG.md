@@ -5,6 +5,7 @@ This project uses [Semantic Versioning](http://semver.org/).
 ## 1.7.0-alpha
 ### Fixed
 - Corrected message validation prior to decoding.
+- Fixed message handling logic.
 
 ### Changed
 - Updated color of addon messages in chat.
