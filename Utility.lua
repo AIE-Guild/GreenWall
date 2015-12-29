@@ -71,7 +71,7 @@ end
 -- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Write(...)
     local msg = string.format(unpack({...}))
-    DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r ' .. msg)
+    DEFAULT_CHAT_FRAME:AddMessage('|cff0bda51GreenWall:|r ' .. msg)
     gw.Log(msg)
 end
 

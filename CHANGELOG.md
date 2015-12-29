@@ -3,6 +3,12 @@
 This project uses [Semantic Versioning](http://semver.org/).
 
 ## 1.7.0-alpha
+### Fixed
+- Corrected message validation prior to decoding.
+
+### Changed
+- Updated color of addon messages in chat.
+
 ### Added
 - Confederation bridging API for third-party add-ons.
 - Automatic Prat-3.0 compatibility mode.
