@@ -396,7 +396,9 @@ function GwChannel:receive(f, ...)
         elseif type == GW_MTYPE_EXTERNAL then
             -- Handle the API traffic
             local addon, api_message = unpack(content)
-            gw.APIDispatcher(addon, sender, api_message)
+            if addon ~= nil and api_message ~= nil then
+                gw.APIDispatcher(addon, sender, api_message)
+            end
         end
     end
 end
@@ -407,7 +409,12 @@ function GwChannel:al_decode(type, message)
         return strsplit(':', message)
     elseif type == GW_MTYPE_EXTERNAL then
         local tag, data = strsplit(':', message)
-        return tag, base64.decode(data)
+        if data ~= nil then
+            data = base64.decode(data)
+        else
+            gw.Debug(GW_LOG_DEBUG, 'malformed API message: %s', message) 
+        end
+        return tag, data
     else
         return message
     end
