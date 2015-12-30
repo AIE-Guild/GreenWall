@@ -393,7 +393,7 @@ function GwChannel:receive(f, ...)
             if content ~= nil then
                 local addon, api_message = unpack(content)
                 if addon ~= nil and api_message ~= nil then
-                    gw.APIDispatcher(addon, sender, api_message)
+                    gw.APIDispatcher(addon, sender, guild_id, api_message)
                 end
             end
         elseif sender ~= gw.player and guild_id ~= gw.config.guild_id then

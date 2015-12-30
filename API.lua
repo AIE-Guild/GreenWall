@@ -124,13 +124,15 @@ end
 --- The API handler dispatcher
 -- @param addon The sending addon
 -- @param sender The sending player
+-- @param guild_id Originating co-guild
 -- @param message The message contents
-function gw.APIDispatcher(addon, sender, message)
-    local echo = (sender == gw.player and true or false)
+function gw.APIDispatcher(addon, sender, guild_id, message)
+    local echo = sender == gw.player
+    local guild = guild_id == gw.config.guild_id
     for _, e in ipairs(gw.api_table) do
         if addon == e[2] or addon == '*' then
             gw.Debug(GW_LOG_INFO, 'dispatch API handler; id=%s, addon=%s, priority=%d', e[1], e[2], e[3])
-            e[4](addon, sender, echo, message)
+            e[4](addon, sender, message, echo, guild)
         end
     end
 end
