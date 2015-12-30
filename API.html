@@ -463,24 +463,29 @@ for add-on messages.</p>
 who would like to be able to use the bridged communication on a guild<br>
 confederation.</p>
 
+<p>A simple example, which demonstrates the use of the API, is <a href="https://github.com/AIE-Guild/GWSonar">GWSonar</a>.</p>
+
 <h2>Safety First</h2>
 
 <p>Before any API functions are called, there are two tests that should be<br>
 run to verify the environment.</p>
 
-<ol>
-<li>Check that GreenWall is loaded.</li>
-</ol>
+<h3>1. Check that GreenWall is loaded.</h3>
 
 <div class="highlight highlight-source-lua"><pre><span class="pl-k">if</span> <span class="pl-c1">IsAddOnLoaded</span>(<span class="pl-s"><span class="pl-pds">'</span>GreenWall<span class="pl-pds">'</span></span>) <span class="pl-k">then</span>
     <span class="pl-c1">...</span>
 <span class="pl-k">end</span></pre></div>
 
-<ol>
-<li>Check that the API is supported.</li>
-</ol>
+<h3>2. Check that the API is supported.</h3>
 
 <div class="highlight highlight-source-lua"><pre><span class="pl-k">if</span> GreenWallAPI <span class="pl-k">~=</span> <span class="pl-c1">nil</span> <span class="pl-k">then</span>
+    <span class="pl-c1">...</span>
+<span class="pl-k">end</span></pre></div>
+
+<h3>3. Optionally, check the API version.</h3>
+
+<div class="highlight highlight-source-lua"><pre>
+<span class="pl-k">if</span> GreenWallAPI <span class="pl-k">==</span> <span class="pl-c1">1</span> <span class="pl-k">then</span>
     <span class="pl-c1">...</span>
 <span class="pl-k">end</span></pre></div>
 
@@ -499,15 +504,16 @@ from any add-on.</p>
 
 <h3>1. Create the callback</h3>
 
-<div class="highlight highlight-source-lua"><pre><span class="pl-k">local</span> <span class="pl-k">function</span> <span class="pl-en">handler</span>(<span class="pl-smi">addon, sender, echo, message</span>)</pre></div>
+<div class="highlight highlight-source-lua"><pre><span class="pl-k">local</span> <span class="pl-k">function</span> <span class="pl-en">handler</span>(<span class="pl-smi">addon, sender, message, echo, guild</span>)</pre></div>
 
 <p>The function should accept the following arguments:</p>
 
 <ul>
 <li>addon - The name of the addon sending the message.</li>
 <li>sender - The player sending the message.</li>
-<li>echo - Set to true if the message was sent by the current player.</li>
 <li>message - The text of the message.</li>
+<li>echo - Set to true if the message was sent by the player.</li>
+<li>guild - Set to true if the message originated in the player's co-guild.</li>
 </ul>
 
 <h3>2. Add the handler to the dispatch table</h3>

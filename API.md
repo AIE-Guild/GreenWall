@@ -13,13 +13,15 @@ So this simple messaging API is provided for third-party add-on developers
 who would like to be able to use the bridged communication on a guild
 confederation.
 
+A simple example, which demonstrates the use of the API, is [GWSonar](https://github.com/AIE-Guild/GWSonar).
+
 
 ## Safety First
 
 Before any API functions are called, there are two tests that should be
 run to verify the environment.
 
-1. Check that GreenWall is loaded.
+### 1. Check that GreenWall is loaded.
 
 ```lua
 if IsAddOnLoaded('GreenWall') then
@@ -27,10 +29,19 @@ if IsAddOnLoaded('GreenWall') then
 end
 ```
 
-2. Check that the API is supported.
+### 2. Check that the API is supported.
 
 ```lua
 if GreenWallAPI ~= nil then
+    ...
+end
+```
+
+### 3. Optionally, check the API version.
+
+```lua
+
+if GreenWallAPI == 1 then
     ...
 end
 ```
@@ -53,15 +64,16 @@ The receiving of messages is handled with callbacks.
 ### 1. Create the callback
 
 ```lua
-local function handler(addon, sender, echo, message)
+local function handler(addon, sender, message, echo, guild)
 ```
 
 The function should accept the following arguments:
 
 - addon - The name of the addon sending the message.
 - sender - The player sending the message.
-- echo - Set to true if the message was sent by the current player.
 - message - The text of the message.
+- echo - Set to true if the message was sent by the player.
+- guild - Set to true if the message originated in the player's co-guild.
 
 ### 2. Add the handler to the dispatch table
 
