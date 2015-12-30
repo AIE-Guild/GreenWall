@@ -103,7 +103,7 @@ function gw.Debug(level, ...)
             local trace = format('[debug/%d@%s] %s', level, get_caller(), msg)
             gw.Log(trace)
             if GreenWall.verbose then
-                DEFAULT_CHAT_FRAME:AddMessage(format('|cffabd473GreenWall:|r |cff778899%s|r', trace))
+                DEFAULT_CHAT_FRAME:AddMessage(format('|cff009a7dGreenWall:|r |cff778899%s|r', trace))
             end
         end
     end
