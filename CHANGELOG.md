@@ -2,7 +2,7 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## 1.7.0-alpha
+## [1.7.0] -- Unreleased
 ### Fixed
 - Improved message validation during adaptation layer decoding.
 - Fixed message handling logic.
@@ -440,6 +440,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.7.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.6...v1.7.0
 [1.6.6]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.5...v1.6.6
 [1.6.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.4...v1.6.5
 [1.6.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.3...v1.6.4
