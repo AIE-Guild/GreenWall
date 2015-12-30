@@ -117,7 +117,3 @@ gw.usage = [[
  
 ]]
 
---
--- Global to expose API
---
-GreenWallAPI = {}

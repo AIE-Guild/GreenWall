@@ -30,6 +30,14 @@ An API for guild chat bridging as a transport
 
 --]]-----------------------------------------------------------------------
 
+--
+-- Global to expose API
+--
+GreenWallAPI = {
+    version = 1,
+}
+
+
 --- Send a message to the guild confederation.
 -- @param addon The addon name (the same one used for the name of the TOC
 --  file).
