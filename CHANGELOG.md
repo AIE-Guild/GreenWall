@@ -4,7 +4,7 @@ This project uses [Semantic Versioning](http://semver.org/).
 
 ## 1.7.0-alpha
 ### Fixed
-- Corrected message validation prior to decoding.
+- Improved message validation during adaptation layer decoding.
 - Fixed message handling logic.
 
 ### Changed
