@@ -406,7 +406,7 @@ function GwChannel:receive(f, ...)
 end
 
 --- Adaptation layer decoding.
--- @param type message type
+-- @param mtype message type
 -- @param message message content
 -- @return A table of message strings. Returns nil on error.
 function GwChannel:al_decode(mtype, message)

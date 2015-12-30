@@ -119,7 +119,7 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#gw.APIDispatcher">gw.APIDispatcher</a>&nbsp;(addon, sender, message)</td>
+	<td class="name" nowrap><a href="#gw.APIDispatcher">gw.APIDispatcher</a>&nbsp;(addon, sender, guild_id, message)</td>
 	<td class="summary">The API handler dispatcher </td>
 	</tr>
 
@@ -263,7 +263,7 @@ Send a message to the guild confederation.
 
 
 
-<dt><a name="gw.APIDispatcher"></a><strong>gw.APIDispatcher</strong>&nbsp;(addon, sender, message)</dt>
+<dt><a name="gw.APIDispatcher"></a><strong>gw.APIDispatcher</strong>&nbsp;(addon, sender, guild_id, message)</dt>
 <dd>
 The API handler dispatcher
 
@@ -277,6 +277,10 @@ The API handler dispatcher
 	
 	<li>
 	  <code><em>sender</em></code>: The sending player
+	</li>
+	
+	<li>
+	  <code><em>guild_id</em></code>: Originating co-guild
 	</li>
 	
 	<li>
