@@ -384,39 +384,56 @@ Receive Methods
 -- @param ... The API event arguments.
 -- @return The return value of f applied to the data.
 function GwChannel:receive(f, ...)
-    local sender, guild_id, type, message = self:tl_receive(...)
+    local sender, guild_id, mtype, message = self:tl_receive(...)
     sender = gw.GlobalName(sender)
     if message ~= nil then
-        local content = { self:al_decode(type, message) }
-        if type == GW_MTYPE_EXTERNAL then
+        local content = self:al_decode(mtype, message)
+        if mtype == GW_MTYPE_EXTERNAL then
             -- API traffic is handled regardless of the sender.
-            local addon, api_message = unpack(content)
-            if addon ~= nil and api_message ~= nil then
-                gw.APIDispatcher(addon, sender, api_message)
+            if content ~= nil then
+                local addon, api_message = unpack(content)
+                if addon ~= nil and api_message ~= nil then
+                    gw.APIDispatcher(addon, sender, api_message)
+                end
             end
         elseif sender ~= gw.player and guild_id ~= gw.config.guild_id then
             -- Process the chat message if it from another co-guild.
             gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, guild=%s, message=%s',
-                    self.number, type, sender, guild_id, message)
-            return f(type, guild_id, content, {...})
+                    self.number, mtype, sender, guild_id, message)
+            return f(mtype, guild_id, content, {...})
         end
     end
 end
 
-function GwChannel:al_decode(type, message)
-    gw.Debug(GW_LOG_DEBUG, 'type=%d, message=%s', type, message)
-    if type == GW_MTYPE_BROADCAST then
-        return strsplit(':', message)
-    elseif type == GW_MTYPE_EXTERNAL then
-        local tag, data = strsplit(':', message)
-        if data ~= nil then
-            data = base64.decode(data)
-        else
-            gw.Debug(GW_LOG_DEBUG, 'malformed API message: %s', message) 
+--- Adaptation layer decoding.
+-- @param type message type
+-- @param message message content
+-- @return A table of message strings. Returns nil on error.
+function GwChannel:al_decode(mtype, message)
+    local function expand(message, n)
+        assert(type(n) == 'number' and n > 0)
+        message = type(message) == 'string' and message or ''
+        local t = { strsplit(':', message, n) }
+        for i = 1, n do
+            t[i] = t[i] ~= nil and t[i] or ''
         end
-        return tag, data
+        return t
+    end
+    
+    gw.Debug(GW_LOG_DEBUG, 'type=%d, message=%s', mtype, message)
+    if mtype == GW_MTYPE_BROADCAST then
+        return expand(message, 3)
+    elseif mtype == GW_MTYPE_EXTERNAL then
+        local tag, data = unpack(expand(message, 2))
+        local rv, result = pcall(base64.decode, data)
+        if (rv) then
+            return { tag, result }
+        else
+            gw.Debug(GW_LOG_DEBUG, 'API error: %s', result)
+            return
+        end
     else
-        return message
+        return { message }
     end
 end
 
