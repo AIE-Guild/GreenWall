@@ -2,9 +2,24 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.7.0] -- 2016-01-01
+### Fixed
+- Improved message validation during adaptation layer decoding.
+- Fixed message handling logic.
+
+### Changed
+- Updated color of addon messages in chat.
+
+### Added
+- Confederation bridging API for third-party add-ons.
+- Automatic Prat-3.0 compatibility mode.
+
+### Removed
+- Removed version number from options screen title.
+
 ## [1.6.6] -- 2015-12-16
 ### Fixed
-- A check is now done for officer status before sending a gratuitious officer announcement.
+- A check is now done for officer status before sending a gratuitous officer announcement.
 - Added officer note data validation before parsing.
 
 ### Added
@@ -425,6 +440,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.7.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.6...v1.7.0
 [1.6.6]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.5...v1.6.6
 [1.6.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.4...v1.6.5
 [1.6.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.3...v1.6.4

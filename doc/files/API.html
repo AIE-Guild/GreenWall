@@ -1,0 +1,320 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li><strong>API.lua</strong></li>
+	
+	<li>
+		<a href="../files/Channel.html">Channel.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Chat.html">Chat.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Compat.html">Compat.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Config.html">Config.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Constants.html">Constants.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Globals.html">Globals.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/GreenWall.html">GreenWall.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/HoldDown.html">HoldDown.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Utility.html">Utility.lua</a>
+	</li>
+
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>API.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#GreenWallAPI.AddMessageHandler">GreenWallAPI.AddMessageHandler</a>&nbsp;(handler, addon, priority)</td>
+	<td class="summary">Insert a handler for addon messages from the guild confederation.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GreenWallAPI.ClearMessageHandlers">GreenWallAPI.ClearMessageHandlers</a>&nbsp;(addon)</td>
+	<td class="summary">Clear our portions or all of the dispatch table entries.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GreenWallAPI.RemoveMessageHandler">GreenWallAPI.RemoveMessageHandler</a>&nbsp;(id)</td>
+	<td class="summary">Remove an addon message handler.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GreenWallAPI.SendMessage">GreenWallAPI.SendMessage</a>&nbsp;(addon, message)</td>
+	<td class="summary">Send a message to the guild confederation.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#gw.APIDispatcher">gw.APIDispatcher</a>&nbsp;(addon, sender, guild_id, message)</td>
+	<td class="summary">The API handler dispatcher </td>
+	</tr>
+
+</table>
+
+
+
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="GreenWallAPI.AddMessageHandler"></a><strong>GreenWallAPI.AddMessageHandler</strong>&nbsp;(handler, addon, priority)</dt>
+<dd>
+Insert a handler for addon messages from the guild confederation.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>handler</em></code>: A callback function.
+	</li>
+	
+	<li>
+	  <code><em>addon</em></code>: The name of the addon that you want to receive meaasges from (the same one used for the name of the TOC file).  If the value '*' is supplied, messages from all addons will be handled.
+	</li>
+	
+	<li>
+	  <code><em>priority</em></code>: A signed integer indicating relative priority, lower value is handled first.  The default is 0.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The ID that can be used to remove the handler.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GreenWallAPI.ClearMessageHandlers"></a><strong>GreenWallAPI.ClearMessageHandlers</strong>&nbsp;(addon)</dt>
+<dd>
+Clear our portions or all of the dispatch table entries.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>addon</em></code>: Optional identifier for the addon or '*'.  If nil, all table entries will be removed.  Note: A '*' value passed as addon is not a wildcard in this context, it will only matche instances where the handler was installed with '*' as the addon.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GreenWallAPI.RemoveMessageHandler"></a><strong>GreenWallAPI.RemoveMessageHandler</strong>&nbsp;(id)</dt>
+<dd>
+Remove an addon message handler.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>id</em></code>: The ID of the callback function to remove.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if a matching handler is found, false otherwise.</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GreenWallAPI.SendMessage"></a><strong>GreenWallAPI.SendMessage</strong>&nbsp;(addon, message)</dt>
+<dd>
+Send a message to the guild confederation.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>addon</em></code>: The addon name (the same one used for the name of the TOC file).
+	</li>
+	
+	<li>
+	  <code><em>message</em></code>: The message to send. Accepts 8-bit data.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="gw.APIDispatcher"></a><strong>gw.APIDispatcher</strong>&nbsp;(addon, sender, guild_id, message)</dt>
+<dd>
+The API handler dispatcher
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>addon</em></code>: The sending addon
+	</li>
+	
+	<li>
+	  <code><em>sender</em></code>: The sending player
+	</li>
+	
+	<li>
+	  <code><em>guild_id</em></code>: Originating co-guild
+	</li>
+	
+	<li>
+	  <code><em>message</em></code>: The message contents
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>

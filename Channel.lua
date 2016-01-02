@@ -31,6 +31,7 @@ Imported Libraries
 --]]-----------------------------------------------------------------------
 
 local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
+local base64 = LibStub:GetLibrary("Encoding:Hash:Base64BCA-1.0")
 
 
 --[[-----------------------------------------------------------------------
@@ -266,6 +267,7 @@ Transmit Methods
 --     GW_MTYPE_NOTICE
 --     GW_MTYPE_REQUEST
 --     GW_MTYPE_ADDON
+--     GW_MTYPE_EXTERNAL
 -- @param ... Text of the message.
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
@@ -281,6 +283,9 @@ function GwChannel:al_encode(type, ...)
         assert(#arg >= 1)
         assert(#arg <= 3)
         return strjoin(':', arg[1], arg[2] or '', arg[3] or '')
+    elseif type == GW_MTYPE_EXTERNAL then
+        assert(#arg == 2)
+        return strjoin(':', arg[1], base64.encode(arg[2]))
     else
         assert(#arg == 1)
         return arg[1]
@@ -301,6 +306,8 @@ function GwChannel:tl_send(type, message)
         opcode = 'R'
     elseif type == GW_MTYPE_ADDON then
         opcode = 'M'
+    elseif type == GW_MTYPE_EXTERNAL then
+        opcode = 'E'
     else
         gw.Debug(GW_LOG_ERROR, 'unknown message type: %d', type)
         return
@@ -377,23 +384,56 @@ Receive Methods
 -- @param ... The API event arguments.
 -- @return The return value of f applied to the data.
 function GwChannel:receive(f, ...)
-    local sender, guild_id, type, message = self:tl_receive(...)
+    local sender, guild_id, mtype, message = self:tl_receive(...)
+    sender = gw.GlobalName(sender)
     if message ~= nil then
-        if gw.GlobalName(sender) ~= gw.player and guild_id ~= gw.config.guild_id then
+        local content = self:al_decode(mtype, message)
+        if mtype == GW_MTYPE_EXTERNAL then
+            -- API traffic is handled regardless of the sender.
+            if content ~= nil then
+                local addon, api_message = unpack(content)
+                if addon ~= nil and api_message ~= nil then
+                    gw.APIDispatcher(addon, sender, guild_id, api_message)
+                end
+            end
+        elseif sender ~= gw.player and guild_id ~= gw.config.guild_id then
+            -- Process the chat message if it from another co-guild.
             gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, guild=%s, message=%s',
-                    self.number, type, sender, guild_id, message)
-            local content = { self:al_decode(type, message) }
-            return f(type, guild_id, content, {...})
+                    self.number, mtype, sender, guild_id, message)
+            return f(mtype, guild_id, content, {...})
         end
     end
 end
 
-function GwChannel:al_decode(type, message)
-    gw.Debug(GW_LOG_DEBUG, 'type=%d, message=%s', type, message)
-    if type == GW_MTYPE_BROADCAST then
-        return strsplit(':', message)
+--- Adaptation layer decoding.
+-- @param mtype message type
+-- @param message message content
+-- @return A table of message strings. Returns nil on error.
+function GwChannel:al_decode(mtype, message)
+    local function expand(message, n)
+        assert(type(n) == 'number' and n > 0)
+        message = type(message) == 'string' and message or ''
+        local t = { strsplit(':', message, n) }
+        for i = 1, n do
+            t[i] = t[i] ~= nil and t[i] or ''
+        end
+        return t
+    end
+    
+    gw.Debug(GW_LOG_DEBUG, 'type=%d, message=%s', mtype, message)
+    if mtype == GW_MTYPE_BROADCAST then
+        return expand(message, 3)
+    elseif mtype == GW_MTYPE_EXTERNAL then
+        local tag, data = unpack(expand(message, 2))
+        local rv, result = pcall(base64.decode, data)
+        if (rv) then
+            return { tag, result }
+        else
+            gw.Debug(GW_LOG_DEBUG, 'API error: %s', result)
+            return
+        end
     else
-        return message
+        return { message }
     end
 end
 
@@ -437,6 +477,8 @@ function GwChannel:tl_receive(...)
         type = GW_MTYPE_REQUEST
     elseif opcode == 'M' then
         type = GW_MTYPE_ADDON
+    elseif opcode == 'E' then
+        type = GW_MTYPE_EXTERNAL
     else
         gw.Debug(GW_LOG_ERROR, 'unknown segment opcode: %s', opcode)
     end

@@ -38,10 +38,18 @@
 <h1>Files</h1>
 <ul>
 
+	<li>
+		<a href="../files/API.html">API.lua</a>
+	</li>
+
 	<li><strong>Channel.lua</strong></li>
 	
 	<li>
 		<a href="../files/Chat.html">Chat.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Compat.html">Compat.lua</a>
 	</li>
 
 	<li>
@@ -93,6 +101,11 @@
 	<tr>
 	<td class="name" nowrap><a href="#GwChannel:age">GwChannel:age</a>&nbsp;()</td>
 	<td class="summary">Mark the channel as stale.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#GwChannel:al_decode">GwChannel:al_decode</a>&nbsp;(mtype, message)</td>
+	<td class="summary">Adaptation layer decoding.</td>
 	</tr>
 
 	<tr>
@@ -192,6 +205,39 @@ Mark the channel as stale.
 
 
 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="GwChannel:al_decode"></a><strong>GwChannel:al_decode</strong>&nbsp;(mtype, message)</dt>
+<dd>
+Adaptation layer decoding.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>mtype</em></code>: message type
+	</li>
+	
+	<li>
+	  <code><em>message</em></code>: message content
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>A table of message strings. Returns nil on error.</ul>
 
 
 
@@ -439,7 +485,7 @@ Sends an encoded message on the shared channel.
 <ul>
 	
 	<li>
-	  <code><em>type</em></code>: The message type. Accepted values are: GW_MTYPE_CHAT GW_MTYPE_ACHIEVEMENT GW_MTYPE_BROADCAST GW_MTYPE_NOTICE GW_MTYPE_REQUEST GW_MTYPE_ADDON
+	  <code><em>type</em></code>: The message type. Accepted values are: GW_MTYPE_CHAT GW_MTYPE_ACHIEVEMENT GW_MTYPE_BROADCAST GW_MTYPE_NOTICE GW_MTYPE_REQUEST GW_MTYPE_ADDON GW_MTYPE_EXTERNAL
 	</li>
 	
 	<li>

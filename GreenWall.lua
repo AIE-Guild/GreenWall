@@ -284,7 +284,7 @@ function GreenWall_OnLoad(self)
     --
     -- Add a tab to the Interface Options panel.
     --
-    self.name = 'GreenWall ' .. gw.version
+    self.name = 'GreenWall'
     self.refresh = function (self) GreenWallInterfaceFrame_OnShow(self) end
     self.okay = function (self) GreenWallInterfaceFrame_SaveUpdates(self) end
     self.cancel = function (self) return end
@@ -348,11 +348,6 @@ function GreenWall_OnEvent(self, event, ...)
         gw.addon_loaded = true
         gw.Write('v%s loaded.', gw.version)
         gw.Debug(GW_LOG_DEBUG, 'loading complete; name=%s, realm=%s', gw.player, gw.realm)
-        
-        --
-        -- Apply compatibility workarounds
-        --
-        gw.EnableCompatibility()
         
     end            
         
@@ -578,6 +573,10 @@ function GreenWall_OnEvent(self, event, ...)
         if RegisterAddonMessagePrefix then
             RegisterAddonMessagePrefix("GreenWall")
         end
+
+        -- Apply compatibility workarounds
+        gw.EnableCompatibility()
+        
 
     elseif event == 'PLAYER_GUILD_UPDATE' then
     

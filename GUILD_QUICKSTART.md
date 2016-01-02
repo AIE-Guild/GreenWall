@@ -73,7 +73,7 @@ This disables the GreenWall client if the member is running a version prior to v
 ### Example ###
 
     GWc:topSekritChan:pencil
-    GWv:1.1.00
+    GWv:1.6.0
     GWp:Darkmoon Clan:DMC
     GWp:Baseball Dandies:BBD
     GWp:Nightlife:NL

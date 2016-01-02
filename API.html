@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>README</title>
+<title>API</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
@@ -450,248 +450,127 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<h1>User Documentation for GreenWall</h1>
+<h1>GreenWall API Reference</h1>
 
-<h2>Frequently Asked Questions</h2>
+<h2>Purpose</h2>
+
+<p>Initially, it was hoped that GreenWall could be extended to bridge<br>
+standard add-on messages.  However, the WoW API doesn't have a function<br>
+similar to <code>ChatFrame_MessageEventHandler</code> that could be used<br>
+for add-on messages.</p>
+
+<p>So this simple messaging API is provided for third-party add-on developers<br>
+who would like to be able to use the bridged communication on a guild<br>
+confederation.</p>
+
+<p>A simple example, which demonstrates the use of the API, is <a href="https://github.com/AIE-Guild/GWSonar">GWSonar</a>.</p>
+
+<h2>Safety First</h2>
+
+<p>Before any API functions are called, there are tests that should be<br>
+run to verify the environment.</p>
+
+<h3>Individual API checks</h3>
+
+<h4>Check that GreenWall is loaded</h4>
+
+<div class="highlight highlight-source-lua"><pre><span class="pl-k">if</span> <span class="pl-c1">IsAddOnLoaded</span>(<span class="pl-s"><span class="pl-pds">'</span>GreenWall<span class="pl-pds">'</span></span>) <span class="pl-k">then</span>
+    <span class="pl-c1">...</span>
+<span class="pl-k">end</span></pre></div>
+
+<h4>Check that the API is supported</h4>
+
+<div class="highlight highlight-source-lua"><pre><span class="pl-k">if</span> GreenWallAPI <span class="pl-k">~=</span> <span class="pl-c1">nil</span> <span class="pl-k">then</span>
+    <span class="pl-c1">...</span>
+<span class="pl-k">end</span></pre></div>
+
+<h4>Check the API version</h4>
+
+<div class="highlight highlight-source-lua"><pre>
+<span class="pl-k">if</span> GreenWallAPI <span class="pl-k">&gt;=</span> <span class="pl-c1">1</span> <span class="pl-k">then</span>
+    <span class="pl-c1">...</span>
+<span class="pl-k">end</span></pre></div>
+
+<h3>Unified API check</h3>
+
+<p>This combines all of the tests into one function.</p>
+
+<div class="highlight highlight-source-lua"><pre><span class="pl-k">function</span> <span class="pl-en">apiAvailable</span>()
+    <span class="pl-k">function</span> <span class="pl-en">testAPI</span>()
+        <span class="pl-c">-- Raises and exception of GreenWall is loaded or is pre-1.7.</span>
+        <span class="pl-c1">assert</span>(<span class="pl-c1">IsAddOnLoaded</span>(<span class="pl-s"><span class="pl-pds">'</span>GreenWall<span class="pl-pds">'</span></span>))
+        <span class="pl-k">return</span> GreenWallAPI.<span class="pl-smi">version</span>
+    <span class="pl-k">end</span>
+
+    <span class="pl-c">-- Catch any exceptions</span>
+    <span class="pl-k">local</span> found, version <span class="pl-k">=</span> <span class="pl-c1">pcall</span>(testAPI)
+
+    <span class="pl-k">return</span> found <span class="pl-k">and</span> version <span class="pl-k">&gt;=</span> <span class="pl-c1">1</span>
+<span class="pl-k">end</span></pre></div>
+
+<h2>Sending a Message</h2>
+
+<p>To send a message to other instances of the add-on, use the following function.</p>
+
+<div class="highlight highlight-source-lua"><pre>GreenWallAPI.<span class="pl-c1">SendMessage</span>(addon, message)</pre></div>
+
+<p>The <strong>addon</strong> parameter is either the name of the add-on or '*', which matches <br>
+from any add-on.</p>
+
+<h2>Receiving a Message</h2>
+
+<p>The receiving of messages is handled with callbacks. </p>
+
+<h3>1. Create the callback</h3>
+
+<div class="highlight highlight-source-lua"><pre><span class="pl-k">local</span> <span class="pl-k">function</span> <span class="pl-en">handler</span>(<span class="pl-smi">addon, sender, message, echo, guild</span>)</pre></div>
+
+<p>The function should accept the following arguments:</p>
 
 <ul>
-<li>What does GreenWall do?</li>
+<li>addon - The name of the addon sending the message.</li>
+<li>sender - The player sending the message.</li>
+<li>message - The text of the message.</li>
+<li>echo - Set to true if the message was sent by the player.</li>
+<li>guild - Set to true if the message originated in the player's co-guild.</li>
 </ul>
 
-<p>This add-on replicates guild chat and achievement spam between multiple guilds.</p>
+<h3>2. Add the handler to the dispatch table</h3>
 
-<p>The add-on's functionality is very close to LemonKing's Cross Guild Chat, but the management interface (or lack of one in GreenWall's case) is very different.</p>
+<div class="highlight highlight-source-lua"><pre><span class="pl-k">local</span> id <span class="pl-k">=</span> GreenWallAPI.<span class="pl-c1">AddMessageHandler</span>(handler, addon, priority)</pre></div>
 
 <ul>
-<li>Do I need to be a member of Alea Iacta Est to use it?</li>
+<li>handler - The handler function.</li>
+<li>addon - A tag defining the name of the add-on messages will be received from.
+The <code>*</code> character can be used to match all add-ons.</li>
+<li>priority - A signed integer.  Lower priority matches are executed earlier.</li>
 </ul>
 
-<p>No, it was written to be guild-agnostic.  While it addresses a specific need that we had, it was designed to work for any guild that's larger than the limit.</p>
+<h2>Dispatch Table</h2>
+
+<p>In addition to the <code>GreenWallAPI.AddMessageHandler</code> function to add a handler,<br>
+the following functions are available to manage the dispatch table.</p>
+
+<h3>Remove a handler</h3>
+
+<div class="highlight highlight-source-lua"><pre><span class="pl-k">local</span> found <span class="pl-k">=</span> GreenWallAPI.<span class="pl-c1">RemoveMessageHandler</span>(id)</pre></div>
 
 <ul>
-<li>If I'm a member of Alea Iacta Est, do I need to run it?</li>
+<li>handler_id - The ID of the handler function.</li>
 </ul>
 
-<p>No, you don't. But guild chat will be very, very frustrating for you if you don't since you will only see about 1% of the complete conversations.</p>
+<h3>Clear one or more handlers</h3>
+
+<div class="highlight highlight-source-lua"><pre>GreenWallAPI.<span class="pl-c1">ClearMessageHandlers</span>(addon)</pre></div>
 
 <ul>
-<li>How do I get it?</li>
+<li>addon - (Optional) A tag defining the name of the add-on messages will be 
+received from. The <code>*</code> character can be used to match all add-ons. If this 
+value is <code>nil</code>, all entries will be cleared.</li>
 </ul>
 
-<p>The latest version is available at the following locations.</p>
-
-<ul>
-<li><a href="https://github.com/AIE-Guild/GreenWall/releases">GitHub</a></li>
-<li><a href="http://www.curse.com/addons/wow/greenwall">Curse</a></li>
-</ul>
-
-<p>It is also mirrored in WoWMatrix, but we make no guarantees about how frequently WoWMatrix updates or the integrity of the files that it provides.</p>
-
-<ul>
-<li><a href="http://www.wowmatrix.com/">WoWMatrix</a></li>
-</ul>
-
-<p>You can also check out the latest version from the GitHub repository, if you are technically inclined and foolhardy enough to run pre-release code.</p>
-
-<p><a href="https://github.com/AIE-Guild/GreenWall">GitHub</a></p>
-
-<h2>Prerequisites</h2>
-
-<ul>
-<li>You must have fewer than 10 custom channels configured in-game.  You can see a listing of the custom channels by opening the "Social" window (bound to the "O" key) and selecting the "Chat" tab.</li>
-<li>You must be able to edit the Guild Information tab to configure GreenWall for the co-guild members.</li>
-</ul>
-
-<h2>Installation</h2>
-
-<ol>
-<li>Download the compressed distribution file.</li>
-<li>Close World of Warcaft.</li>
-<li>Extract the contents of the file and place them in the World of Warcraft AddOns directory.
-
-<ul>
-<li>On Windows, <code>C:\Program Files (x86)\World of Warcraft\Interface\AddOns</code> or <code>C:\Program Files\World of Warcraft\Interface\AddOns</code>.</li>
-<li>On OSX, <code>~/Applications/World of Warcraft/Interface/Addons</code>.</li>
-</ul>
-</li>
-<li>Launch World of Warcraft.</li>
-<li>Click the <strong>AddOns</strong> button on the character selection screen.</li>
-<li>Enable the add-on for your character.</li>
-</ol>
-
-<h2>Configuration</h2>
-
-<p>GreenWall was designed to minimize the amount of configuration necessary by most members.  If your officers have set up the guild configuration correctly, you don't need to do anything to particiapte in the conversation between co-guilds.</p>
-
-<p>However, there are a few options you may want to consider.  </p>
-
-<p>To access the user configuration screen:</p>
-
-<ol>
-<li>Open the <strong>Game Menu</strong> by hitting the <code>Esc</code> key.</li>
-<li>Click on the <strong>Interface</strong> button.</li>
-<li>Select the <strong>AddOns</strong> tab.</li>
-<li>Click on <strong>GreenWall</strong> in the sidebar.</li>
-</ol>
-
-<p>You will be able to enable or disable the following options.</p>
-
-<p><strong>Show Co-Guild Tags</strong></p>
-
 <blockquote>
-<p>Show co-guild identifier in messages. <br>
-Default: on</p>
-</blockquote>
-
-<p><strong>Show Co-Guild Achievement Announcements</strong></p>
-
-<blockquote>
-<p>Show achievements from other co-guilds. <br>
-Default: off</p>
-</blockquote>
-
-<p><strong>Show Co-Guild Roster Announcements</strong></p>
-
-<blockquote>
-<p>Show guild join and leave messages from other co-guilds. <br>
-Default: on </p>
-</blockquote>
-
-<p><strong>Show Co-Guild Rank Announcements</strong></p>
-
-<blockquote>
-<p>Show promotion and demotion messages from other co-guilds. <br>
-Default: off </p>
-</blockquote>
-
-<p><strong>Bridge Officer Chat</strong></p>
-
-<blockquote>
-<p>Show bridge officer chat between the co-guilds. This only works for members who have privileges to view officer notes.<br>
-Default: off </p>
-</blockquote>
-
-<h2>Command Line Interface</h2>
-
-<p>All commands must be prefixed with <code>/greenwall</code> or <code>/gw</code>.</p>
-
-<p>As an example, the configuration option for co-guild tagging is <code>tag</code>. To turn it on, you would enter one of the following commands. In the command descriptions, optional arguments are in square brackets and alternatives are separated by the pipe character.</p>
-
-<pre><code>/greenwall tag on
-/gw tag on
-</code></pre>
-
-<p>To view the current configuration, you would enter one of the following.</p>
-
-<pre><code>/greenwall tag
-/gw tag
-</code></pre>
-
-<h3>Output Options</h3>
-
-<p>tag [ on | off ]</p>
-
-<blockquote>
-<p>Show co-guild identifier in messages. <br>
-Default: on</p>
-</blockquote>
-
-<p>achievements [ on | off ]</p>
-
-<blockquote>
-<p>Show achievements from other co-guilds. <br>
-Default: off</p>
-</blockquote>
-
-<p>roster [ on | off ]</p>
-
-<blockquote>
-<p>Show guild join and leave messages from other co-guilds. <br>
-Default: on </p>
-</blockquote>
-
-<p>rank [ on | off ]</p>
-
-<blockquote>
-<p>Show promotion and demotion messages from other co-guilds. <br>
-Default: off </p>
-</blockquote>
-
-<h3>Officer Options</h3>
-
-<p>ochat [ on | off ]</p>
-
-<blockquote>
-<p>Show bridge officer chat between the co-guilds. This only works for members who have privileges to view officer notes.<br>
-Default: off </p>
-</blockquote>
-
-<h3>Debugging Options</h3>
-
-<p>debug level</p>
-
-<blockquote>
-<p>Enable debugging at the specified level. The level argument is an integer from 0 to 5. Setting the level to 0 disables debugging. <br>
-Default: 0 </p>
-</blockquote>
-
-<p>log [ on | off ]</p>
-
-<blockquote>
-<p>Capture debugging output in the <code>SavedVariables</code> file. <br>
-Default: off </p>
-</blockquote>
-
-<p>logsize length</p>
-
-<blockquote>
-<p>Keep length number log entries in the <code>SavedVariables</code> file. <br>
-Default: 2048 </p>
-</blockquote>
-
-<p>verbose [ on | off ]</p>
-
-<blockquote>
-<p>Display the debugging output in your chat window. Only do this if you are masochistic. <br>
-Default: off </p>
-</blockquote>
-
-<h3>Operation</h3>
-
-<p>help</p>
-
-<blockquote>
-<p>Print a summary of available commands. </p>
-</blockquote>
-
-<p>stats</p>
-
-<blockquote>
-<p>Prints a summary of the connection statistics for the common communication channel(s). </p>
-</blockquote>
-
-<p>status</p>
-
-<blockquote>
-<p>Prints a summary of the GreenWall communication parameters and state variables. </p>
-</blockquote>
-
-<p>reload</p>
-
-<blockquote>
-<p>Issues a request to all members of the confederated guilds to reload the configuration. </p>
-</blockquote>
-
-<p>refresh</p>
-
-<blockquote>
-<p>Checks and corrects the communications status for the common channel(s). </p>
-</blockquote>
-
-<p>version</p>
-
-<blockquote>
-<p>Print the installed version of GreenWall. </p>
+<p>Note: A <code>*</code> value passed as add-on is not a wildcard in this context, it will only matched instances where the handler was installed with <code>*</code> as the add-on.</p>
 </blockquote>
 </body>
 </html>

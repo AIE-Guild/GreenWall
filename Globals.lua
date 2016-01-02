@@ -34,8 +34,9 @@ Global Variables
 -- State variables
 --
 gw = {
-    frame_table     = {},
     addon_loaded    = false,
+    frame_table     = {},
+    api_table       = {},
 }
 gw.version      = GetAddOnMetadata('GreenWall', 'Version')
 gw.realm        = GetRealmName()
@@ -115,3 +116,4 @@ gw.usage = [[
         -- (officer only) Force a reload of the configuration by all online guild members.
  
 ]]
+

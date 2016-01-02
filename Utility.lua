@@ -71,7 +71,7 @@ end
 -- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Write(...)
     local msg = string.format(unpack({...}))
-    DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r ' .. msg)
+    DEFAULT_CHAT_FRAME:AddMessage('|cff0bda51GreenWall:|r ' .. msg)
     gw.Log(msg)
 end
 
@@ -103,7 +103,7 @@ function gw.Debug(level, ...)
             local trace = format('[debug/%d@%s] %s', level, get_caller(), msg)
             gw.Log(trace)
             if GreenWall.verbose then
-                DEFAULT_CHAT_FRAME:AddMessage(format('|cffabd473GreenWall:|r |cff778899%s|r', trace))
+                DEFAULT_CHAT_FRAME:AddMessage(format('|cff009a7dGreenWall:|r |cff778899%s|r', trace))
             end
         end
     end
