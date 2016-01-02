@@ -2,7 +2,7 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## [1.7.0] -- Unreleased
+## [1.7.0] -- 2016-01-01
 ### Fixed
 - Improved message validation during adaptation layer decoding.
 - Fixed message handling logic.

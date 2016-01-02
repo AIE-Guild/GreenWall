@@ -467,26 +467,45 @@ confederation.</p>
 
 <h2>Safety First</h2>
 
-<p>Before any API functions are called, there are two tests that should be<br>
+<p>Before any API functions are called, there are tests that should be<br>
 run to verify the environment.</p>
 
-<h3>1. Check that GreenWall is loaded.</h3>
+<h3>Individual API checks</h3>
+
+<h4>Check that GreenWall is loaded</h4>
 
 <div class="highlight highlight-source-lua"><pre><span class="pl-k">if</span> <span class="pl-c1">IsAddOnLoaded</span>(<span class="pl-s"><span class="pl-pds">'</span>GreenWall<span class="pl-pds">'</span></span>) <span class="pl-k">then</span>
     <span class="pl-c1">...</span>
 <span class="pl-k">end</span></pre></div>
 
-<h3>2. Check that the API is supported.</h3>
+<h4>Check that the API is supported</h4>
 
 <div class="highlight highlight-source-lua"><pre><span class="pl-k">if</span> GreenWallAPI <span class="pl-k">~=</span> <span class="pl-c1">nil</span> <span class="pl-k">then</span>
     <span class="pl-c1">...</span>
 <span class="pl-k">end</span></pre></div>
 
-<h3>3. Optionally, check the API version.</h3>
+<h4>Check the API version</h4>
 
 <div class="highlight highlight-source-lua"><pre>
-<span class="pl-k">if</span> GreenWallAPI <span class="pl-k">==</span> <span class="pl-c1">1</span> <span class="pl-k">then</span>
+<span class="pl-k">if</span> GreenWallAPI <span class="pl-k">&gt;=</span> <span class="pl-c1">1</span> <span class="pl-k">then</span>
     <span class="pl-c1">...</span>
+<span class="pl-k">end</span></pre></div>
+
+<h3>Unified API check</h3>
+
+<p>This combines all of the tests into one function.</p>
+
+<div class="highlight highlight-source-lua"><pre><span class="pl-k">function</span> <span class="pl-en">apiAvailable</span>()
+    <span class="pl-k">function</span> <span class="pl-en">testAPI</span>()
+        <span class="pl-c">-- Raises and exception of GreenWall is loaded or is pre-1.7.</span>
+        <span class="pl-c1">assert</span>(<span class="pl-c1">IsAddOnLoaded</span>(<span class="pl-s"><span class="pl-pds">'</span>GreenWall<span class="pl-pds">'</span></span>))
+        <span class="pl-k">return</span> GreenWallAPI.<span class="pl-smi">version</span>
+    <span class="pl-k">end</span>
+
+    <span class="pl-c">-- Catch any exceptions</span>
+    <span class="pl-k">local</span> found, version <span class="pl-k">=</span> <span class="pl-c1">pcall</span>(testAPI)
+
+    <span class="pl-k">return</span> found <span class="pl-k">and</span> version <span class="pl-k">&gt;=</span> <span class="pl-c1">1</span>
 <span class="pl-k">end</span></pre></div>
 
 <h2>Sending a Message</h2>
