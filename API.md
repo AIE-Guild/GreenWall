@@ -18,10 +18,12 @@ A simple example, which demonstrates the use of the API, is [GWSonar](https://gi
 
 ## Safety First
 
-Before any API functions are called, there are two tests that should be
+Before any API functions are called, there are tests that should be
 run to verify the environment.
 
-### 1. Check that GreenWall is loaded.
+### Individual API checks
+
+#### Check that GreenWall is loaded
 
 ```lua
 if IsAddOnLoaded('GreenWall') then
@@ -29,7 +31,7 @@ if IsAddOnLoaded('GreenWall') then
 end
 ```
 
-### 2. Check that the API is supported.
+#### Check that the API is supported
 
 ```lua
 if GreenWallAPI ~= nil then
@@ -37,14 +39,34 @@ if GreenWallAPI ~= nil then
 end
 ```
 
-### 3. Optionally, check the API version.
+#### Check the API version
 
 ```lua
 
-if GreenWallAPI == 1 then
+if GreenWallAPI >= 1 then
     ...
 end
 ```
+
+### Unified API check
+
+This combines all of the tests into one function.
+
+```lua
+function apiAvailable()
+    function testAPI()
+        -- Raises and exception of GreenWall is loaded or is pre-1.7.
+        assert(IsAddOnLoaded('GreenWall'))
+        return GreenWallAPI.version
+	end
+    
+	-- Catch any exceptions
+	local found, version = pcall(testAPI)
+
+	return found and version >= 1
+end
+```
+
 
 ## Sending a Message
 
