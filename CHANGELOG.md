@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.7.1] -- 2016-07-20
+### Changed
+- Updated TOC for WoW 7.0.3.
+
 ## [1.7.0] -- 2016-01-01
 ### Fixed
 - Improved message validation during adaptation layer decoding.
@@ -55,7 +59,7 @@ for handling hold-down expiry.
 ### Fixed
 - Added conditional to check achievements flag on receipt of achievement spam.
 
-### Added 
+### Added
 - Added guild ID to debugging output on message receipt.
 
 ## [1.6.0] -- 2015-02-24
@@ -80,7 +84,7 @@ for handling hold-down expiry.
 
 ## [1.5.3] -- 2014-11-11
 ### Fixed
-- Added comember cache updates for channel join/leave events. This stops 
+- Added comember cache updates for channel join/leave events. This stops
 flapping roster announcements for characters in peer co-guilds.
 
 ## [1.5.2] -- 2014-10-31
@@ -440,6 +444,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.7.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.6...v1.7.0
 [1.6.6]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.5...v1.6.6
 [1.6.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.4...v1.6.5
