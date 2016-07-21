@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2015 Mark Rogaski
+Copyright (c) 2010-2016 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -82,7 +82,7 @@ function gw.handlerOfficerChat(type, guild_id, content, arglist)
 end
 
 
---- Copies a message received on a common channel to all chat window instances of a 
+--- Copies a message received on a common channel to all chat window instances of a
 -- target chat channel.
 -- @param event Chat message event to generate.
 --   Accepted values:
@@ -101,36 +101,36 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
     local target = arglist[5]
     local flags = arglist[6]
     local guid = arglist[12]
-    
+
     gw.Debug(GW_LOG_INFO, 'event=%s, guild_id=%s, message=%s', event, guild_id, message)
-    
+
     if GreenWall.tag and event ~= 'SYSTEM' then
         message = format('<%s> %s', guild_id, message)
     end
-    
-    local i    
+
+    local i
     for i = 1, NUM_CHAT_WINDOWS do
 
         gw.frame_table = { GetChatWindowMessages(i) }
-        
+
         local v
         for _, v in ipairs(gw.frame_table) do
-                        
+
             if v == event then
-                    
+
                 local frame = 'ChatFrame' .. i
                 if _G[frame] then
                     gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%s', frame, event, sender, message)
                     gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message, sender, language, '', target, flags, 0, 0, '', 0, 0, guid)
                 end
                 break
-                        
+
             end
-                        
+
         end
-                    
+
     end
-    
+
 end
 
 
@@ -159,7 +159,7 @@ function gw.SendLocal(type, message)
     local payload = strsub(strjoin('#', opcode, message), 1, 255)
     gw.Debug(GW_LOG_DEBUG, 'message=%s', payload)
     SendAddonMessage('GreenWall', payload, 'GUILD')
-    
+
 end
 
 --- Parses and handles an encoded message from the add-on channel.
@@ -169,15 +169,15 @@ end
 function gw.ReceiveLocal(sender, message)
 
     gw.Debug(GW_LOG_INFO, 'sender=%s, message=%s', sender, message)
-    
+
     if not gw.iCmp(gw.GlobalName(sender), gw.player) then
 
         local opcode, payload = strsplit('#', message)
         payload = payload or ''
         gw.Debug(GW_LOG_DEBUG, 'opcode=%s, payload=%s', opcode, payload)
-    
+
         if opcode == 'I' then
-    
+
             if message == 'reload' then
                 if gw.IsOfficer(sender) then
                     if gw.config.timer.reload:hold() then
@@ -186,21 +186,21 @@ function gw.ReceiveLocal(sender, message)
                         gw.Write('Received configuration reload request from %s.', sender)
                         gw.config:reload()
                         gw.config.timer.reload:start()
-                    end   
+                    end
                 end
             end
-    
+
         elseif opcode == 'C' then
-    
+
             if message == 'officer' then
                 -- A query for officers
                 if gw.IsOfficer() then
                     gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
                 end
             end
-    
+
         elseif opcode == 'R' then
-    
+
             if message == 'officer' then
                 -- A response to the officer query
                 if gw.IsOfficer(sender) then
@@ -216,12 +216,12 @@ function gw.ReceiveLocal(sender, message)
                     gw.Debug(GW_LOG_WARNING, 'officer spoofing attempt from %s', sender)
                 end
             end
-    
+
         end
-    
+
     end
-    
+
     return true
-    
+
 end
 

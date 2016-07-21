@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2015 Mark Rogaski
+Copyright (c) 2010-2016 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,7 @@ end
 --  supplied, messages from all addons will be handled.
 -- @param priority A signed integer indicating relative priority, lower value
 --  is handled first.  The default is 0.
--- @return The ID that can be used to remove the handler. 
+-- @return The ID that can be used to remove the handler.
 function GreenWallAPI.AddMessageHandler(handler, addon, priority)
     local function generate_id(handler)
         local count = 0
@@ -73,10 +73,10 @@ function GreenWallAPI.AddMessageHandler(handler, addon, priority)
     if addon ~= '*' then
         assert(addon == GetAddOnInfo(addon))
     end
-    
+
     local id = generate_id(handler)
     gw.Debug(GW_LOG_INFO, 'add API handler; id=%s, addon=%s, priority=%d', id, addon, priority)
-    
+
     table.insert(gw.api_table, {id, addon, priority, handler})
     table.sort(gw.api_table, function (a, b) return a[2] < b[2] end)
 
@@ -105,7 +105,7 @@ end
 
 
 --- Clear our portions or all of the dispatch table entries.
--- @param addon Optional identifier for the addon or '*'.  If nil, 
+-- @param addon Optional identifier for the addon or '*'.  If nil,
 --  all table entries will be removed.
 --
 -- Note: A '*' value passed as addon is not a wildcard in this context,
@@ -124,7 +124,7 @@ function GreenWallAPI.ClearMessageHandlers(addon)
                 gw.Debug(GW_LOG_INFO, 'remove API handler; id=%, addon=%s, priority=%d', e[1], e[2], e[3])
                 gw.api_table[i] = nil
             end
-        end        
+        end
     end
 end
 

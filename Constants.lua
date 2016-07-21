@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2015 Mark Rogaski
+Copyright (c) 2010-2016 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ GW_LOG_ERROR      = 1
 GW_LOG_WARNING    = 2
 GW_LOG_NOTICE     = 3
 GW_LOG_INFO       = 4
-GW_LOG_DEBUG      = 5 
+GW_LOG_DEBUG      = 5
 
 
 --

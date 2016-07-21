@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2015 Mark Rogaski
+Copyright (c) 2010-2016 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ GwHoldDown.__index = GwHoldDown
 
 --- GwHoldDown constructor function.
 -- @param interval The length, in seconds, of the hold-down interval.
--- @param limit The maximum hold time when the continue method is invoked.  
+-- @param limit The maximum hold time when the continue method is invoked.
 -- If no value is supplied, the interval value is used.
 -- @return An initialized GwHoldDown instance.
 function GwHoldDown:new(interval, limit)
@@ -83,11 +83,11 @@ function GwHoldDown:start(f)
     local expiry = t + self.interval
     self.timestamp = t
     self.scale = 0
-    
+
     local frame = CreateFrame('frame')
     frame:SetScript('OnUpdate', handler)
-    
-    gw.Debug(GW_LOG_NOTICE, 'hold-down start; timer=%s, timestamp=%d, expiry=%d, function=%s', 
+
+    gw.Debug(GW_LOG_NOTICE, 'hold-down start; timer=%s, timestamp=%d, expiry=%d, function=%s',
             tostring(self), self.timestamp, expiry, tostring(f))
     return expiry
 end
@@ -98,17 +98,17 @@ function GwHoldDown:continue()
     if self.timestamp == 0 then
         return self:start()
     end
-    
+
     -- Increase scaling factor
     if self.interval * 2 ^ (self.scale + 1) <= self.limit then
         self.scale = self.scale + 1
     end
-    
+
     -- Set the timer
     local t = time()
     local expiry = t + self.interval * 2 ^ self.scale
     self.timestamp = t
-    
+
     gw.Debug(GW_LOG_NOTICE, 'hold-down continue; timer=%s, timestamp=%d, scale=%d, expiry=%d',
             tostring(self), self.timestamp, self.scale, expiry)
 
@@ -125,8 +125,12 @@ end
 --- Test the hold-down status.
 -- @return True if a hold-down is in effect, false otherwise.
 function GwHoldDown:hold()
-    local t = time()
-    return self.timestamp + self.interval * 2 ^ self.scale > t
+    if self.timestamp > 0 then
+        local t = time()
+        return self.timestamp + self.interval * 2 ^ self.scale > t
+    else
+        return false
+    end
 end
 
 
@@ -156,7 +160,7 @@ end
 function GwHoldDownCache:hold(s)
     local t = time()
     local rv = false
-    
+
     -- Check for hold-down
     if self.cache[s] == nil then
         self.cache[s] = t
@@ -170,7 +174,7 @@ function GwHoldDownCache:hold(s)
             gw.Debug(GW_LOG_DEBUG, 'cache expire; target=%s, cache=%s', s, tostring(self))
         end
     end
-    
+
     -- Prune if necessary
     if #self.cache > self.soft_max then
         for k, v in pairs(self.cache) do
@@ -180,7 +184,7 @@ function GwHoldDownCache:hold(s)
             end
         end
     end
-    
+
     -- Hard prune if necessary
     if #self.cache > self.hard_max then
         local index = {}
@@ -193,7 +197,7 @@ function GwHoldDownCache:hold(s)
             gw.Debug(GW_LOG_DEBUG, 'cache hard prune; target=%s, cache=%s', index[i][2], tostring(self))
         end
     end
-    
+
     return rv
 end
 

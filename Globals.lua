@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2015 Mark Rogaski
+Copyright (c) 2010-2016 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -73,14 +73,14 @@ gw.option = {
 }
 
 gw.usage = [[
- 
+
   Usage:
-  
+
   /greenwall <command>  or  /gw <command>
-  
+
   Commands:
-  
-  help 
+
+  help
         -- Print this message.
   version
         -- Print the add-on version.
@@ -114,6 +114,6 @@ gw.usage = [[
         -- Specify the maximum number of log entries to keep.
   admin reload
         -- (officer only) Force a reload of the configuration by all online guild members.
- 
+
 ]]
 
