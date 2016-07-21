@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2015 Mark Rogaski
+Copyright (c) 2010-2016 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -81,7 +81,7 @@ function GwConfig:initialize_state()
     }
     self.comember_cache = GwHoldDownCache:new(GW_CACHE_COMEMBER_HOLD,
             GW_CACHE_COMEMBER_SOFT_MAX, GW_CACHE_COMEMBER_HARD_MAX)
-            
+
     return self
 end
 
@@ -89,7 +89,7 @@ end
 --- Dump configuration attributes.
 function GwConfig:dump(keep)
     local function dump_tier(t, level)
-        level = level == nil and 0 or level 
+        level = level == nil and 0 or level
         local indent = strrep('  ', level)
         local index = {}
         for i in pairs(t) do
@@ -110,10 +110,10 @@ function GwConfig:dump(keep)
                 else
                     gw.Write("%s%s = %s", indent, k, tostring(t[k]))
                 end
-            end 
+            end
         end
     end
-    
+
     gw.Write('[Options]')
     dump_tier(GreenWall, 0)
     gw.Write('[Configuration]')
@@ -140,12 +140,12 @@ function GwConfig:load()
         end
         return estr
     end
-    
+
     local function get_gm_officer_note()
         if not gw.IsOfficer() then
             return
         end
-        
+
         local n = GetNumGuildMembers();
         local name, rank, note
         for i = 1, n do
@@ -157,7 +157,7 @@ function GwConfig:load()
         end
         return
     end
-    
+
     local xlat = {}                     -- Translation table for string substitution.
 
     -- Abort if current configuration is valid
@@ -174,16 +174,16 @@ function GwConfig:load()
         gw.Debug(GW_LOG_WARNING, 'not in a guild.')
         return false
     end
-    
+
     -- Abort if configuration is not yet available
     local info = GetGuildInfoText()     -- Guild information text.
     if info == '' then
         gw.Debug(GW_LOG_WARNING, 'guild configuration not available.')
         return false
     end
-    
+
     gw.Debug(GW_LOG_INFO, 'parsing guild configuration.')
-    
+
 
 
     -- Soft reset of configuration
@@ -191,10 +191,10 @@ function GwConfig:load()
     for k, channel in pairs(self.channel) do
         channel:age()
     end
-    
+
     -- Update the channel hold-down
     self.timer.channel:set(GreenWall.joindelay)
-    
+
     --
     -- Check configuration version
     --
@@ -204,19 +204,19 @@ function GwConfig:load()
     if strmatch(info, 'GW:?c:') then
         self.cversion = 1
     end
-    
+
     if self.cversion == 1 then
         --
         -- Parse version 1 configuration
         --
         for buffer in gmatch(info, 'GW:?(%l:[^\n]*)') do
-        
+
             if buffer ~= nil then
-            
+
                 self.cversion = 1
                 buffer = strtrim(buffer)
                 local field = { strsplit(':', buffer) }
-            
+
                 if field[1] == 'c' then
                     -- Guild channel configuration
                     if field[2] and field[2] ~= '' then
@@ -224,10 +224,10 @@ function GwConfig:load()
                     else
                         gw.Error('invalid common channel name specified')
                     end
-    
+
                 elseif field[1] == 'p' then
                     -- Peer guild
-                    local peer_name = gw.GlobalName(substitute(field[2], xlat))                
+                    local peer_name = gw.GlobalName(substitute(field[2], xlat))
                     local peer_id = substitute(field[3], xlat)
                     if gw.iCmp(guild_name, peer_name) then
                         self.guild_id = peer_id
@@ -271,7 +271,7 @@ function GwConfig:load()
 
         self.valid = true
     end
-    
+
     -- Officer note
     if GreenWall.ochat then
         local note = get_gm_officer_note()
@@ -288,7 +288,7 @@ function GwConfig:load()
     else
         self.channel.officer:clear()
     end
-    
+
     --
     -- Version check
     --
@@ -299,7 +299,7 @@ function GwConfig:load()
             gw.Error('Guild configuration specifies a minimum version of %s (%s currently installed).', tostring(min), tostring(cur))
         end
     end
-    
+
     --
     -- Clean up.
     --
@@ -311,9 +311,9 @@ function GwConfig:load()
     if self.valid then
         self.timer.config:start()
     end
-    
+
     return true;
-    
+
 end
 
 

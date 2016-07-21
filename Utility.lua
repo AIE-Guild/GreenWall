@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2014 Mark Rogaski
+Copyright (c) 2010-2016 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -96,7 +96,7 @@ function gw.Debug(level, ...)
         local fun = strmatch(s, 'in function \`([%a_-]+)\'')
         return fun and loc .. '(' .. fun .. ')' or loc
     end
-    
+
     local msg = string.format(unpack({...}))
     if GreenWall ~= nil then
         if level <= GreenWall.debug then
@@ -217,7 +217,7 @@ function gw.IsOfficer(target)
     if rank then
 
         local name = GuildControlGetRankName(rank)
-    
+
         GuildControlSetRank(rank);
         for i, v in ipairs({GuildControlGetRankFlags()}) do
             local flag = _G["GUILDCONTROL_OPTION"..i]

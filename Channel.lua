@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2015 Mark Rogaski
+Copyright (c) 2010-2016 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -150,22 +150,22 @@ end
 -- @return True if connection success, false otherwise.
 function GwChannel:join()
 
-    
+
     if not self:is_configured() then
-    
+
         -- Only join if we have the channel details
         return false
-    
+
     elseif self.fdelay:hold() then
 
         -- Hold down in effect.
         return false
 
     elseif self:is_connected() then
-    
+
         -- Already connected
         return true
-    
+
     else
 
         gw.Debug(GW_LOG_INFO, 'joining channel; channel=%s, password=%s',
@@ -174,21 +174,21 @@ function GwChannel:join()
         local number = GetChannelName(self.name)
 
         if number == 0 then
-    
+
             gw.Error('cannot create communication channel: %s', gw.Redact(self.name))
             self.stats.fconn = self.stats.fconn + 1
             self.fdelay:continue()
             return false
-    
+
         else
-    
+
             self.number = number
             self.stats.sconn = self.stats.sconn + 1
             self.fdelay:clear()
             gw.Debug(GW_LOG_NOTICE, 'joined channel; number=%d, name=%s, password=%s',
                     self.number, gw.Redact(self.name), gw.Redact(self.password))
             gw.Write('Connected to confederation on channel %d.', self.number)
-                  
+
             --
             -- Hide the channel
             --
@@ -198,23 +198,23 @@ function GwChannel:join()
                     if v == self.name then
                         local frame = format('ChatFrame%d', i)
                         if _G[frame] then
-                            gw.Debug(GW_LOG_INFO, 'hiding channel: number=%d, name=%s, frame=%s', 
+                            gw.Debug(GW_LOG_INFO, 'hiding channel: number=%d, name=%s, frame=%s',
                                     self.number, gw.Redact(self.name), frame)
                             ChatFrame_RemoveChannel(frame, self.name)
                         end
                     end
                 end
             end
-    
+
             -- Gratuitous officer announcement, veracity of the claim should be verified by the receiver.
             if gw.IsOfficer() then
                 gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
             end
-    
+
             return true
-    
+
         end
-        
+
     end
 
 end
@@ -223,7 +223,7 @@ end
 -- @return True if a disconnection occurred, false otherwise.
 function GwChannel:leave()
     if self:is_connected() then
-        gw.Debug(GW_LOG_INFO, 'leaving channel; number=%d, channel=%s, password=%s', 
+        gw.Debug(GW_LOG_INFO, 'leaving channel; number=%d, channel=%s, password=%s',
                 self.number, gw.Redact(self.name), gw.Redact(self.password))
         LeaveChannelByName(self.name)
         self.stats.leave = self.stats.leave + 1
@@ -245,7 +245,7 @@ Informational Methods
 -- @param label An identifier for the channel.
 function GwChannel:dump_status(label)
     label = label or 'channel'
-    gw.Write('%s: connected=%s, number=%d, channel=%s, password=%s, stale=%s (sconn=%d, fconn=%d, leave=%d, disco=%d)', 
+    gw.Write('%s: connected=%s, number=%d, channel=%s, password=%s, stale=%s (sconn=%d, fconn=%d, leave=%d, disco=%d)',
                 label, tostring(self:is_connected()), self.number, gw.Redact(self.name),
                 gw.Redact(self.password), tostring(self:is_stale()),
                 self.stats.sconn, self.stats.fconn, self.stats.leave, self.stats.disco)
@@ -260,7 +260,7 @@ Transmit Methods
 
 --- Sends an encoded message on the shared channel.
 -- @param type The message type.
---   Accepted values are: 
+--   Accepted values are:
 --     GW_MTYPE_CHAT
 --     GW_MTYPE_ACHIEVEMENT
 --     GW_MTYPE_BROADCAST
@@ -312,10 +312,10 @@ function GwChannel:tl_send(type, message)
         gw.Debug(GW_LOG_ERROR, 'unknown message type: %d', type)
         return
     end
-    
+
     -- Format the message segment
     local segment = strsub(strjoin('#', opcode, gw.config.guild_id, '', message), 1, GW_MAX_MESSAGE_LENGTH)
-    
+
     -- Send the message
     self:tl_enqueue(segment)
     self:tl_flush()
@@ -419,7 +419,7 @@ function GwChannel:al_decode(mtype, message)
         end
         return t
     end
-    
+
     gw.Debug(GW_LOG_DEBUG, 'type=%d, message=%s', mtype, message)
     if mtype == GW_MTYPE_BROADCAST then
         return expand(message, 3)
@@ -442,7 +442,7 @@ function GwChannel:tl_receive(...)
     sender = gw.GlobalName(sender)
     gw.Debug(GW_LOG_INFO, 'channel=%d, sender=%s, segment=%s', self.number, sender, segment)
     self.stats.rxcnt = self.stats.rxcnt + 1
-    
+
     -- Check the segment hash
     if sender == gw.player then
         local hash = crc.Hash(segment)
@@ -457,13 +457,13 @@ function GwChannel:tl_receive(...)
             gw.Error('Message corruption detected.  Please disable add-ons that might modify messages on channel %d.', self.number)
         end
     end
-    
+
     -- Process the segment
     local opcode, guild_id, _, message = strsplit('#', segment, 4)
     guild_id = guild_id or '-'
     message = message or ''
     gw.Debug(GW_LOG_DEBUG, 'opcode=%s, guild_id=%s, message=%s', opcode, guild_id, message)
-    
+
     local type = GW_MTYPE_NONE
     if opcode == 'C' then
         type = GW_MTYPE_CHAT
