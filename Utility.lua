@@ -132,7 +132,7 @@ end
 -- @return A formatted cross-realm address.
 function gw.GlobalName(name, realm)
     -- Pass formatted names without modification.
-    if name:match(".+-[%a']+$") then
+    if name:match("[^-]+-[^-]+$") then
         return name
     end
 
