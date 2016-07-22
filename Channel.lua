@@ -123,10 +123,10 @@ end
 --- Check if a connection exists to the custom channel.
 -- @return True if connected, otherwise false.
 function GwChannel:is_connected()
-    gw.Debug(GW_LOG_DEBUG, 'number=%d, name=%s', self.number, gw.Redact(self.name))
+    gw.Debug(GW_LOG_DEBUG, 'checking number=%d, name=%s', self.number, gw.Redact(self.name))
     if self:is_configured() then
         self.number = GetChannelName(self.name)
-        gw.Debug(GW_LOG_DEBUG, 'set number=%d', self.number)
+        gw.Debug(GW_LOG_DEBUG, 'confirmed number=%d, name=%s', self.number, gw.Redact(self.name))
         if self.number == 0 then
             return false
         else
