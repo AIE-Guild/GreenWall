@@ -5,6 +5,7 @@ This project uses [Semantic Versioning](http://semver.org/).
 ## [1.7.3] -- Unreleased
 ### Fixed
 - Corrected global name parsing to account for UTF-8.
+- Updated API documentation.
 
 ## [1.7.2] -- 2016-07-20
 ### Fixed
