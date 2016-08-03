@@ -76,8 +76,11 @@ To send a message to other instances of the add-on, use the following function.
 GreenWallAPI.SendMessage(addon, message)
 ```
 
-The __addon__ parameter is either the name of the add-on or '*', which matches 
-from any add-on.
+Arguments:
+
+- addon - The addon name, should the one used for the name of the TOC file.
+- message - The message to send. Accepts 8-bit data.
+
 
 ## Receiving a Message
 
@@ -89,7 +92,7 @@ The receiving of messages is handled with callbacks.
 local function handler(addon, sender, message, echo, guild)
 ```
 
-The function should accept the following arguments:
+Arguments:
 
 - addon - The name of the addon sending the message.
 - sender - The player sending the message.
@@ -103,10 +106,15 @@ The function should accept the following arguments:
 local id = GreenWallAPI.AddMessageHandler(handler, addon, priority)
 ```
 
-- handler - The handler function.
-- addon - A tag defining the name of the add-on messages will be received from.
-  The `*` character can be used to match all add-ons.
-- priority - A signed integer.  Lower priority matches are executed earlier.
+Arguments:
+
+- handler - The callback function.
+- addon - The name of the addon that you want to receive messages from (the same one used for the name of the TOC file).  If the value '*' is supplied, messages from all addons will be handled.
+-  priority - A signed integer indicating relative priority, lower value is handled first.  The default is 0.
+
+Returns:
+
+- The ID that can be used to remove the handler.
 
 ## Dispatch Table
 
@@ -119,6 +127,8 @@ the following functions are available to manage the dispatch table.
 local found = GreenWallAPI.RemoveMessageHandler(id)
 ```
 
+Arguments:
+
 - handler_id - The ID of the handler function.
 
 ### Clear one or more handlers
@@ -126,6 +136,8 @@ local found = GreenWallAPI.RemoveMessageHandler(id)
 ```lua
 GreenWallAPI.ClearMessageHandlers(addon)
 ```
+
+Arguments:
 
 - addon - (Optional) A tag defining the name of the add-on messages will be 
   received from. The `*` character can be used to match all add-ons. If this 

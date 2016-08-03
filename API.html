@@ -6,7 +6,7 @@
 <style type="text/css">
 /* GitHub stylesheet for MarkdownPad (http://markdownpad.com) */
 /* Author: Nicolas Hery - http://nicolashery.com */
-/* Version: 29d1c5bc36da364ad5aa86946d420b7bbc54a253 */
+/* Version: b13fe65ca28d2e568c6ed5d7f06581183df8f2ff */
 /* Source: https://github.com/nicolahery/markdownpad-github */
 
 /* RESET
@@ -210,6 +210,24 @@ pre {
 pre code, pre tt {
   background-color: transparent;
   border: none;
+}
+
+kbd {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #DDDDDD;
+    background-image: linear-gradient(#F1F1F1, #DDDDDD);
+    background-repeat: repeat-x;
+    border-color: #DDDDDD #CCCCCC #CCCCCC #DDDDDD;
+    border-image: none;
+    border-radius: 2px 2px 2px 2px;
+    border-style: solid;
+    border-width: 1px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    line-height: 10px;
+    padding: 1px 4px;
 }
 
 /* QUOTES
@@ -450,128 +468,87 @@ vertical-align:1px;
 </style>
 </head>
 <body>
-<h1>GreenWall API Reference</h1>
-
-<h2>Purpose</h2>
-
-<p>Initially, it was hoped that GreenWall could be extended to bridge<br>
-standard add-on messages.  However, the WoW API doesn't have a function<br>
-similar to <code>ChatFrame_MessageEventHandler</code> that could be used<br>
-for add-on messages.</p>
-
-<p>So this simple messaging API is provided for third-party add-on developers<br>
-who would like to be able to use the bridged communication on a guild<br>
-confederation.</p>
-
+<h1 id="greenwall-api-reference">GreenWall API Reference</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Initially, it was hoped that GreenWall could be extended to bridge<br>standard add-on messages.  However, the WoW API doesn&#39;t have a function<br>similar to <code>ChatFrame_MessageEventHandler</code> that could be used<br>for add-on messages.</p>
+<p>So this simple messaging API is provided for third-party add-on developers<br>who would like to be able to use the bridged communication on a guild<br>confederation.</p>
 <p>A simple example, which demonstrates the use of the API, is <a href="https://github.com/AIE-Guild/GWSonar">GWSonar</a>.</p>
-
-<h2>Safety First</h2>
-
-<p>Before any API functions are called, there are tests that should be<br>
-run to verify the environment.</p>
-
-<h3>Individual API checks</h3>
-
-<h4>Check that GreenWall is loaded</h4>
-
-<div class="highlight highlight-source-lua"><pre><span class="pl-k">if</span> <span class="pl-c1">IsAddOnLoaded</span>(<span class="pl-s"><span class="pl-pds">'</span>GreenWall<span class="pl-pds">'</span></span>) <span class="pl-k">then</span>
-    <span class="pl-c1">...</span>
-<span class="pl-k">end</span></pre></div>
-
-<h4>Check that the API is supported</h4>
-
-<div class="highlight highlight-source-lua"><pre><span class="pl-k">if</span> GreenWallAPI <span class="pl-k">~=</span> <span class="pl-c1">nil</span> <span class="pl-k">then</span>
-    <span class="pl-c1">...</span>
-<span class="pl-k">end</span></pre></div>
-
-<h4>Check the API version</h4>
-
-<div class="highlight highlight-source-lua"><pre>
-<span class="pl-k">if</span> GreenWallAPI <span class="pl-k">&gt;=</span> <span class="pl-c1">1</span> <span class="pl-k">then</span>
-    <span class="pl-c1">...</span>
-<span class="pl-k">end</span></pre></div>
-
-<h3>Unified API check</h3>
-
+<h2 id="safety-first">Safety First</h2>
+<p>Before any API functions are called, there are tests that should be<br>run to verify the environment.</p>
+<h3 id="individual-api-checks">Individual API checks</h3>
+<h4 id="check-that-greenwall-is-loaded">Check that GreenWall is loaded</h4>
+<pre><code class="lang-lua">if IsAddOnLoaded(&#39;GreenWall&#39;) then
+    ...
+end
+</code></pre>
+<h4 id="check-that-the-api-is-supported">Check that the API is supported</h4>
+<pre><code class="lang-lua">if GreenWallAPI ~= nil then
+    ...
+end
+</code></pre>
+<h4 id="check-the-api-version">Check the API version</h4>
+<pre><code class="lang-lua">
+if GreenWallAPI &gt;= 1 then
+    ...
+end
+</code></pre>
+<h3 id="unified-api-check">Unified API check</h3>
 <p>This combines all of the tests into one function.</p>
+<pre><code class="lang-lua">function apiAvailable()
+    function testAPI()
+        -- Raises and exception of GreenWall is loaded or is pre-1.7.
+        assert(IsAddOnLoaded(&#39;GreenWall&#39;))
+        return GreenWallAPI.version
+    end
 
-<div class="highlight highlight-source-lua"><pre><span class="pl-k">function</span> <span class="pl-en">apiAvailable</span>()
-    <span class="pl-k">function</span> <span class="pl-en">testAPI</span>()
-        <span class="pl-c">-- Raises and exception of GreenWall is loaded or is pre-1.7.</span>
-        <span class="pl-c1">assert</span>(<span class="pl-c1">IsAddOnLoaded</span>(<span class="pl-s"><span class="pl-pds">'</span>GreenWall<span class="pl-pds">'</span></span>))
-        <span class="pl-k">return</span> GreenWallAPI.<span class="pl-smi">version</span>
-    <span class="pl-k">end</span>
+    -- Catch any exceptions
+    local found, version = pcall(testAPI)
 
-    <span class="pl-c">-- Catch any exceptions</span>
-    <span class="pl-k">local</span> found, version <span class="pl-k">=</span> <span class="pl-c1">pcall</span>(testAPI)
-
-    <span class="pl-k">return</span> found <span class="pl-k">and</span> version <span class="pl-k">&gt;=</span> <span class="pl-c1">1</span>
-<span class="pl-k">end</span></pre></div>
-
-<h2>Sending a Message</h2>
-
+    return found and version &gt;= 1
+end
+</code></pre>
+<h2 id="sending-a-message">Sending a Message</h2>
 <p>To send a message to other instances of the add-on, use the following function.</p>
-
-<div class="highlight highlight-source-lua"><pre>GreenWallAPI.<span class="pl-c1">SendMessage</span>(addon, message)</pre></div>
-
-<p>The <strong>addon</strong> parameter is either the name of the add-on or '*', which matches <br>
-from any add-on.</p>
-
-<h2>Receiving a Message</h2>
-
+<pre><code class="lang-lua">GreenWallAPI.SendMessage(addon, message)
+</code></pre>
+<p>Arguments:</p>
+<ul>
+<li>addon - The addon name, should the one used for the name of the TOC file.</li><li>message - The message to send. Accepts 8-bit data.</li></ul>
+<h2 id="receiving-a-message">Receiving a Message</h2>
 <p>The receiving of messages is handled with callbacks. </p>
-
-<h3>1. Create the callback</h3>
-
-<div class="highlight highlight-source-lua"><pre><span class="pl-k">local</span> <span class="pl-k">function</span> <span class="pl-en">handler</span>(<span class="pl-smi">addon, sender, message, echo, guild</span>)</pre></div>
-
-<p>The function should accept the following arguments:</p>
-
+<h3 id="1-create-the-callback">1. Create the callback</h3>
+<pre><code class="lang-lua">local function handler(addon, sender, message, echo, guild)
+</code></pre>
+<p>Arguments:</p>
 <ul>
-<li>addon - The name of the addon sending the message.</li>
-<li>sender - The player sending the message.</li>
-<li>message - The text of the message.</li>
-<li>echo - Set to true if the message was sent by the player.</li>
-<li>guild - Set to true if the message originated in the player's co-guild.</li>
-</ul>
-
-<h3>2. Add the handler to the dispatch table</h3>
-
-<div class="highlight highlight-source-lua"><pre><span class="pl-k">local</span> id <span class="pl-k">=</span> GreenWallAPI.<span class="pl-c1">AddMessageHandler</span>(handler, addon, priority)</pre></div>
-
+<li>addon - The name of the addon sending the message.</li><li>sender - The player sending the message.</li><li>message - The text of the message.</li><li>echo - Set to true if the message was sent by the player.</li><li>guild - Set to true if the message originated in the player&#39;s co-guild.</li></ul>
+<h3 id="2-add-the-handler-to-the-dispatch-table">2. Add the handler to the dispatch table</h3>
+<pre><code class="lang-lua">local id = GreenWallAPI.AddMessageHandler(handler, addon, priority)
+</code></pre>
+<p>Arguments:</p>
 <ul>
-<li>handler - The handler function.</li>
-<li>addon - A tag defining the name of the add-on messages will be received from.
-The <code>*</code> character can be used to match all add-ons.</li>
-<li>priority - A signed integer.  Lower priority matches are executed earlier.</li>
-</ul>
-
-<h2>Dispatch Table</h2>
-
-<p>In addition to the <code>GreenWallAPI.AddMessageHandler</code> function to add a handler,<br>
-the following functions are available to manage the dispatch table.</p>
-
-<h3>Remove a handler</h3>
-
-<div class="highlight highlight-source-lua"><pre><span class="pl-k">local</span> found <span class="pl-k">=</span> GreenWallAPI.<span class="pl-c1">RemoveMessageHandler</span>(id)</pre></div>
-
+<li>handler - The callback function.</li><li>addon - The name of the addon that you want to receive messages from (the same one used for the name of the TOC file).  If the value &#39;*&#39; is supplied, messages from all addons will be handled.</li><li>priority - A signed integer indicating relative priority, lower value is handled first.  The default is 0.</li></ul>
+<p>Returns:</p>
 <ul>
-<li>handler_id - The ID of the handler function.</li>
-</ul>
-
-<h3>Clear one or more handlers</h3>
-
-<div class="highlight highlight-source-lua"><pre>GreenWallAPI.<span class="pl-c1">ClearMessageHandlers</span>(addon)</pre></div>
-
+<li>The ID that can be used to remove the handler.</li></ul>
+<h2 id="dispatch-table">Dispatch Table</h2>
+<p>In addition to the <code>GreenWallAPI.AddMessageHandler</code> function to add a handler,<br>the following functions are available to manage the dispatch table.</p>
+<h3 id="remove-a-handler">Remove a handler</h3>
+<pre><code class="lang-lua">local found = GreenWallAPI.RemoveMessageHandler(id)
+</code></pre>
+<p>Arguments:</p>
 <ul>
-<li>addon - (Optional) A tag defining the name of the add-on messages will be 
-received from. The <code>*</code> character can be used to match all add-ons. If this 
-value is <code>nil</code>, all entries will be cleared.</li>
-</ul>
-
+<li>handler_id - The ID of the handler function.</li></ul>
+<h3 id="clear-one-or-more-handlers">Clear one or more handlers</h3>
+<pre><code class="lang-lua">GreenWallAPI.ClearMessageHandlers(addon)
+</code></pre>
+<p>Arguments:</p>
+<ul>
+<li>addon - (Optional) A tag defining the name of the add-on messages will be<br>received from. The <code>*</code> character can be used to match all add-ons. If this<br>value is <code>nil</code>, all entries will be cleared.</li></ul>
 <blockquote>
 <p>Note: A <code>*</code> value passed as add-on is not a wildcard in this context, it will only matched instances where the handler was installed with <code>*</code> as the add-on.</p>
 </blockquote>
+
 </body>
 </html>
 <!-- This document was created with MarkdownPad, the Markdown editor for Windows (http://markdownpad.com) -->
