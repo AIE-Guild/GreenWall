@@ -2,7 +2,7 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## [1.7.3] -- Unreleased
+## [1.7.3] -- 2016-08-03
 ### Fixed
 - Corrected global name parsing to account for UTF-8.
 - Updated API documentation.
@@ -453,7 +453,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
-[1.7.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.2...v1.7.2-beta
+[1.7.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.2...v1.7.3
 [1.7.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.6...v1.7.0
