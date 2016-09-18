@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.8.0 -- Unreleased
+### Changed
+- Compatibility messages are now raised as debugging output.
+
 ## [1.7.3] -- 2016-08-03
 ### Fixed
 - Corrected global name parsing to account for UTF-8.
