@@ -3,6 +3,9 @@
 This project uses [Semantic Versioning](http://semver.org/).
 
 ## 1.8.0 -- Unreleased
+### Fixed
+- Added whitespace trimming to configuration parser.
+
 ### Changed
 - Compatibility messages are now raised as debugging output.
 
