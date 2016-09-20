@@ -2,7 +2,7 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## 1.8.0 -- Unreleased
+## [1.8.0] -- 2016-09-20
 ### Fixed
 - Added whitespace trimming to configuration parser.
 
@@ -472,6 +472,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.8.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.3...v1.8.0
 [1.7.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.2...v1.7.3
 [1.7.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.0...v1.7.1
