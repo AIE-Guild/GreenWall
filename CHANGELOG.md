@@ -16,7 +16,8 @@ This project uses [Semantic Versioning](http://semver.org/).
 
 ## [1.7.2] -- 2016-07-20
 ### Fixed
-- Workaround for delayed bridge channel join caused by missing CHAT_MSG_CHANNEL_NOTICE events.
+- Workaround for delayed bridge channel join caused by missing 
+  CHAT_MSG_CHANNEL_NOTICE events.
 
 ## [1.7.1] -- 2016-07-20
 ### Changed
@@ -39,7 +40,8 @@ This project uses [Semantic Versioning](http://semver.org/).
 
 ## [1.6.6] -- 2015-12-16
 ### Fixed
-- A check is now done for officer status before sending a gratuitous officer announcement.
+- A check is now done for officer status before sending a gratuitous officer
+  announcement.
 - Added officer note data validation before parsing.
 
 ### Added
@@ -55,7 +57,8 @@ This project uses [Semantic Versioning](http://semver.org/).
 ### Changed
 - Refactored the user option validation.
 - Modified the GwHoldDown object.  Renamed `GwHoldDown:set()` to
-`GwHoldDown:start()` and created a new 'GwHoldDown:set()' mutator to change the interval.
+ `GwHoldDown:start()` and created a new 'GwHoldDown:set()' mutator to
+  change the interval.
 - Moved the Semantic Versioning parser to a LibStub library.
 
 ### Added
@@ -87,13 +90,15 @@ for handling hold-down expiry.
 
 ### Added
 - Added GwConfig object to contain configuration.
-- Added GwChannel objects for channel management, implementing transport and adaptation layers for communication.
+- Added GwChannel objects for channel management, implementing transport and 
+  adaptation layers for communication.
 - Added GwHoldDown and GwHoldDownCache objects.
 - Added LibStub libraries for SHA256, Salsa20, CRC16-CCITT, and Base64.
 
 ## [1.5.4] -- 2014-12-12
 ### Fixed
-- Corrected comparisons of character names to account for capitalization normalization in the API.
+- Corrected comparisons of character names to account for capitalization
+  normalization in the API.
 
 ### Changed
 - Updated luadoc.
@@ -198,8 +203,11 @@ flapping roster announcements for characters in peer co-guilds.
 
 ## [1.2.3] -- 2012-08-25
 ### Changed
-- Replaced the 32-bit string hash used to obfuscate channel names in the debugging output with a standard CRC-16-CCITT implementation to avoid overflow issues with `string.format()` in MoP.
-- Made some changes to the debugging code to improve visibility into message passing and replication.
+- Replaced the 32-bit string hash used to obfuscate channel names in the
+  debugging output with a standard CRC-16-CCITT implementation to avoid
+  overflow issues with `string.format()` in MoP.
+- Made some changes to the debugging code to improve visibility into message
+  passing and replication.
 
 ### Added
 - Added extra debugging information for current guild information.
@@ -237,7 +245,8 @@ flapping roster announcements for characters in peer co-guilds.
 ### Added
 - Added officer chat support.
 - Added message queuing.
-- Added a GwIsOfficer() check to the officer chat configuration phase to avoid pointless work.
+- Added a GwIsOfficer() check to the officer chat configuration phase to
+  avoid pointless work.
 - Added broadcast message type.
 - Added broadcasts of guild join and leave events.
 - Added broadcasts of promote and demote messages.
@@ -280,7 +289,8 @@ flapping roster announcements for characters in peer co-guilds.
 ## [1.1.03] -- 2011-01-14
 ### Changed
 - Moved `GuildRoster` call to PLAYER_LOGIN handler.
-- Limited conditions under which reinitialization occurred on PLAYER_GUILD_UPDATE.
+- Limited conditions under which reinitialization occurred on
+  PLAYER_GUILD_UPDATE.
 - Renamed `gwPlayerGuild` to `gwGuildName`.
 - Cleaned up prep/refresh/join flow for connecting to the common channel.
 
@@ -335,7 +345,8 @@ flapping roster announcements for characters in peer co-guilds.
 
 ## [1.0.15] -- 2010-12-03
 ### Fixed
-- Removed faulty `tContains()` for `gwPeerTable` checks to stop prolific kicking.
+- Removed faulty `tContains()` for `gwPeerTable` checks to stop
+  prolific kicking.
 
 ## [1.0.14] -- 2010-12-03
 ### Fixed
@@ -419,7 +430,8 @@ flapping roster announcements for characters in peer co-guilds.
 
 ## [1.0.02] -- 2010-11-12
 ### Added
-- Added container IDs to channel messages to avoid duplicates within the same co-guild.
+- Added container IDs to channel messages to avoid duplicates within the
+  same co-guild.
 
 ## [1.0.01] -- 2010-11-12
 ### Added
