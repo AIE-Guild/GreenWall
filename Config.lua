@@ -141,10 +141,6 @@ function GwConfig:load()
         return estr
     end
     
-    local function trim(s)
-        return string.gsub(s, '^%s*(.-)%s*$', '%1')
-    end
-
     local function get_gm_officer_note()
         if not gw.IsOfficer() then
             return
@@ -222,7 +218,7 @@ function GwConfig:load()
                 -- Groom configuration entries.
                 local field = {}
                 for i, v in ipairs({ strsplit(':', buffer) }) do
-                    field[i] = trim(v)
+                    field[i] = strtrim(v)
                 end
 
                 if field[1] == 'c' then
