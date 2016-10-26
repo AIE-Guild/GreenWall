@@ -2,6 +2,13 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.8.1] -- 2016-10-25
+### Fixed
+- Corrected configuration whitespace grooming.
+
+### Changed
+- Updated TOC for WoW 7.1.
+
 ## [1.8.0] -- 2016-09-20
 ### Fixed
 - Added whitespace trimming to configuration parser.
