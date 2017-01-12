@@ -236,7 +236,10 @@ local function GwSlashCmd(message, editbox)
 
     elseif command == 'version' then
 
+        local version, build, _, interface = GetBuildInfo() 
         gw.Write('GreenWall version %s.', gw.version)
+        gw.Write('World of Warcraft version %s, build %s, interface %s.',
+                version, build, interface)
 
     else
 
