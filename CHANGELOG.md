@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.8.2 -- Unreleased
+### Added
+- The version command now give WoW version information.
+
 ## [1.8.1] -- 2016-10-25
 ### Fixed
 - Corrected configuration whitespace grooming.
