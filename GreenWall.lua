@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2016 Mark Rogaski
+Copyright (c) 2010-2017 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -236,7 +236,10 @@ local function GwSlashCmd(message, editbox)
 
     elseif command == 'version' then
 
+        local version, build, _, interface = GetBuildInfo() 
         gw.Write('GreenWall version %s.', gw.version)
+        gw.Write('World of Warcraft version %s, build %s, interface %s.',
+                version, build, interface)
 
     else
 
