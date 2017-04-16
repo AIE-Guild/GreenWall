@@ -39,7 +39,8 @@ luac.out
 *.x86_64
 *.hex
 
-# Eclipse
+# IDE
 .project
 .buildpath
 .settings/
+.idea/
