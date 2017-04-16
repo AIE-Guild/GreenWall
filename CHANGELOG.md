@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.8.3] -- 2017-04-16
+### Added
+- Updated the TOC for WoW 7.2.
+
 ## [1.8.2] -- 2017-01-12
 ### Added
 - The version command now give WoW version information.
@@ -483,6 +487,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.8.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.2...v1.8.3
 [1.8.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.1...v1.8.2
 [1.8.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.3...v1.8.0
