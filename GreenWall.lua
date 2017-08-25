@@ -276,6 +276,7 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHAT_MSG_CHANNEL_LEAVE')
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE')
     self:RegisterEvent('CHAT_MSG_GUILD')
+    self:RegisterEvent('CHAT_MSG_LOOT')
     self:RegisterEvent('CHAT_MSG_OFFICER')
     self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT')
     self:RegisterEvent('CHAT_MSG_SYSTEM')
@@ -377,6 +378,17 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
         if gw.iCmp(sender, gw.player) then
             gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
+        end
+
+    elseif event == 'CHAT_MSG_LOOT' then
+
+        local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
+        item = gw.GetItemString(message)
+        if gw.IsLegendary(item) then
+            if gw.iCmp(sender, gw.player) then
+                gw.config.channel.guild:send(GW_MTYPE_LOOT, message)
+            end
         end
 
     elseif event == 'CHAT_MSG_OFFICER' then

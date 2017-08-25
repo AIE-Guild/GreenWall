@@ -298,6 +298,8 @@ function GwChannel:tl_send(type, message)
         opcode = 'C'
     elseif type == GW_MTYPE_ACHIEVEMENT then
         opcode = 'A'
+    elseif type == GW_MTYPE_LOOT then
+        opcode = 'L'
     elseif type == GW_MTYPE_BROADCAST then
         opcode = 'B'
     elseif type == GW_MTYPE_NOTICE then
@@ -469,6 +471,8 @@ function GwChannel:tl_receive(...)
         type = GW_MTYPE_CHAT
     elseif opcode == 'A' then
         type = GW_MTYPE_ACHIEVEMENT
+    elseif opcode == 'L' then
+        type = GW_MTYPE_LOOT
     elseif opcode == 'B' then
         type = GW_MTYPE_BROADCAST
     elseif opcode == 'N' then
