@@ -254,6 +254,30 @@ function gw.WorldChannelFound()
 end
 
 
+---------------------------------------------------------------------------
+-- Item functions
+---------------------------------------------------------------------------
+
+--- Extract an embedded itemString from a chat message.
+-- @param message A chat message.
+-- @return An itemString.
+function gw.GetItemString(message)
+    return string.match(message, '|H(item.+)|h')
+end
+
+--- Extract an embedded itemString from a chat message.
+-- @param item An itemString.
+-- @return True is the item is legendary.
+function gw.IsLegendary(item)
+    _, _, rarity = GetItemInfo(item)
+    if rarity == 5 then
+        return true
+    else
+        return false
+    end
+end
+
+
 --[[-----------------------------------------------------------------------
 
 END
