@@ -6,6 +6,9 @@ This project uses [Semantic Versioning](http://semver.org/).
 ### Added
 - Added confederation announcements of legendary items looted.
 
+### Removed
+- Removed luadoc HTML output.
+
 ## [1.8.3] -- 2017-04-16
 ### Added
 - Updated the TOC for WoW 7.2.
