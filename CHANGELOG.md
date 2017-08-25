@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.9.0] -- Unreleased
+### Added
+- Added confederation announcements of legendary items looted.
+
 ## [1.8.3] -- 2017-04-16
 ### Added
 - Updated the TOC for WoW 7.2.
