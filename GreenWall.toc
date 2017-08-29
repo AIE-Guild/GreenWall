@@ -15,6 +15,7 @@ Constants.lua
 Globals.lua
 Utility.lua
 HoldDown.lua
+Parser.lua
 Config.lua
 Compat.lua
 Chat.lua
