@@ -210,6 +210,17 @@ function gw.IsOfficer(target)
         return
     end
 
+    -- Workaround for 7.3.0, where GuildControlSetRank() is protected.
+    local version, build  = GetBuildInfo()
+    if version == '7.3.0' then
+        local note = gw.GetGMOfficerNote()
+        if note then
+            return true
+        else
+            return false
+        end
+    end
+
     local see_chat = false
     local see_note = false
     local rank = get_rank(target)
@@ -237,6 +248,21 @@ function gw.IsOfficer(target)
     gw.Debug(GW_LOG_INFO, 'is_officer: %s; rank=%d, see_chat=%s, see_note=%s',
             tostring(result), tostring(rank), tostring(see_chat), tostring(see_note))
     return result
+end
+
+
+--- Get the officer note for the GM, iff possible.
+-- @return The officer note of the GM as a string, or nil.
+function gw.GetGMOfficerNote()
+    local n = GetNumGuildMembers();
+    local name, rank, note
+    for i = 1, n do
+        name, _, rank, _, _, _, _, note = GetGuildRosterInfo(i);
+        if rank == 0 then
+            return note;
+        end
+    end
+    return
 end
 
 

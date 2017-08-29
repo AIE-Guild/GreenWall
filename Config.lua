@@ -141,23 +141,6 @@ function GwConfig:load()
         return estr
     end
     
-    local function get_gm_officer_note()
-        if not gw.IsOfficer() then
-            return
-        end
-
-        local n = GetNumGuildMembers();
-        local name, rank, note
-        for i = 1, n do
-            name, _, rank, _, _, _, _, note = GetGuildRosterInfo(i);
-            if rank == 0 then
-                gw.Debug(GW_LOG_INFO, 'parsing officer note for %s.', name);
-                return note;
-            end
-        end
-        return
-    end
-
     local xlat = {}                     -- Translation table for string substitution.
 
     -- Abort if current configuration is valid
@@ -278,7 +261,7 @@ function GwConfig:load()
 
     -- Officer note
     if GreenWall.ochat then
-        local note = get_gm_officer_note()
+        local note = gw.GetGMOfficerNote()
         if note and note ~= '' then
             local cname, cpass = string.match(note, 'GW:?a:([%w_]*):([%w_]*)')
             if cname and cname ~= '' then
