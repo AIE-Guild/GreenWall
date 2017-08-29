@@ -211,42 +211,13 @@ function gw.IsOfficer(target)
     end
 
     -- Workaround for 7.3.0, where GuildControlSetRank() is protected.
-    local version, build  = GetBuildInfo()
-    if version == '7.3.0' then
-        local note = gw.GetGMOfficerNote()
-        if note then
-            return true
-        else
-            return false
-        end
+    local note = gw.GetGMOfficerNote()
+    local result = false
+    if note ~= nil and note ~= '' then
+        result = true
     end
+    gw.Debug(GW_LOG_INFO, 'is_officer: %s', tostring(result))
 
-    local see_chat = false
-    local see_note = false
-    local rank = get_rank(target)
-
-    if rank then
-
-        local name = GuildControlGetRankName(rank)
-        gw.Debug(GW_LOG_DEBUG, 'rank=%s', rank)
-
-        GuildControlSetRank(rank)
-        for i, v in ipairs({GuildControlGetRankFlags()}) do
-            local flag = _G["GUILDCONTROL_OPTION"..i]
-            if flag == 'Officerchat Listen' then
-                see_chat = v
-                gw.Debug(GW_LOG_DEBUG, 'option=%s, value=%s', flag, tostring(v))
-            elseif flag == 'View Officer Note' then
-                see_note = v
-                gw.Debug(GW_LOG_DEBUG, 'option=%s, value=%s', flag, tostring(v))
-            end
-        end
-
-    end
-
-    local result = see_chat and see_note
-    gw.Debug(GW_LOG_INFO, 'is_officer: %s; rank=%d, see_chat=%s, see_note=%s',
-            tostring(result), tostring(rank), tostring(see_chat), tostring(see_note))
     return result
 end
 
