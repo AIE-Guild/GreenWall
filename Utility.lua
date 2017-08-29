@@ -222,7 +222,7 @@ function gw.IsOfficer(target)
 end
 
 
---- Get the officer note for the GM, iff possible.
+--- Get the officer note for the GM, if possible.
 -- @return The officer note of the GM as a string, or nil.
 function gw.GetGMOfficerNote()
     local n = GetNumGuildMembers();
