@@ -217,14 +217,17 @@ function gw.IsOfficer(target)
     if rank then
 
         local name = GuildControlGetRankName(rank)
+        gw.Debug(GW_LOG_DEBUG, 'rank=%s', rank)
 
-        GuildControlSetRank(rank);
+        GuildControlSetRank(rank)
         for i, v in ipairs({GuildControlGetRankFlags()}) do
             local flag = _G["GUILDCONTROL_OPTION"..i]
             if flag == 'Officerchat Listen' then
                 see_chat = v
+                gw.Debug(GW_LOG_DEBUG, 'option=%s, value=%s', flag, tostring(v))
             elseif flag == 'View Officer Note' then
                 see_note = v
+                gw.Debug(GW_LOG_DEBUG, 'option=%s, value=%s', flag, tostring(v))
             end
         end
 
