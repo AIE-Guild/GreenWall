@@ -210,30 +210,30 @@ function gw.IsOfficer(target)
         return
     end
 
-    local see_chat = false
-    local see_note = false
-    local rank = get_rank(target)
-
-    if rank then
-
-        local name = GuildControlGetRankName(rank)
-
-        GuildControlSetRank(rank);
-        for i, v in ipairs({GuildControlGetRankFlags()}) do
-            local flag = _G["GUILDCONTROL_OPTION"..i]
-            if flag == 'Officerchat Listen' then
-                see_chat = v
-            elseif flag == 'View Officer Note' then
-                see_note = v
-            end
-        end
-
+    -- Workaround for 7.3.0, where GuildControlSetRank() is protected.
+    local note = gw.GetGMOfficerNote()
+    local result = false
+    if note ~= nil and note ~= '' then
+        result = true
     end
+    gw.Debug(GW_LOG_INFO, 'is_officer: %s', tostring(result))
 
-    local result = see_chat and see_note
-    gw.Debug(GW_LOG_INFO, 'is_officer: %s; rank=%d, see_chat=%s, see_note=%s',
-            tostring(result), tostring(rank), tostring(see_chat), tostring(see_note))
     return result
+end
+
+
+--- Get the officer note for the GM, if possible.
+-- @return The officer note of the GM as a string, or nil.
+function gw.GetGMOfficerNote()
+    local n = GetNumGuildMembers();
+    local name, rank, note
+    for i = 1, n do
+        name, _, rank, _, _, _, _, note = GetGuildRosterInfo(i);
+        if rank == 0 then
+            return note;
+        end
+    end
+    return
 end
 
 

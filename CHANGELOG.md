@@ -9,8 +9,18 @@ This project uses [Semantic Versioning](http://semver.org/).
 ### Removed
 - Removed luadoc HTML output.
 
+## [1.8.5] -- 2017-08-29
+### Fixed
+- Applied a workaround for 7.3.0 where GuildControlSetRank() was made
+  protected.  Checking for rank access is now determined by reading the 
+  officer note of the GM.
+
+## [1.8.4] -- 2017-08-29
+### Updated
+- Updated the TOC for WoW 7.3.
+
 ## [1.8.3] -- 2017-04-16
-### Added
+### Updated
 - Updated the TOC for WoW 7.2.
 
 ## [1.8.2] -- 2017-01-12
@@ -494,6 +504,8 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.8.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.4...v1.8.5
+[1.8.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.3...v1.8.4
 [1.8.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.2...v1.8.3
 [1.8.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.1...v1.8.2
 [1.8.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.0...v1.8.1
