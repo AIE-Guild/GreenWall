@@ -37,22 +37,24 @@ Class Variables
 
 --]] -----------------------------------------------------------------------
 
-GwUserConfig = {}
-GwUserConfig.__index = GwUserConfig
+GwSettings = {}
+GwSettings.__index = GwSettings
 
 
 
---- GwUserConfig constructor function.
--- @return An initialized GwUserConfig instance.
-function GwUserConfig:new()
+--- GwSettings constructor function.
+-- @return An initialized GwSettings instance.
+function GwSettings:new()
     local self = {}
-    setmetatable(self, GwUserConfig)
+    setmetatable(self, GwSettings)
+    self:initialize()
+    gw.Debug(GW_LOG_INFO, 'settings initialized')
     return self
 end
 
 
 --- Set the default values and attributes.
-function GwUserConfig:initialize()
+function GwSettings:initialize()
     self._default = {
         tag = {
             value = true,
@@ -134,7 +136,7 @@ end
 
 
 --- Reset options to default values.
-function GwUserConfig:reset()
+function GwSettings:reset()
     for k, p in pairs(self._default) do
         GreenWall[k] = p.value
     end
@@ -144,7 +146,7 @@ end
 --- Get a user setting value.
 -- @param name The name of the setting.
 -- @return The setting value.
-function GwUserConfig:get(name)
+function GwSettings:get(name)
     if self._default[name] == nil then
         return
     else
@@ -157,7 +159,7 @@ end
 -- @param name The name of the setting.
 -- @param attr The setting attribute.
 -- @return The setting attribute value.
-function GwUserConfig:getattr(name, attr)
+function GwSettings:getattr(name, attr)
     if self._default[name] == nil then
         return
     else
@@ -170,7 +172,7 @@ end
 -- @param name The name of the setting.
 -- @param value The value of the setting.
 -- @return A string containing an error message on failure, nil on success.
-function GwUserConfig:validate(name, value)
+function GwSettings:validate(name, value)
     if self._default[name] == nil then
         return string.format('%s is not a valid setting', name)
     else
@@ -196,7 +198,7 @@ end
 -- @param name The name of the setting.
 -- @param value The value of the setting.
 -- @return True on success, false on failure.
-function GwUserConfig:set(name, value)
+function GwSettings:set(name, value)
     err = self:validate(name, value)
     if err then
         return false
@@ -209,7 +211,7 @@ end
 --- Load settings from a user profile.
 -- @param profile
 -- @return True on success, false on failure.
-function GwUserConfig:load_profile()
+function GwSettings:load_profile()
     local pdata = GreenWallProfiles[profile]
     if not pdata then
         gw.Error('no profile named %s found', profile)
@@ -230,7 +232,7 @@ end
 --- Save settings to a user profile.
 -- @param profile
 -- @return True on success, false on failure.
-function GwUserConfig:save_profile()
+function GwSettings:save_profile()
     -- Profile timestamps
     if not GreenWallProfiles[profile] then
         GreenWallProfiles[profile].created = os.date('%y-%m-%d %H:%M:%S')

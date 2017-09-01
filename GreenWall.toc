@@ -14,7 +14,7 @@
 Lib\Load.xml
 Constants.lua
 Globals.lua
-UserConfig.lua
+Settings.lua
 Utility.lua
 HoldDown.lua
 Config.lua
