@@ -98,7 +98,7 @@ function GwSettings:initialize()
         },
         redact = {
             value = true,
-            desc = "obfuscate sensitive data in debug output"
+            desc = "obfuscate sensitive data"
         },
         joindelay = {
             value = 30,
@@ -168,6 +168,14 @@ function GwSettings:getattr(name, attr)
 end
 
 
+--- Get a user setting value.
+-- @param name The name of the setting.
+-- @return True if the setting exists, false otherwise.
+function GwSettings:exists(name)
+    return self._default[name] ~= nil
+end
+
+
 --- Set a user setting value.
 -- @param name The name of the setting.
 -- @param value The value of the setting.
@@ -203,7 +211,23 @@ function GwSettings:set(name, value)
     if err then
         return false
     end
+
+    local curr = self:get(name)
     GreenWall[name] = value
+
+    -- Special handling for vlaue changes
+    if curr ~= value then
+        if name == 'logsize' then
+            while #GreenWallLog > value do
+                tremove(GreenWallLog, 1)
+            end
+        elseif name == 'joindelay' then
+            gw.config.timer.channel:set(value)
+        elseif name == 'ochat' then
+            gw.config:reload()
+        end
+    end
+
     return true
 end
 

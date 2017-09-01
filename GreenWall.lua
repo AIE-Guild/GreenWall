@@ -84,20 +84,14 @@ function GreenWallInterfaceFrame_SaveUpdates(self)
     gw.settings:set('achievements', getglobal(self:GetName() .. "OptionAchievements"):GetChecked() and true or false)
     gw.settings:set('roster', getglobal(self:GetName() .. "OptionRoster"):GetChecked() and true or false)
     gw.settings:set('rank', getglobal(self:GetName() .. "OptionRank"):GetChecked() and true or false)
-
     gw.settings:set('joindelay', getglobal(self:GetName() .. "OptionJoinDelay"):GetValue())
-    gw.config.timer.channel:set(GreenWall.joindelay)
-
     if (gw.IsOfficer()) then
         gw.settings:set('ochat', getglobal(self:GetName() .. "OptionOfficerChat"):GetChecked() and true or false)
-        gw.config:reload()
     end
 end
 
 function GreenWallInterfaceFrame_SetDefaults(self)
     gw.settings:reset()
-    gw.config.timer.channel:set(GreenWall.joindelay)
-    gw.config:reload()
 end
 
 function GreenWallInterfaceFrameOptionJoinDelay_OnValueChanged(self, value)
@@ -118,56 +112,37 @@ Slash Command Handler
 
 --]] -----------------------------------------------------------------------
 
---- Update or display the value of a user configuration variable.
+--- Update or display the value of a user settings variable.
 -- @param key The name of the variable.
--- @param val The variable value.
--- @return True if the key matches a variable name, false otherwise.
-local function GwCmdConfig(key, val)
-    if key == nil then
-        return false
-    else
-        if gw.option[key] ~= nil then
-            local default = gw.option[key]['default']
-            local desc = gw.option[key]['desc']
-            if type(default) == 'boolean' then
-                if val == nil or val == '' then
-                    if GreenWall[key] then
-                        gw.Write(desc .. ' turned ON.', desc)
-                    else
-                        gw.Write(desc .. ' turned OFF.')
-                    end
-                elseif val == 'on' then
-                    GreenWall[key] = true
-                    gw.Write(desc .. ' turned ON.')
-                elseif val == 'off' then
-                    GreenWall[key] = false
-                    gw.Write(desc .. ' turned OFF.')
-                else
-                    gw.Error('invalid argument for %s: %s', desc, val)
-                end
-                return true
-            elseif type(default) == 'number' then
-                if val == nil or val == '' then
-                    if GreenWall[key] then
-                        gw.Write('%s set to %d.', desc, GreenWall[key])
-                    end
-                elseif val:match('^-?%d+$') then
-                    local x = val + 0
-                    if gw.option[key].min and gw.option[key].min <= x and gw.option[key].max and gw.option[key].max >= x then
-                        GreenWall[key] = x
-                        gw.Write('%s set to %d.', desc, GreenWall[key])
-                    else
-                        gw.Error('argument out of range for %s: %s (range = [%s, %s])', desc, val,
-                            tostring(gw.option[key].min), tostring(gw.option[key].max))
-                    end
-                else
-                    gw.Error('invalid argument for %s: %s', desc, val)
-                end
-                return true
+-- @param value The variable value.
+local function GwSettingCmd(key, value)
+    if gw.settings:getattr(key, 'type') == 'boolean' then
+        if value and value ~= '' then
+            if value == 'on' then
+                gw.settings:set(key, true)
+            elseif value == 'off' then
+                gw.settings:set(key, false)
+            else
+                gw.Error('%s setting must be "on" or "off"', key)
             end
         end
+        gw.Write('%s is turned %s.',
+            gw.settings:getattr(key, 'desc'),
+            gw.settings:get(key) and 'ON' or 'OFF'
+        )
+    elseif gw.settings:getattr(key, 'type') == 'number' then
+        if value and value ~= '' then
+            if value:match('^-?%d+$') then
+                gw.settings:set(key, value + 0)
+            else
+                gw.Error('%s setting must be numeric: %s', key)
+            end
+        end
+        gw.Write('%s is set to %d.',
+            gw.settings:getattr(key, 'desc'),
+            gw.settings:get(key)
+        )
     end
-    return false
 end
 
 
@@ -187,18 +162,9 @@ local function GwSlashCmd(message, editbox)
             gw.Write(line)
         end
 
-    elseif GwCmdConfig(command, argstr) then
+    elseif gw.settings:exists(command) then
 
-        -- Some special handling here
-        if command == 'logsize' then
-            while #GreenWallLog > GreenWall.logsize do
-                tremove(GreenWallLog, 1)
-            end
-        elseif command == 'joindelay' then
-            gw.config.timer.channel:set(GreenWall.joindelay)
-        elseif command == 'ochat' then
-            gw.config:reload()
-        end
+        GwSettingCmd(command, argstr)
 
     elseif command == 'admin' then
 
