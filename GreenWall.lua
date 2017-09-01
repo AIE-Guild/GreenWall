@@ -323,7 +323,7 @@ function GreenWall_OnEvent(self, event, ...)
 
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
-        if gw.iCmp(sender, gw.player) and GreenWall.ochat then
+        if gw.iCmp(sender, gw.player) and gw.settings:get('ochat') then
             gw.config.channel.officer:send(GW_MTYPE_CHAT, message)
         end
 
@@ -348,7 +348,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, channel=%s, player=%s', event, number, player)
 
         if number == gw.config.channel.guild.number then
-            if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
+            if GetCVar('guildMemberNotify') == '1' and gw.settings:get('roster') then
                 if gw.config.comember_cache:hold(gw.GlobalName(player)) then
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', gw.GlobalName(player))
                 else
@@ -364,7 +364,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, channel=%s, player=%s', event, number, player)
 
         if number == gw.config.channel.guild.number then
-            if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
+            if GetCVar('guildMemberNotify') == '1' and gw.settings:get('roster') then
                 if gw.config.comember_cache:hold(gw.GlobalName(player)) then
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', gw.GlobalName(player))
                 else
