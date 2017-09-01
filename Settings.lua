@@ -114,11 +114,14 @@ function GwSettings:initialize()
 
     -- Initialize the user settings
     if GreenWall == nil then
-        GreenWall = { version = gw.version }
+        GreenWall = {
+            version = gw.version,
+            created = date('%Y-%m-%d %H:%M:%S')
+        }
     end
 
     for k, p in pairs(self._default) do
-        if GreenWall[k] == nil then
+        if GreenWall[k] == nil or self:validate(k, GreenWall[k]) then
             GreenWall[k] = p.value
         end
     end
@@ -207,16 +210,20 @@ end
 -- @param value The value of the setting.
 -- @return True on success, false on failure.
 function GwSettings:set(name, value)
-    err = self:validate(name, value)
+    local err = self:validate(name, value)
     if err then
+        gw.Error(err)
         return false
     end
 
     local curr = self:get(name)
     GreenWall[name] = value
 
-    -- Special handling for vlaue changes
+    -- Special handling for value changes
     if curr ~= value then
+        gw.Debug(GW_LOG_INFO, 'set %s to %s', name, tostring(value))
+        GreenWall.updated = date('%Y-%m-%d %H:%M:%S')
+
         if name == 'logsize' then
             while #GreenWallLog > value do
                 tremove(GreenWallLog, 1)
@@ -259,11 +266,11 @@ end
 function GwSettings:save_profile()
     -- Profile timestamps
     if not GreenWallProfiles[profile] then
-        GreenWallProfiles[profile].created = os.date('%y-%m-%d %H:%M:%S')
+        GreenWallProfiles[profile].created = date('%Y-%m-%d %H:%M:%S')
     end
-    GreenWallProfiles[profile].updated = os.date('%y-%m-%d %H:%M:%S')
+    GreenWallProfiles[profile].updated = date('%Y-%m-%d %H:%M:%S')
     -- Profile data
-    for k, v in pairs(GreenWall) do
+    for k, v in pairs(self._default) do
         GreenWallProfiles[profile][k] = v
     end
     return true
