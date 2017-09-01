@@ -39,12 +39,6 @@ local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
 local _
 
 
---
--- Global objects
---
-gw.config = GwConfig:new()
-
-
 --[[-----------------------------------------------------------------------
 
 UI Handlers
@@ -272,8 +266,12 @@ function GreenWall_OnEvent(self, event, ...)
         --
         -- Initialize the saved variables
         --
-        -- GwSetDefaults(true)
         gw.settings = GwSettings:new()
+
+        --
+        -- Initialize the confederation configuration
+        --
+        gw.config = GwConfig:new()
 
         --
         -- Thundercats are go!

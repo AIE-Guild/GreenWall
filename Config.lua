@@ -75,7 +75,7 @@ function GwConfig:initialize_state()
         officer = GwChannel:new(),
     }
     self.timer = {
-        channel = GwHoldDown:new(gw.option.joindelay.default),
+        channel = GwHoldDown:new(gw.settings:get('joindelay')),
         config  = GwHoldDown:new(GW_TIMEOUT_CONFIG_HOLD),
         reload  = GwHoldDown:new(GW_TIMEOUT_RELOAD_HOLD),
     }
