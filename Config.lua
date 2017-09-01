@@ -75,7 +75,7 @@ function GwConfig:initialize_state()
         officer = GwChannel:new(),
     }
     self.timer = {
-        channel = GwHoldDown:new(gw.option.joindelay.default),
+        channel = GwHoldDown:new(gw.settings:get('joindelay')),
         config  = GwHoldDown:new(GW_TIMEOUT_CONFIG_HOLD),
         reload  = GwHoldDown:new(GW_TIMEOUT_RELOAD_HOLD),
     }
@@ -114,7 +114,7 @@ function GwConfig:dump(keep)
         end
     end
 
-    gw.Write('[Options]')
+    gw.Write('[Settings]')
     dump_tier(GreenWall, 0)
     gw.Write('[Configuration]')
     dump_tier(self, 0)
@@ -176,7 +176,7 @@ function GwConfig:load()
     end
 
     -- Update the channel hold-down
-    self.timer.channel:set(GreenWall.joindelay)
+    self.timer.channel:set(gw.settings:get('joindelay'))
 
     --
     -- Check configuration version
@@ -260,7 +260,7 @@ function GwConfig:load()
     end
 
     -- Officer note
-    if GreenWall.ochat then
+    if gw.settings:get('ochat') then
         local note = gw.GetGMOfficerNote()
         if note and note ~= '' then
             local cname, cpass = string.match(note, 'GW:?a:([%w_]*):([%w_]*)')
@@ -359,7 +359,7 @@ function GwConfig:refresh_channels()
     else
         gw.Debug(GW_LOG_INFO, 'refreshing channels.')
         self.channel.guild:join()
-        if GreenWall.ochat then
+        if gw.settings:get('ochat') then
             self.channel.officer:join()
         else
             self.channel.officer:leave()

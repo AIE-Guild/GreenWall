@@ -5,6 +5,8 @@ This project uses [Semantic Versioning](http://semver.org/).
 ## [1.9.0] -- Unreleased
 ### Added
 - Added confederation announcements of legendary items looted.
+- Moved configuration handling to a proxy class to allow a single point
+  of access for all configuration data.
 
 ### Removed
 - Removed luadoc HTML output.

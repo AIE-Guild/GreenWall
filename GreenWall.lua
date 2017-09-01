@@ -22,13 +22,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
---]]-----------------------------------------------------------------------
+--]] -----------------------------------------------------------------------
 
 --[[-----------------------------------------------------------------------
 
 Imported Libraries
 
---]]-----------------------------------------------------------------------
+--]] -----------------------------------------------------------------------
 
 local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
 
@@ -39,18 +39,11 @@ local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
 local _
 
 
---
--- Global objects
---
-gw.config = GwConfig:new()
-
-
 --[[-----------------------------------------------------------------------
 
 UI Handlers
 
---]]-----------------------------------------------------------------------
-
+--]] -----------------------------------------------------------------------
 function GreenWallInterfaceFrame_OnShow(self)
     if (not gw.addon_loaded) then
         -- Configuration not loaded.
@@ -59,51 +52,40 @@ function GreenWallInterfaceFrame_OnShow(self)
     end
 
     -- Initialize widgets
-    getglobal(self:GetName().."OptionJoinDelay"):SetMinMaxValues(gw.option.joindelay.min, gw.option.joindelay.max)
-    getglobal(self:GetName().."OptionJoinDelay"):SetValueStep(gw.option.joindelay.step)
+    getglobal(self:GetName() .. "OptionJoinDelay"):SetMinMaxValues(gw.settings:getattr('joindelay', 'min'),
+        gw.settings:getattr('joindelay', 'max'))
+    getglobal(self:GetName() .. "OptionJoinDelay"):SetValueStep(gw.settings:getattr('joindelay', 'step'))
 
     -- Populate interface panel.
-    getglobal(self:GetName().."OptionTag"):SetChecked(GreenWall.tag)
-    getglobal(self:GetName().."OptionAchievements"):SetChecked(GreenWall.achievements)
-    getglobal(self:GetName().."OptionRoster"):SetChecked(GreenWall.roster)
-    getglobal(self:GetName().."OptionRank"):SetChecked(GreenWall.rank)
-    getglobal(self:GetName().."OptionJoinDelay"):SetValue(GreenWall.joindelay)
+    getglobal(self:GetName() .. "OptionTag"):SetChecked(gw.settings:get('tag'))
+    getglobal(self:GetName() .. "OptionAchievements"):SetChecked(gw.settings:get('achievements'))
+    getglobal(self:GetName() .. "OptionRoster"):SetChecked(gw.settings:get('roster'))
+    getglobal(self:GetName() .. "OptionRank"):SetChecked(gw.settings:get('rank'))
+    getglobal(self:GetName() .. "OptionJoinDelay"):SetValue(gw.settings:get('joindelay'))
     if (gw.IsOfficer()) then
-        getglobal(self:GetName().."OptionOfficerChat"):SetChecked(GreenWall.ochat)
-        getglobal(self:GetName().."OptionOfficerChatText"):SetTextColor(1, 1, 1)
-        getglobal(self:GetName().."OptionOfficerChat"):Enable()
+        getglobal(self:GetName() .. "OptionOfficerChat"):SetChecked(gw.settings:get('ochat'))
+        getglobal(self:GetName() .. "OptionOfficerChatText"):SetTextColor(1, 1, 1)
+        getglobal(self:GetName() .. "OptionOfficerChat"):Enable()
     else
-        getglobal(self:GetName().."OptionOfficerChat"):SetChecked(false)
-        getglobal(self:GetName().."OptionOfficerChatText"):SetTextColor(.5, .5, .5)
-        getglobal(self:GetName().."OptionOfficerChat"):Disable()
+        getglobal(self:GetName() .. "OptionOfficerChat"):SetChecked(false)
+        getglobal(self:GetName() .. "OptionOfficerChatText"):SetTextColor(.5, .5, .5)
+        getglobal(self:GetName() .. "OptionOfficerChat"):Disable()
     end
 end
 
 function GreenWallInterfaceFrame_SaveUpdates(self)
-    GreenWall.tag = getglobal(self:GetName().."OptionTag"):GetChecked() and true or false
-    GreenWall.achievements = getglobal(self:GetName().."OptionAchievements"):GetChecked() and true or false
-    GreenWall.roster = getglobal(self:GetName().."OptionRoster"):GetChecked() and true or false
-    GreenWall.rank = getglobal(self:GetName().."OptionRank"):GetChecked() and true or false
-
-    GreenWall.joindelay = getglobal(self:GetName().."OptionJoinDelay"):GetValue()
-    gw.config.timer.channel:set(GreenWall.joindelay)
-
+    gw.settings:set('tag', getglobal(self:GetName() .. "OptionTag"):GetChecked() and true or false)
+    gw.settings:set('achievements', getglobal(self:GetName() .. "OptionAchievements"):GetChecked() and true or false)
+    gw.settings:set('roster', getglobal(self:GetName() .. "OptionRoster"):GetChecked() and true or false)
+    gw.settings:set('rank', getglobal(self:GetName() .. "OptionRank"):GetChecked() and true or false)
+    gw.settings:set('joindelay', getglobal(self:GetName() .. "OptionJoinDelay"):GetValue())
     if (gw.IsOfficer()) then
-        GreenWall.ochat = getglobal(self:GetName().."OptionOfficerChat"):GetChecked() and true or false
-        gw.config:reload()
+        gw.settings:set('ochat', getglobal(self:GetName() .. "OptionOfficerChat"):GetChecked() and true or false)
     end
 end
 
 function GreenWallInterfaceFrame_SetDefaults(self)
-    GreenWall.tag = gw.option['tag']['default']
-    GreenWall.achievements = gw.option['achievements']['default']
-    GreenWall.roster = gw.option['roster']['default']
-    GreenWall.rank = gw.option['rank']['default']
-
-    GreenWall.joindelay = gw.option['joindelay']['default']
-    gw.config.timer.channel:set(GreenWall.joindelay)
-
-    GreenWall.ochat = gw.option['ochat']['default']
+    gw.settings:reset()
 end
 
 function GreenWallInterfaceFrameOptionJoinDelay_OnValueChanged(self, value)
@@ -113,66 +95,48 @@ function GreenWallInterfaceFrameOptionJoinDelay_OnValueChanged(self, value)
         self:SetValue(self:GetValue())
         value = self:GetValue()
         self._onsetting = false
-    else return end
-    getglobal(self:GetName().."Text"):SetText(value)
+    else return
+    end
+    getglobal(self:GetName() .. "Text"):SetText(value)
 end
 
 --[[-----------------------------------------------------------------------
 
 Slash Command Handler
 
---]]-----------------------------------------------------------------------
+--]] -----------------------------------------------------------------------
 
---- Update or display the value of a user configuration variable.
+--- Update or display the value of a user settings variable.
 -- @param key The name of the variable.
--- @param val The variable value.
--- @return True if the key matches a variable name, false otherwise.
-local function GwCmdConfig(key, val)
-    if key == nil then
-        return false
-    else
-        if gw.option[key] ~= nil then
-            local default = gw.option[key]['default']
-            local desc = gw.option[key]['desc']
-            if type(default) == 'boolean' then
-                if val == nil or val == '' then
-                    if GreenWall[key] then
-                        gw.Write(desc .. ' turned ON.', desc)
-                    else
-                        gw.Write(desc .. ' turned OFF.')
-                    end
-                elseif val == 'on' then
-                    GreenWall[key] = true
-                    gw.Write(desc .. ' turned ON.')
-                elseif val == 'off' then
-                    GreenWall[key] = false
-                    gw.Write(desc .. ' turned OFF.')
-                else
-                    gw.Error('invalid argument for %s: %s', desc, val)
-                end
-                return true
-            elseif type(default) == 'number' then
-                if val == nil or val == '' then
-                    if GreenWall[key] then
-                        gw.Write('%s set to %d.', desc, GreenWall[key])
-                    end
-                elseif val:match('^-?%d+$') then
-                    local x = val + 0
-                    if gw.option[key].min and gw.option[key].min <= x and gw.option[key].max and gw.option[key].max >= x then
-                        GreenWall[key] = x
-                        gw.Write('%s set to %d.', desc, GreenWall[key])
-                    else
-                        gw.Error('argument out of range for %s: %s (range = [%s, %s])', desc, val,
-                                tostring(gw.option[key].min), tostring(gw.option[key].max))
-                    end
-                else
-                    gw.Error('invalid argument for %s: %s', desc, val)
-                end
-                return true
+-- @param value The variable value.
+local function GwSettingCmd(key, value)
+    if gw.settings:getattr(key, 'type') == 'boolean' then
+        if value and value ~= '' then
+            if value == 'on' then
+                gw.settings:set(key, true)
+            elseif value == 'off' then
+                gw.settings:set(key, false)
+            else
+                gw.Error('%s setting must be "on" or "off"', key)
             end
         end
+        gw.Write('%s is turned %s.',
+            gw.settings:getattr(key, 'desc'),
+            gw.settings:get(key) and 'ON' or 'OFF'
+        )
+    elseif gw.settings:getattr(key, 'type') == 'number' then
+        if value and value ~= '' then
+            if value:match('^-?%d+$') then
+                gw.settings:set(key, value + 0)
+            else
+                gw.Error('%s setting must be numeric: %s', key)
+            end
+        end
+        gw.Write('%s is set to %d.',
+            gw.settings:getattr(key, 'desc'),
+            gw.settings:get(key)
+        )
     end
-    return false
 end
 
 
@@ -192,18 +156,9 @@ local function GwSlashCmd(message, editbox)
             gw.Write(line)
         end
 
-    elseif GwCmdConfig(command, argstr) then
+    elseif gw.settings:exists(command) then
 
-        -- Some special handling here
-        if command == 'logsize' then
-            while # GreenWallLog > GreenWall.logsize do
-                tremove(GreenWallLog, 1)
-            end
-        elseif command == 'joindelay' then
-            gw.config.timer.channel:set(GreenWall.joindelay)
-        elseif command == 'ochat' then
-            gw.config:reload()
-        end
+        GwSettingCmd(command, argstr)
 
     elseif command == 'admin' then
 
@@ -236,17 +191,15 @@ local function GwSlashCmd(message, editbox)
 
     elseif command == 'version' then
 
-        local version, build, _, interface = GetBuildInfo() 
+        local version, build, _, interface = GetBuildInfo()
         gw.Write('GreenWall version %s.', gw.version)
         gw.Write('World of Warcraft version %s, build %s, interface %s.',
-                version, build, interface)
+            version, build, interface)
 
     else
 
         gw.Error('Unknown command: %s', command)
-
     end
-
 end
 
 
@@ -254,8 +207,7 @@ end
 
 Initialization
 
---]]-----------------------------------------------------------------------
-
+--]] -----------------------------------------------------------------------
 function GreenWall_OnLoad(self)
 
     --
@@ -289,40 +241,11 @@ function GreenWall_OnLoad(self)
     -- Add a tab to the Interface Options panel.
     --
     self.name = 'GreenWall'
-    self.refresh = function (self) GreenWallInterfaceFrame_OnShow(self) end
-    self.okay = function (self) GreenWallInterfaceFrame_SaveUpdates(self) end
-    self.cancel = function (self) return end
-    self.default = function (self) GreenWallInterfaceFrame_SetDefaults(self) end
+    self.refresh = function(self) GreenWallInterfaceFrame_OnShow(self) end
+    self.okay = function(self) GreenWallInterfaceFrame_SaveUpdates(self) end
+    self.cancel = function(self) return end
+    self.default = function(self) GreenWallInterfaceFrame_SetDefaults(self) end
     InterfaceOptions_AddCategory(self)
-
-end
-
-
---- Initialize options to default values.
--- @param soft If true, set only undefined options to the default values.
-local function GwSetDefaults(soft)
-
-    if soft == nil then
-        soft = false
-    else
-        soft = true
-    end
-
-    if GreenWall == nil then
-        GreenWall = {}
-    end
-
-    for k, p in pairs(gw.option) do
-        if not soft or GreenWall[k] == nil then
-            GreenWall[k] = p['default']
-        end
-    end
-    GreenWall.version = gw.version
-
-    if GreenWallLog == nil then
-        GreenWallLog = {}
-    end
-
 end
 
 
@@ -330,8 +253,7 @@ end
 
 Frame Event Functions
 
---]]-----------------------------------------------------------------------
-
+--]] -----------------------------------------------------------------------
 function GreenWall_OnEvent(self, event, ...)
 
     gw.Debug(GW_LOG_DEBUG, 'event occurred; event=%s', event)
@@ -344,7 +266,12 @@ function GreenWall_OnEvent(self, event, ...)
         --
         -- Initialize the saved variables
         --
-        GwSetDefaults(true)
+        gw.settings = GwSettings:new()
+
+        --
+        -- Initialize the confederation configuration
+        --
+        gw.config = GwConfig:new()
 
         --
         -- Thundercats are go!
@@ -352,11 +279,10 @@ function GreenWall_OnEvent(self, event, ...)
         gw.addon_loaded = true
         gw.Write('v%s loaded.', gw.version)
         gw.Debug(GW_LOG_DEBUG, 'loading complete; name=%s, realm=%s', gw.player, gw.realm)
-
     end
 
     if not gw.addon_loaded then
-        return      -- early exit
+        return -- early exit
     end
 
     --
@@ -395,7 +321,7 @@ function GreenWall_OnEvent(self, event, ...)
 
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
-        if gw.iCmp(sender, gw.player) and GreenWall.ochat then
+        if gw.iCmp(sender, gw.player) and gw.settings:get('ochat') then
             gw.config.channel.officer:send(GW_MTYPE_CHAT, message)
         end
 
@@ -420,7 +346,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, channel=%s, player=%s', event, number, player)
 
         if number == gw.config.channel.guild.number then
-            if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
+            if GetCVar('guildMemberNotify') == '1' and gw.settings:get('roster') then
                 if gw.config.comember_cache:hold(gw.GlobalName(player)) then
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', gw.GlobalName(player))
                 else
@@ -436,7 +362,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, channel=%s, player=%s', event, number, player)
 
         if number == gw.config.channel.guild.number then
-            if GetCVar('guildMemberNotify') == '1' and GreenWall.roster then
+            if GetCVar('guildMemberNotify') == '1' and gw.settings:get('roster') then
                 if gw.config.comember_cache:hold(gw.GlobalName(player)) then
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', gw.GlobalName(player))
                 else
@@ -453,7 +379,7 @@ function GreenWall_OnEvent(self, event, ...)
         end
 
         if gw.config.timer.channel:hold() then
-            for _, v in ipairs({GetChannelList()}) do
+            for _, v in ipairs({ GetChannelList() }) do
                 if v == 'General' then
                     gw.config.timer.channel:clear()
                 end
@@ -486,7 +412,6 @@ function GreenWall_OnEvent(self, event, ...)
                 gw.config.timer.channel:clear()
                 gw.config:refresh_channels()
             end
-
         end
 
     elseif event == 'CHAT_MSG_SYSTEM' then
@@ -581,7 +506,6 @@ function GreenWall_OnEvent(self, event, ...)
                 gw.Debug(GW_LOG_NOTICE, 'you demoted %s to %s', target, rank)
                 gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'demote', target, rank)
             end
-
         end
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
@@ -613,13 +537,11 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'PLAYER_LOGIN' then
 
         -- Defer joining to allow General to grab slot 1
-        gw.config.timer.channel:start(function () gw.config:refresh_channels() end )
+        gw.config.timer.channel:start(function() gw.config:refresh_channels() end)
 
         -- Initiate the comms
         gw.config:refresh()
-
     end
-
 end
 
 
@@ -627,4 +549,4 @@ end
 
 END
 
---]]-----------------------------------------------------------------------
+--]] -----------------------------------------------------------------------

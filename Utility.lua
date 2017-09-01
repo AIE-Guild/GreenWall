@@ -57,10 +57,10 @@ end
 --- Add a message to the log file
 -- @param msg A string to write to the log.
 function gw.Log(msg)
-    if GreenWall ~= nil and GreenWall.log and GreenWallLog ~= nil then
+    if gw.settings and gw.settings:get('log') then
         local ts = date('%Y-%m-%d %H:%M:%S')
         tinsert(GreenWallLog, format('%s -- %s', ts, msg))
-        while # GreenWallLog > GreenWall.logsize do
+        while # GreenWallLog > gw.settings:get('logsize') do
             tremove(GreenWallLog, 1)
         end
     end
@@ -98,11 +98,11 @@ function gw.Debug(level, ...)
     end
 
     local msg = string.format(unpack({...}))
-    if GreenWall ~= nil then
-        if level <= GreenWall.debug then
+    if gw.settings then
+        if level <= gw.settings:get('debug') then
             local trace = format('[debug/%d@%s] %s', level, get_caller(), msg)
             gw.Log(trace)
-            if GreenWall.verbose then
+            if gw.settings:get('verbose') then
                 DEFAULT_CHAT_FRAME:AddMessage(format('|cff009a7dGreenWall:|r |cff778899%s|r', trace))
             end
         end
@@ -114,7 +114,7 @@ end
 -- @param msg The input string
 -- @return The string with redaction applied, if necessary.
 function gw.Redact(msg)
-    if GreenWall.redact then
+    if gw.settings:get('redact') then
         return string.format('<<%04X>>', crc.Hash(msg))
     else
         return msg
