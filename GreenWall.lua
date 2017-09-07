@@ -1,4 +1,4 @@
---[[-----------------------------------------------------------------------
+--[[ -----------------------------------------------------------------------
 
 The MIT License (MIT)
 
@@ -24,7 +24,7 @@ SOFTWARE.
 
 --]] -----------------------------------------------------------------------
 
---[[-----------------------------------------------------------------------
+--[[ -----------------------------------------------------------------------
 
 Imported Libraries
 
@@ -39,76 +39,11 @@ local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
 local _
 
 
---[[-----------------------------------------------------------------------
-
-UI Handlers
-
---]]-----------------------------------------------------------------------
-
-function GreenWallInterfaceFrame_OnShow(self)
-    if (not gw.addon_loaded) then
-        -- Configuration not loaded.
-        self:Hide()
-        return
-    end
-
-    -- Initialize widgets
-    getglobal(self:GetName() .. "OptionJoinDelay"):SetMinMaxValues(gw.settings:getattr('joindelay', 'min'),
-        gw.settings:getattr('joindelay', 'max'))
-    getglobal(self:GetName() .. "OptionJoinDelay"):SetValueStep(gw.settings:getattr('joindelay', 'step'))
-
-    -- Populate interface panel.
-    getglobal(self:GetName() .. "OptionMode"):SetChecked(gw.settings:get('mode') == GW_MODE_ACCOUNT)
-    getglobal(self:GetName() .. "OptionTag"):SetChecked(gw.settings:get('tag'))
-    getglobal(self:GetName() .. "OptionAchievements"):SetChecked(gw.settings:get('achievements'))
-    getglobal(self:GetName() .. "OptionRoster"):SetChecked(gw.settings:get('roster'))
-    getglobal(self:GetName() .. "OptionRank"):SetChecked(gw.settings:get('rank'))
-    getglobal(self:GetName() .. "OptionJoinDelay"):SetValue(gw.settings:get('joindelay'))
-    if (gw.IsOfficer()) then
-        getglobal(self:GetName() .. "OptionOfficerChat"):SetChecked(gw.settings:get('ochat'))
-        getglobal(self:GetName() .. "OptionOfficerChatText"):SetTextColor(1, 1, 1)
-        getglobal(self:GetName() .. "OptionOfficerChat"):Enable()
-    else
-        getglobal(self:GetName() .. "OptionOfficerChat"):SetChecked(false)
-        getglobal(self:GetName() .. "OptionOfficerChatText"):SetTextColor(.5, .5, .5)
-        getglobal(self:GetName() .. "OptionOfficerChat"):Disable()
-    end
-end
-
-function GreenWallInterfaceFrame_SaveUpdates(self)
-    gw.settings:set('mode', getglobal(self:GetName() .. "OptionMode"):GetChecked() and GW_MODE_ACCOUNT or GW_MODE_CHARACTER)
-    gw.settings:set('tag', getglobal(self:GetName() .. "OptionTag"):GetChecked() and true or false)
-    gw.settings:set('achievements', getglobal(self:GetName() .. "OptionAchievements"):GetChecked() and true or false)
-    gw.settings:set('roster', getglobal(self:GetName() .. "OptionRoster"):GetChecked() and true or false)
-    gw.settings:set('rank', getglobal(self:GetName() .. "OptionRank"):GetChecked() and true or false)
-    gw.settings:set('joindelay', getglobal(self:GetName() .. "OptionJoinDelay"):GetValue())
-    if (gw.IsOfficer()) then
-        gw.settings:set('ochat', getglobal(self:GetName() .. "OptionOfficerChat"):GetChecked() and true or false)
-    end
-end
-
-function GreenWallInterfaceFrame_SetDefaults(self)
-    gw.settings:reset()
-end
-
-function GreenWallInterfaceFrameOptionJoinDelay_OnValueChanged(self, value)
-    -- Fix for 5.4.0, see http://www.wowwiki.com/Patch_5.4.0/API_changes
-    if not self._onsetting then
-        self._onsetting = true
-        self:SetValue(self:GetValue())
-        value = self:GetValue()
-        self._onsetting = false
-    else return
-    end
-    getglobal(self:GetName() .. "Text"):SetText(value)
-end
-
-
---[[-----------------------------------------------------------------------
+--[[ -----------------------------------------------------------------------
 
 Slash Command Handler
 
---]]-----------------------------------------------------------------------
+--]] -----------------------------------------------------------------------
 
 --- Update or display the value of a user settings variable.
 -- @param key The name of the variable.
@@ -207,7 +142,7 @@ local function GwSlashCmd(message, editbox)
 end
 
 
---[[-----------------------------------------------------------------------
+--[[ -----------------------------------------------------------------------
 
 Initialization
 
@@ -253,7 +188,7 @@ function GreenWall_OnLoad(self)
 end
 
 
---[[-----------------------------------------------------------------------
+--[[ -----------------------------------------------------------------------
 
 Frame Event Functions
 
@@ -549,7 +484,7 @@ function GreenWall_OnEvent(self, event, ...)
 end
 
 
---[[-----------------------------------------------------------------------
+--[[ -----------------------------------------------------------------------
 
 END
 

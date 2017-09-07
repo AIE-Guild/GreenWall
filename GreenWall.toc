@@ -22,6 +22,7 @@ Compat.lua
 Chat.lua
 Channel.lua
 API.lua
+Interface.lua
 GreenWall.lua
 GreenWall.xml
 
