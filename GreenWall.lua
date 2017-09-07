@@ -43,7 +43,8 @@ local _
 
 UI Handlers
 
---]] -----------------------------------------------------------------------
+--]]-----------------------------------------------------------------------
+
 function GreenWallInterfaceFrame_OnShow(self)
     if (not gw.addon_loaded) then
         -- Configuration not loaded.
@@ -57,6 +58,7 @@ function GreenWallInterfaceFrame_OnShow(self)
     getglobal(self:GetName() .. "OptionJoinDelay"):SetValueStep(gw.settings:getattr('joindelay', 'step'))
 
     -- Populate interface panel.
+    getglobal(self:GetName() .. "OptionMode"):SetChecked(gw.settings:get('mode') == GW_MODE_ACCOUNT)
     getglobal(self:GetName() .. "OptionTag"):SetChecked(gw.settings:get('tag'))
     getglobal(self:GetName() .. "OptionAchievements"):SetChecked(gw.settings:get('achievements'))
     getglobal(self:GetName() .. "OptionRoster"):SetChecked(gw.settings:get('roster'))
@@ -74,6 +76,7 @@ function GreenWallInterfaceFrame_OnShow(self)
 end
 
 function GreenWallInterfaceFrame_SaveUpdates(self)
+    gw.settings:set('mode', getglobal(self:GetName() .. "OptionMode"):GetChecked() and GW_MODE_ACCOUNT or GW_MODE_CHARACTER)
     gw.settings:set('tag', getglobal(self:GetName() .. "OptionTag"):GetChecked() and true or false)
     gw.settings:set('achievements', getglobal(self:GetName() .. "OptionAchievements"):GetChecked() and true or false)
     gw.settings:set('roster', getglobal(self:GetName() .. "OptionRoster"):GetChecked() and true or false)
@@ -100,11 +103,12 @@ function GreenWallInterfaceFrameOptionJoinDelay_OnValueChanged(self, value)
     getglobal(self:GetName() .. "Text"):SetText(value)
 end
 
+
 --[[-----------------------------------------------------------------------
 
 Slash Command Handler
 
---]] -----------------------------------------------------------------------
+--]]-----------------------------------------------------------------------
 
 --- Update or display the value of a user settings variable.
 -- @param key The name of the variable.

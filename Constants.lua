@@ -24,6 +24,14 @@ SOFTWARE.
 
 --]]-----------------------------------------------------------------------
 
+
+--
+-- Settings
+--
+GW_MODE_ACCOUNT = 'account'
+GW_MODE_CHARACTER = 'character'
+
+
 --
 -- Debugging levels
 --

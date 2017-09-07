@@ -68,12 +68,25 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
             </Layer>
         </Layers>
         <Frames>
-            <CheckButton name="$parentOptionTag" inherits="InterfaceOptionsCheckButtonTemplate">
+            <CheckButton name="$parentOptionMode" inherits="InterfaceOptionsCheckButtonTemplate">
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="$parentSubText"
                             relativePoint="BOTTOMLEFT">
                         <Offset>
                             <AbsDimension x="-2" y="-8"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Account Settings");</OnLoad>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentOptionTag" inherits="InterfaceOptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentOptionMode"
+                            relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-8"/>
                         </Offset>
                     </Anchor>
                 </Anchors>

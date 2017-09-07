@@ -56,6 +56,11 @@ end
 --- Set the default values and attributes.
 function GwSettings:initialize()
     self._default = {
+        mode = {
+            value = GW_MODE_ACCOUNT,
+            desc = 'settings mode: account or character',
+            opts = {GW_MODE_ACCOUNT, GW_MODE_CHARACTER}
+        },
         tag = {
             value = true,
             desc = "co-guild tagging"
@@ -116,8 +121,11 @@ function GwSettings:initialize()
     if GreenWall == nil then
         GreenWall = {
             version = gw.version,
-            created = date('%Y-%m-%d %H:%M:%S')
+            created = date('%Y-%m-%d %H:%M:%S'),
+            mode = GW_MODE_ACCOUNT
         }
+    elseif not GreenWall.mode or GreenWall.mode == '' then
+        GreenWall.mode = GW_MODE_CHARACTER  -- Backwards compatibility
     end
 
     for k, p in pairs(self._default) do
@@ -184,6 +192,15 @@ end
 -- @param value The value of the setting.
 -- @return A string containing an error message on failure, nil on success.
 function GwSettings:validate(name, value)
+    local function contains(list, item)
+        for index, value in ipairs(list) do
+            if value == item then
+                return true
+            end
+        end
+        return false
+    end
+
     if self._default[name] == nil then
         return string.format('%s is not a valid setting', name)
     else
@@ -199,6 +216,10 @@ function GwSettings:validate(name, value)
             if self:getattr(name, 'max') and self:getattr(name, 'max') < value then
                 return string.format('%s must be less than or equal to %d',
                     name, self:getattr(name, 'max'))
+            end
+        elseif opt_type == 'string' then
+            if self:getattr(name, 'opts') and not contains(self:getattr(name, 'opts'), value) then
+                return string.format('invalid option for %s: %s', name, value)
             end
         end
     end
