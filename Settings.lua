@@ -131,9 +131,9 @@ end
 
 
 --- Set the default values and attributes.
--- @param svtable Settings table reference (may be nil)
+-- @param svtable Settings table reference (may be nil).
 -- @param profile The name of a shared profile or nil.
--- @return An initialized settings table reference
+-- @return An initialized settings table reference.
 function GwSettings:initialize(svtable, profile)
     -- Flag to indicate a fresh installation
     local init = false
@@ -181,9 +181,15 @@ end
 
 
 --- Reset options to default values.
-function GwSettings:reset()
-    for k, p in pairs(self._default) do
-        GreenWall[k] = p.value
+-- @param svtable Settings table reference
+-- @param control True if control options should be reset, false otherwise.
+function GwSettings:reset(svtable, control)
+    for k, v in pairs(self._default) do
+        if not v.control or control then
+            if svtable[k] == nil or self:validate(k, svtable[k]) then
+                svtable[k] = v.value
+            end
+        end
     end
 end
 
