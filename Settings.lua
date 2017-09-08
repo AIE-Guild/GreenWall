@@ -41,24 +41,20 @@ GwSettings = {}
 GwSettings.__index = GwSettings
 
 
-
 --- GwSettings constructor function.
 -- @return An initialized GwSettings instance.
 function GwSettings:new()
+    -- Object instantiation
     local self = {}
     setmetatable(self, GwSettings)
-    self:initialize()
-    gw.Debug(GW_LOG_INFO, 'settings initialized')
-    return self
-end
 
-
---- Set the default values and attributes.
-function GwSettings:initialize()
+    -- Default Settings
     self._default = {
         mode = {
             value = GW_MODE_ACCOUNT,
+            compat = GW_MODE_CHARACTER,
             desc = 'settings mode: account or character',
+            control = true,
             opts = {GW_MODE_ACCOUNT, GW_MODE_CHARACTER}
         },
         tag = {
@@ -117,32 +113,70 @@ function GwSettings:initialize()
         self._default[k].type = type(v.value)
     end
 
-    -- Initialize the user settings
-    if GreenWall == nil then
-        GreenWall = {
-            version = gw.version,
-            created = date('%Y-%m-%d %H:%M:%S'),
-            mode = GW_MODE_ACCOUNT
-        }
-    elseif not GreenWall.mode or GreenWall.mode == '' then
-        GreenWall.mode = GW_MODE_CHARACTER  -- Backwards compatibility
-    end
-
-    for k, p in pairs(self._default) do
-        if GreenWall[k] == nil or self:validate(k, GreenWall[k]) then
-            GreenWall[k] = p.value
-        end
-    end
+    -- Initialize saved settings
+    GreenWall = self:initialize(GreenWall)
+    GreenWallProfiles = self:initialize(GreenWallProfiles, 'default')
+    self._char = GreenWall
+    self._acct = GreenWallProfiles.default
 
     -- Initialize user log
     if GreenWallLog == nil then
         GreenWallLog = {}
     end
+    self._log = GreenWallLog
 
-    -- Initialize user profiles
-    if GreenWallProfiles == nil then
-        GreenWallProfiles = {}
+    gw.Debug(GW_LOG_INFO, 'settings initialized')
+    return self
+end
+
+
+--- Set the default values and attributes.
+-- @param svtable Settings table reference (may be nil)
+-- @param profile The name of a shared profile or nil.
+-- @return An initialized settings table reference
+function GwSettings:initialize(svtable, profile)
+    -- Flag to indicate a fresh installation
+    local init = false
+    local store
+
+    -- Create the store if necessary
+    if svtable == nil then
+        svtable = {}
+        init = true
     end
+    if profile then
+        if svtable[profile] == nil then
+            svtable[profile] = {}
+            init = true
+        end
+        store = svtable[profile]
+    else
+        store = svtable
+    end
+    if init then
+        store.created = date('%Y-%m-%d %H:%M:%S')
+    end
+
+    -- Groom the valid variables
+    for k, v in pairs(self._default) do
+        if not profile or not v.control then
+            if store[k] == nil or self:validate(k, store[k]) then
+                if v.compat and not init then
+                    -- use compatibility setting
+                    store[k] = v.compat
+                else
+                    -- use default
+                    store[k] = v.value
+                end
+            end
+        end
+    end
+
+    -- Update the metadata
+    store.version = gw.version
+    store.updated = date('%Y-%m-%d %H:%M:%S')
+
+    return svtable
 end
 
 
