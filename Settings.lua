@@ -194,15 +194,11 @@ function GwSettings:reset(svtable, control)
 end
 
 
---- Get a user setting value.
+--- Check if a setting exists.
 -- @param name The name of the setting.
--- @return The setting value.
-function GwSettings:get(name)
-    if self._default[name] == nil then
-        return
-    else
-        return GreenWall[name]
-    end
+-- @return True if the setting exists, false otherwise.
+function GwSettings:exists(name)
+    return self._default[name] ~= nil
 end
 
 
@@ -219,11 +215,37 @@ function GwSettings:getattr(name, attr)
 end
 
 
+--- Check if a setting is a control variable.
+-- @param name The name of the setting.
+-- @return True if the setting is a control variable, false otherwise.
+function GwSettings:is_control(name)
+    if self:exists(name) then
+        if self:getattr(name, 'control') then
+            return true
+        else
+            return false
+        end
+    else
+        return false
+    end
+end
+
+
 --- Get a user setting value.
 -- @param name The name of the setting.
--- @return True if the setting exists, false otherwise.
-function GwSettings:exists(name)
-    return self._default[name] ~= nil
+-- @return The setting value.
+function GwSettings:get(name)
+    if self:exists(name) then
+        if self:is_control(name) then
+            return self._char[name]
+        elseif self._char.mode == GW_MODE_CHARACTER then
+            return self._char[name]
+        else
+            return self._acct[name]
+        end
+    else
+        return
+    end
 end
 
 
