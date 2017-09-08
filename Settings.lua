@@ -137,6 +137,7 @@ end
 function GwSettings:initialize(svtable, profile)
     -- Flag to indicate a fresh installation
     local init = false
+    local update = false
     local store
 
     -- Create the store if necessary
@@ -170,11 +171,14 @@ function GwSettings:initialize(svtable, profile)
                 end
             end
         end
+        update = true
     end
 
     -- Update the metadata
-    store.version = gw.version
-    store.updated = date('%Y-%m-%d %H:%M:%S')
+    if init or update then
+        store.version = gw.version
+        store.updated = date('%Y-%m-%d %H:%M:%S')
+    end
 
     return svtable
 end
@@ -255,7 +259,7 @@ end
 -- @return A string containing an error message on failure, nil on success.
 function GwSettings:validate(name, value)
     local function contains(list, item)
-        for index, value in ipairs(list) do
+        for _, value in ipairs(list) do
             if value == item then
                 return true
             end
@@ -263,10 +267,10 @@ function GwSettings:validate(name, value)
         return false
     end
 
-    if self._default[name] == nil then
+    if not self:exists(name) then
         return string.format('%s is not a valid setting', name)
     else
-        local opt_type = self._default[name].type
+        local opt_type = self:getattr(name, 'type')
         if type(value) ~= opt_type then
             return string.format('%s must be a %s value', name, opt_type)
         end
@@ -293,27 +297,39 @@ end
 -- @param value The value of the setting.
 -- @return True on success, false on failure.
 function GwSettings:set(name, value)
+    -- Validate the new value
     local err = self:validate(name, value)
     if err then
         gw.Error(err)
         return false
     end
 
+    -- Apply the new setting
     local curr = self:get(name)
-    GreenWall[name] = value
+    if self:is_control(name) then
+        self._char[name] = value
+    elseif self._char.mode == GW_MODE_CHARACTER then
+        self._char[name] = value
+    else
+        self._acct[name] = value
+    end
 
     -- Special handling for value changes
     if curr ~= value then
-        gw.Debug(GW_LOG_INFO, 'set %s to %s', name, tostring(value))
+        gw.Debug(GW_LOG_INFO, 'changed %s from %s to %s (%s)',
+            name, tostring(curr), tostring(value), self._char.mode)
         GreenWall.updated = date('%Y-%m-%d %H:%M:%S')
 
         if name == 'logsize' then
-            while #GreenWallLog > value do
-                tremove(GreenWallLog, 1)
+            gw.Debug(GW_LOG_INFO, 'trimming user log')
+            while #self._log > value do
+                tremove(self._log, 1)
             end
         elseif name == 'joindelay' then
+            gw.Debug(GW_LOG_INFO, 'updating channel timers')
             gw.config.timer.channel:set(value)
         elseif name == 'ochat' then
+            gw.Debug(GW_LOG_INFO, 'reloading officer chat channel')
             gw.config:reload()
         end
     end
