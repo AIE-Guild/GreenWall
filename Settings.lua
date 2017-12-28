@@ -55,7 +55,7 @@ function GwSettings:new()
             compat = GW_MODE_CHARACTER,
             desc = 'settings mode: account or character',
             control = true,
-            opts = {GW_MODE_ACCOUNT, GW_MODE_CHARACTER}
+            opts = { GW_MODE_ACCOUNT, GW_MODE_CHARACTER }
         },
         tag = {
             value = true,
@@ -114,10 +114,10 @@ function GwSettings:new()
     end
 
     -- Initialize saved settings
-    GreenWall = self:initialize(GreenWall)
-    GreenWallProfiles = self:initialize(GreenWallProfiles, 'default')
+    GreenWall = self:initialize(GreenWall, false)
+    GreenWallCommon = self:initialize(GreenWallCommon, true)
     self._char = GreenWall
-    self._acct = GreenWallProfiles.default
+    self._acct = GreenWallCommon
 
     -- Initialize user log
     if GreenWallLog == nil then
@@ -132,30 +132,21 @@ end
 
 --- Set the default values and attributes.
 -- @param svtable Settings table reference (may be nil).
--- @param profile The name of a shared profile or nil.
+-- @param common True if the table is account-wide, false otherwise.
 -- @return An initialized settings table reference.
-function GwSettings:initialize(svtable, profile)
+function GwSettings:initialize(svtable, common)
     -- Flag to indicate a fresh installation
-    local init = false
-    local update = false
     local store
+
+    gw.Debug(GW_LOG_INFO, 'initializing settings (common=%s)', tostring(common))
 
     -- Create the store if necessary
     if svtable == nil then
-        svtable = {}
-        init = true
-    end
-    if profile then
-        if svtable[profile] == nil then
-            svtable[profile] = {}
-            init = true
-        end
-        store = svtable[profile]
+        store = {
+            created = date('%Y-%m-%d %H:%M:%S')
+        }
     else
         store = svtable
-    end
-    if init then
-        store.created = date('%Y-%m-%d %H:%M:%S')
     end
 
     -- Groom the valid variables
@@ -169,18 +160,15 @@ function GwSettings:initialize(svtable, profile)
                     -- use default
                     store[k] = v.value
                 end
+                gw.Debug(GW_LOG_DEBUG, 'initialized %s to "%s"', k, tostring(store[k]))
             end
         end
-        update = true
     end
 
     -- Update the metadata
-    if init or update then
-        store.version = gw.version
-        store.updated = date('%Y-%m-%d %H:%M:%S')
-    end
-
-    return svtable
+    store.version = gw.version
+    store.updated = date('%Y-%m-%d %H:%M:%S')
+    return store
 end
 
 
@@ -337,40 +325,3 @@ function GwSettings:set(name, value)
     return true
 end
 
-
---- Load settings from a user profile.
--- @param profile
--- @return True on success, false on failure.
-function GwSettings:load_profile()
-    local pdata = GreenWallProfiles[profile]
-    if not pdata then
-        gw.Error('no profile named %s found', profile)
-        return false
-    else
-        for k, v in pairs(self._default) do
-            if pdata[k] then
-                self:set(k, pdata[k])
-            else
-                self:set(k, self._default[k].value)
-            end
-        end
-        return true
-    end
-end
-
-
---- Save settings to a user profile.
--- @param profile
--- @return True on success, false on failure.
-function GwSettings:save_profile()
-    -- Profile timestamps
-    if not GreenWallProfiles[profile] then
-        GreenWallProfiles[profile].created = date('%Y-%m-%d %H:%M:%S')
-    end
-    GreenWallProfiles[profile].updated = date('%Y-%m-%d %H:%M:%S')
-    -- Profile data
-    for k, v in pairs(self._default) do
-        GreenWallProfiles[profile][k] = v
-    end
-    return true
-end

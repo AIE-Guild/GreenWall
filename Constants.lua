@@ -31,6 +31,9 @@ SOFTWARE.
 GW_MODE_ACCOUNT = 'account'
 GW_MODE_CHARACTER = 'character'
 
+GW_PROFILE_DEFAULT = 'default'
+GW_PROFILE_ACCOUNT = 'account'
+
 
 --
 -- Debugging levels
