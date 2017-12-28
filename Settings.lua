@@ -54,7 +54,7 @@ function GwSettings:new()
             value = GW_MODE_ACCOUNT,
             compat = GW_MODE_CHARACTER,
             desc = 'settings mode: account or character',
-            control = true,
+            meta = true,
             opts = { GW_MODE_ACCOUNT, GW_MODE_CHARACTER }
         },
         tag = {
@@ -114,10 +114,14 @@ function GwSettings:new()
     end
 
     -- Initialize saved settings
+    GreenWallMeta = self:initialize(GreenWallMeta, true)
     GreenWall = self:initialize(GreenWall, false)
-    GreenWallCommon = self:initialize(GreenWallCommon, true)
-    self._char = GreenWall
-    self._acct = GreenWallCommon
+    GreenWallAccount = self:initialize(GreenWallAccount, false)
+    self._meta = GreenWallMeta
+    self._data = {
+        [GW_MODE_CHARACTER] = GreenWall,
+        [GW_MODE_ACCOUNT] = GreenWallAccount
+    }
 
     -- Initialize user log
     if GreenWallLog == nil then
@@ -132,26 +136,28 @@ end
 
 --- Set the default values and attributes.
 -- @param svtable Settings table reference (may be nil).
--- @param common True if the table is account-wide, false otherwise.
+-- @param meta True if the table is metadata for settings, false otherwise.
 -- @return An initialized settings table reference.
-function GwSettings:initialize(svtable, common)
+function GwSettings:initialize(svtable, meta)
     -- Flag to indicate a fresh installation
     local store
+    local init = false
 
-    gw.Debug(GW_LOG_INFO, 'initializing settings (common=%s)', tostring(common))
+    gw.Debug(GW_LOG_INFO, 'initializing settings (meta=%s)', tostring(meta))
 
     -- Create the store if necessary
     if svtable == nil then
         store = {
             created = date('%Y-%m-%d %H:%M:%S')
         }
+        init = true
     else
         store = svtable
     end
 
     -- Groom the valid variables
     for k, v in pairs(self._default) do
-        if not profile or not v.control then
+        if meta == v.meta then
             if store[k] == nil or self:validate(k, store[k]) then
                 if v.compat and not init then
                     -- use compatibility setting
@@ -174,10 +180,10 @@ end
 
 --- Reset options to default values.
 -- @param svtable Settings table reference
--- @param control True if control options should be reset, false otherwise.
-function GwSettings:reset(svtable, control)
+-- @param meta True if meta options should be reset, false otherwise.
+function GwSettings:reset(svtable, meta)
     for k, v in pairs(self._default) do
-        if not v.control or control then
+        if not v.meta or meta then
             if svtable[k] == nil or self:validate(k, svtable[k]) then
                 svtable[k] = v.value
             end
@@ -207,12 +213,12 @@ function GwSettings:getattr(name, attr)
 end
 
 
---- Check if a setting is a control variable.
+--- Check if a setting is a meta variable.
 -- @param name The name of the setting.
--- @return True if the setting is a control variable, false otherwise.
-function GwSettings:is_control(name)
+-- @return True if the setting is a meta variable, false otherwise.
+function GwSettings:is_meta(name)
     if self:exists(name) then
-        if self:getattr(name, 'control') then
+        if self:getattr(name, 'meta') then
             return true
         else
             return false
@@ -228,12 +234,11 @@ end
 -- @return The setting value.
 function GwSettings:get(name)
     if self:exists(name) then
-        if self:is_control(name) then
-            return self._char[name]
-        elseif self._char.mode == GW_MODE_CHARACTER then
-            return self._char[name]
+        if self:is_meta(name) then
+            return self._meta[name]
         else
-            return self._acct[name]
+            local mode = self._meta.mode
+            return self._data[mode][name]
         end
     else
         return
@@ -294,18 +299,17 @@ function GwSettings:set(name, value)
 
     -- Apply the new setting
     local curr = self:get(name)
-    if self:is_control(name) then
-        self._char[name] = value
-    elseif self._char.mode == GW_MODE_CHARACTER then
-        self._char[name] = value
+    if self:is_meta(name) then
+        self._meta[name] = value
     else
-        self._acct[name] = value
+        local mode = self._meta.mode
+        self._data[mode][name] = value
     end
 
     -- Special handling for value changes
     if curr ~= value then
         gw.Debug(GW_LOG_INFO, 'changed %s from %s to %s (%s)',
-            name, tostring(curr), tostring(value), self._char.mode)
+            name, tostring(curr), tostring(value), self._meta.mode)
         GreenWall.updated = date('%Y-%m-%d %H:%M:%S')
 
         if name == 'logsize' then
