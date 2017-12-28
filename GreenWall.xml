@@ -92,6 +92,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                 </Anchors>
                 <Scripts>
                     <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild tags");</OnLoad>
+                    <OnClick>GreenWallInterfaceFrameOptionMode_OnClick(self)</OnClick>
                 </Scripts>
             </CheckButton>
             <CheckButton name="$parentOptionAchievements" inherits="InterfaceOptionsCheckButtonTemplate">

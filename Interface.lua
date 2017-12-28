@@ -82,6 +82,11 @@ function GreenWallInterfaceFrame_SetDefaults(self)
     gw.settings:reset()
 end
 
+function GreenWallInterfaceFrameOptionMode_OnClick(self)
+    local mode = self:GetChecked() and GW_MODE_ACCOUNT or GW_MODE_CHARACTER
+    GreenWallInterfaceFrame_LoadOptions(self, mode)
+end
+
 function GreenWallInterfaceFrameOptionJoinDelay_OnValueChanged(self, value)
     -- Fix for 5.4.0, see http://www.wowwiki.com/Patch_5.4.0/API_changes
     if not self._onsetting then
