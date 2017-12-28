@@ -4,7 +4,7 @@
 ## Author: Mark Rogaski <stigg@aie-guild.org>
 ## Version: 1.9.0-alpha.1
 ## URL: https://github.com/AIE-Guild/GreenWall
-## URL: https://mods.curse.com/addons/wow/greenwall
+## URL: https://www.curseforge.com/wow/addons/greenwall
 ## DefaultState: enabled
 ## SavedVariables: GreenWallProfiles
 ## SavedVariablesPerCharacter: GreenWall,GreenWallLog

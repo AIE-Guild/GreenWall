@@ -8,8 +8,12 @@ This project uses [Semantic Versioning](http://semver.org/).
 - Moved configuration handling to a proxy class to allow a single point
   of access for all configuration data.
 
+### Updated
+- Pointed documentation to new CurseForge URL.
+
 ### Removed
 - Removed luadoc HTML output.
+- HTML copies of other documentation.
 
 ## [1.8.5] -- 2017-08-29
 ### Fixed
