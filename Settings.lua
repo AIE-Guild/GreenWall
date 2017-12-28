@@ -229,6 +229,13 @@ function GwSettings:is_meta(name)
 end
 
 
+--- Return settings mode.
+-- @return GW_MODE_CHARACTER or GW_MODE_ACCOUNT.
+function GwSettings:mode()
+    return self._meta.mode
+end
+
+
 --- Get a user setting value.
 -- @param name The name of the setting.
 -- @return The setting value.
@@ -237,8 +244,7 @@ function GwSettings:get(name)
         if self:is_meta(name) then
             return self._meta[name]
         else
-            local mode = self._meta.mode
-            return self._data[mode][name]
+            return self._data[self:mode()][name]
         end
     else
         return
@@ -302,14 +308,13 @@ function GwSettings:set(name, value)
     if self:is_meta(name) then
         self._meta[name] = value
     else
-        local mode = self._meta.mode
-        self._data[mode][name] = value
+        self._data[self:mode()][name] = value
     end
 
     -- Special handling for value changes
     if curr ~= value then
-        gw.Debug(GW_LOG_INFO, 'changed %s from %s to %s (%s)',
-            name, tostring(curr), tostring(value), self._meta.mode)
+        gw.Debug(GW_LOG_INFO, 'changed %s from "%s" to "%s" (%s)',
+            name, tostring(curr), tostring(value), tostring(self:mode()))
         GreenWall.updated = date('%Y-%m-%d %H:%M:%S')
 
         if name == 'logsize' then
