@@ -31,20 +31,14 @@ UI Handlers
 
 --]] -----------------------------------------------------------------------
 
-function GreenWallInterfaceFrame_OnShow(self)
-    if (not gw.addon_loaded) then
-        -- Configuration not loaded.
-        self:Hide()
-        return
-    end
-
+function GreenWallInterfaceFrame_LoadOptions(self, mode)
     -- Initialize widgets
     getglobal(self:GetName() .. "OptionJoinDelay"):SetMinMaxValues(gw.settings:getattr('joindelay', 'min'),
         gw.settings:getattr('joindelay', 'max'))
     getglobal(self:GetName() .. "OptionJoinDelay"):SetValueStep(gw.settings:getattr('joindelay', 'step'))
 
     -- Populate interface panel.
-    getglobal(self:GetName() .. "OptionMode"):SetChecked(gw.settings:get('mode') == GW_MODE_ACCOUNT)
+    getglobal(self:GetName() .. "OptionMode"):SetChecked(mode == GW_MODE_ACCOUNT)
     getglobal(self:GetName() .. "OptionTag"):SetChecked(gw.settings:get('tag'))
     getglobal(self:GetName() .. "OptionAchievements"):SetChecked(gw.settings:get('achievements'))
     getglobal(self:GetName() .. "OptionRoster"):SetChecked(gw.settings:get('roster'))
@@ -59,6 +53,17 @@ function GreenWallInterfaceFrame_OnShow(self)
         getglobal(self:GetName() .. "OptionOfficerChatText"):SetTextColor(.5, .5, .5)
         getglobal(self:GetName() .. "OptionOfficerChat"):Disable()
     end
+end
+
+function GreenWallInterfaceFrame_OnShow(self)
+    if (not gw.addon_loaded) then
+        -- Configuration not loaded.
+        self:Hide()
+        return
+    end
+
+    local mode = gw.settings:get('mode')
+    GreenWallInterfaceFrame_LoadOptions(self, mode)
 end
 
 function GreenWallInterfaceFrame_SaveUpdates(self)
