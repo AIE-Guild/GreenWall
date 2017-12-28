@@ -23,8 +23,8 @@ No, you don't. But guild chat will be very, very frustrating for you if you don'
 
 The latest version is available at the following locations.
 
+- [Curse](https://www.curseforge.com/wow/addons/greenwall) (Recommended)
 - [GitHub](https://github.com/AIE-Guild/GreenWall/releases)
-- [Curse](http://www.curse.com/addons/wow/greenwall)
 
 It is also mirrored in WoWMatrix, but we make no guarantees about how frequently WoWMatrix updates or the integrity of the files that it provides.
 
