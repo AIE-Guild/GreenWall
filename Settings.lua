@@ -139,7 +139,6 @@ end
 -- @param meta True if the table is metadata for settings, false otherwise.
 -- @return An initialized settings table reference.
 function GwSettings:initialize(svtable, meta)
-    -- Flag to indicate a fresh installation
     local store
     local init = false
 
@@ -147,8 +146,10 @@ function GwSettings:initialize(svtable, meta)
 
     -- Create the store if necessary
     if svtable == nil then
+        ts = date('%Y-%m-%d %H:%M:%S')
         store = {
-            created = date('%Y-%m-%d %H:%M:%S')
+            created = ts,
+            updated = ts
         }
         init = true
     else
@@ -157,7 +158,7 @@ function GwSettings:initialize(svtable, meta)
 
     -- Groom the valid variables
     for k, v in pairs(self._default) do
-        if meta == v.meta then
+        if not meta == not v.meta then  -- Negate both to coerce any to false
             if store[k] == nil or self:validate(k, store[k]) then
                 if v.compat and not init then
                     -- use compatibility setting
@@ -173,7 +174,6 @@ function GwSettings:initialize(svtable, meta)
 
     -- Update the metadata
     store.version = gw.version
-    store.updated = date('%Y-%m-%d %H:%M:%S')
     return store
 end
 
@@ -238,14 +238,21 @@ end
 
 --- Get a user setting value.
 -- @param name The name of the setting.
+-- @param mode An optional mode to specify which settings to retrieve, GW_MODE_CHARACTER or GW_MODE_ACCOUNT.
 -- @return The setting value.
-function GwSettings:get(name)
+function GwSettings:get(name, mode)
     if self:exists(name) then
+        local value
         if self:is_meta(name) then
-            return self._meta[name]
+            value = self._meta[name]
         else
-            return self._data[self:mode()][name]
+            if mode then
+                value = self._data[mode][name]
+            else
+                value = self._data[self:mode()][name]
+            end
         end
+        return value
     else
         return
     end
@@ -294,8 +301,9 @@ end
 --- Set a user setting value.
 -- @param name The name of the setting.
 -- @param value The value of the setting.
+-- @param mode An optional mode to specify which settings to update, GW_MODE_CHARACTER or GW_MODE_ACCOUNT.
 -- @return True on success, false on failure.
-function GwSettings:set(name, value)
+function GwSettings:set(name, value, mode)
     -- Validate the new value
     local err = self:validate(name, value)
     if err then
@@ -304,18 +312,22 @@ function GwSettings:set(name, value)
     end
 
     -- Apply the new setting
-    local curr = self:get(name)
+    local curr = self:get(name, mode)
     if self:is_meta(name) then
         self._meta[name] = value
+        self._meta.updated = date('%Y-%m-%d %H:%M:%S')
     else
-        self._data[self:mode()][name] = value
+        if not mode then
+            mode = self:mode()
+        end
+        self._data[mode][name] = value
+        self._data[mode].updated = date('%Y-%m-%d %H:%M:%S')
     end
 
     -- Special handling for value changes
     if curr ~= value then
         gw.Debug(GW_LOG_INFO, 'changed %s from "%s" to "%s" (%s)',
             name, tostring(curr), tostring(value), tostring(self:mode()))
-        GreenWall.updated = date('%Y-%m-%d %H:%M:%S')
 
         if name == 'logsize' then
             gw.Debug(GW_LOG_INFO, 'trimming user log')

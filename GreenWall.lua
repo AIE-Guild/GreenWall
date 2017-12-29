@@ -71,11 +71,22 @@ local function GwSettingCmd(key, value)
                 gw.Error('%s setting must be numeric: %s', key)
             end
         end
-        gw.Write('%s is set to %d.',
+        gw.Write('%s is set to %s.',
+            gw.settings:getattr(key, 'desc'),
+            tostring(gw.settings:get(key))
+        )
+    elseif gw.settings:getattr(key, 'type') == 'string' then
+        if value and value ~= '' then
+            gw.settings:set(key, value)
+        end
+        gw.Write('%s is set to %s.',
             gw.settings:getattr(key, 'desc'),
             gw.settings:get(key)
         )
+    else
+        gw.Error('cannot parse value for %s', key)
     end
+
 end
 
 
