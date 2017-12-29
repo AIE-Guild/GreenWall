@@ -4,6 +4,9 @@ This project uses [Semantic Versioning](http://semver.org/).
 
 ## [1.9.0] -- Unreleased
 ### Added
+- Added support for shared, account-level settings per character.  Each
+  character can either use the account settings or a character-specific
+  configuration.
 - Added confederation announcements of legendary items looted.
 - Moved configuration handling to a proxy class to allow a single point
   of access for all configuration data.
