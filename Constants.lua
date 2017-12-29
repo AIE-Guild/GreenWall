@@ -31,8 +31,13 @@ SOFTWARE.
 GW_MODE_ACCOUNT = 'account'
 GW_MODE_CHARACTER = 'character'
 
-GW_PROFILE_DEFAULT = 'default'
-GW_PROFILE_ACCOUNT = 'account'
+
+--
+-- UI
+--
+GW_UI_COLOR_INACTIVE = {0.5, 0.5, 0.5 }
+GW_UI_COLOR_ACTIVE = {1.0, 1.0, 1.0}
+GW_UI_COLOR_MODE = {1.0, 1.0, 0.0 }
 
 
 --

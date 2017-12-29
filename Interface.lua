@@ -32,10 +32,7 @@ UI Handlers
 --]] -----------------------------------------------------------------------
 
 function GreenWallInterfaceFrame_LoadOptions(self, mode)
-    -- Initialize widgets
-    getglobal(self:GetName() .. "OptionJoinDelay"):SetMinMaxValues(gw.settings:getattr('joindelay', 'min'),
-        gw.settings:getattr('joindelay', 'max'))
-    getglobal(self:GetName() .. "OptionJoinDelay"):SetValueStep(gw.settings:getattr('joindelay', 'step'))
+    gw.Debug(GW_LOG_INFO, 'Loading interface settings')
 
     -- Populate interface panel.
     getglobal(self:GetName() .. "OptionMode"):SetChecked(mode == GW_MODE_ACCOUNT)
@@ -46,11 +43,11 @@ function GreenWallInterfaceFrame_LoadOptions(self, mode)
     getglobal(self:GetName() .. "OptionJoinDelay"):SetValue(gw.settings:get('joindelay'))
     if (gw.IsOfficer()) then
         getglobal(self:GetName() .. "OptionOfficerChat"):SetChecked(gw.settings:get('ochat'))
-        getglobal(self:GetName() .. "OptionOfficerChatText"):SetTextColor(1, 1, 1)
+        getglobal(self:GetName() .. "OptionOfficerChatText"):SetTextColor(unpack(GW_UI_COLOR_ACTIVE))
         getglobal(self:GetName() .. "OptionOfficerChat"):Enable()
     else
         getglobal(self:GetName() .. "OptionOfficerChat"):SetChecked(false)
-        getglobal(self:GetName() .. "OptionOfficerChatText"):SetTextColor(.5, .5, .5)
+        getglobal(self:GetName() .. "OptionOfficerChatText"):SetTextColor(unpack(GW_UI_COLOR_INACTIVE))
         getglobal(self:GetName() .. "OptionOfficerChat"):Disable()
     end
 end
@@ -61,12 +58,20 @@ function GreenWallInterfaceFrame_OnShow(self)
         self:Hide()
         return
     end
+    gw.Debug(GW_LOG_INFO, 'Displaying interface options')
 
+    -- Initialize widgets
+    getglobal(self:GetName() .. "OptionJoinDelay"):SetMinMaxValues(gw.settings:getattr('joindelay', 'min'),
+        gw.settings:getattr('joindelay', 'max'))
+    getglobal(self:GetName() .. "OptionJoinDelay"):SetValueStep(gw.settings:getattr('joindelay', 'step'))
+
+    -- Display configured values
     local mode = gw.settings:get('mode')
     GreenWallInterfaceFrame_LoadOptions(self, mode)
 end
 
 function GreenWallInterfaceFrame_SaveUpdates(self)
+    gw.Debug(GW_LOG_INFO, 'Saving interface settings')
     gw.settings:set('mode', getglobal(self:GetName() .. "OptionMode"):GetChecked() and GW_MODE_ACCOUNT or GW_MODE_CHARACTER)
     gw.settings:set('tag', getglobal(self:GetName() .. "OptionTag"):GetChecked() and true or false)
     gw.settings:set('achievements', getglobal(self:GetName() .. "OptionAchievements"):GetChecked() and true or false)
@@ -79,16 +84,19 @@ function GreenWallInterfaceFrame_SaveUpdates(self)
 end
 
 function GreenWallInterfaceFrame_SetDefaults(self)
+    gw.Debug(GW_LOG_INFO, 'Resetting interface settings')
     gw.settings:reset()
 end
 
 function GreenWallInterfaceFrameOptionMode_OnClick(self)
     local mode = self:GetChecked() and GW_MODE_ACCOUNT or GW_MODE_CHARACTER
+    gw.Debug(GW_LOG_DEBUG, 'Mode toggled: %s', mode)
     GreenWallInterfaceFrame_LoadOptions(self, mode)
 end
 
 function GreenWallInterfaceFrameOptionJoinDelay_OnValueChanged(self, value)
     -- Fix for 5.4.0, see http://www.wowwiki.com/Patch_5.4.0/API_changes
+    gw.Debug(GW_LOG_DEBUG, 'Join delay setting updated')
     if not self._onsetting then
         self._onsetting = true
         self:SetValue(self:GetValue())

@@ -78,7 +78,11 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                     </Anchor>
                 </Anchors>
                 <Scripts>
-                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Use these settings for all characters on account");</OnLoad>
+                    <OnLoad>
+                            getglobal(self:GetName() .. "Text"):SetText("Use these settings for all characters on this account");
+                            getglobal(self:GetName() .. "Text"):SetTextColor(unpack(GW_UI_COLOR_MODE));
+                    </OnLoad>
+                    <OnClick>GreenWallInterfaceFrameOptionMode_OnClick(self)</OnClick>
                 </Scripts>
             </CheckButton>
             <CheckButton name="$parentOptionTag" inherits="InterfaceOptionsCheckButtonTemplate">
@@ -92,7 +96,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                 </Anchors>
                 <Scripts>
                     <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild tags");</OnLoad>
-                    <OnClick>GreenWallInterfaceFrameOptionMode_OnClick(self)</OnClick>
                 </Scripts>
             </CheckButton>
             <CheckButton name="$parentOptionAchievements" inherits="InterfaceOptionsCheckButtonTemplate">
