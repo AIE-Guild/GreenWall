@@ -19,7 +19,7 @@ function TestClassLib:test_new()
     end
 
     local obj = Foo:new()
-    assertEquals(obj:answer(), 42)
+    lu.assertEquals(obj:answer(), 42)
 end
 
 function TestClassLib:test_super()
@@ -36,8 +36,8 @@ function TestClassLib:test_super()
 
     local obj = Bar:new()
     local parent = obj:super()
-    assertEquals(obj:answer(), 43)
-    assertEquals(parent:answer(), 42)
+    lu.assertEquals(obj:answer(), 43)
+    lu.assertEquals(parent:answer(), 42)
 end
 
 os.exit(lu.run())
