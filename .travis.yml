@@ -15,7 +15,7 @@ install:
   - luarocks install luaunit
 
 script:
-  - lua tests/*.lua
+  - lua tests/*.lua -v
 
 
 notifications:

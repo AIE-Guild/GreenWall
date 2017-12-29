@@ -40,4 +40,16 @@ function TestClassLib:test_super()
     lu.assertEquals(parent:answer(), 42)
 end
 
+function TestClassLib:test_isa()
+    Foo = Class()
+    Bar = Class(Foo)
+    Baz = Class()
+
+    local bar = Bar:new()
+    local baz = Baz:new()
+    lu.assertTrue(bar:isa(Foo))
+    lu.assertTrue(bar:isa(Bar))
+    lu.assertFalse(baz:isa(Foo))
+end
+
 os.exit(lu.run())
