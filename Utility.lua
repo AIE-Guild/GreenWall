@@ -57,10 +57,10 @@ end
 --- Add a message to the log file
 -- @param msg A string to write to the log.
 function gw.Log(msg)
-    if GreenWall ~= nil and GreenWall.log and GreenWallLog ~= nil then
+    if gw.settings and gw.settings:get('log') then
         local ts = date('%Y-%m-%d %H:%M:%S')
         tinsert(GreenWallLog, format('%s -- %s', ts, msg))
-        while # GreenWallLog > GreenWall.logsize do
+        while # GreenWallLog > gw.settings:get('logsize') do
             tremove(GreenWallLog, 1)
         end
     end
@@ -98,11 +98,11 @@ function gw.Debug(level, ...)
     end
 
     local msg = string.format(unpack({...}))
-    if GreenWall ~= nil then
-        if level <= GreenWall.debug then
+    if gw.settings then
+        if level <= gw.settings:get('debug') then
             local trace = format('[debug/%d@%s] %s', level, get_caller(), msg)
             gw.Log(trace)
-            if GreenWall.verbose then
+            if gw.settings:get('verbose') then
                 DEFAULT_CHAT_FRAME:AddMessage(format('|cff009a7dGreenWall:|r |cff778899%s|r', trace))
             end
         end
@@ -114,7 +114,7 @@ end
 -- @param msg The input string
 -- @return The string with redaction applied, if necessary.
 function gw.Redact(msg)
-    if GreenWall.redact then
+    if gw.settings:get('redact') then
         return string.format('<<%04X>>', crc.Hash(msg))
     else
         return msg
@@ -210,30 +210,30 @@ function gw.IsOfficer(target)
         return
     end
 
-    local see_chat = false
-    local see_note = false
-    local rank = get_rank(target)
-
-    if rank then
-
-        local name = GuildControlGetRankName(rank)
-
-        GuildControlSetRank(rank);
-        for i, v in ipairs({GuildControlGetRankFlags()}) do
-            local flag = _G["GUILDCONTROL_OPTION"..i]
-            if flag == 'Officerchat Listen' then
-                see_chat = v
-            elseif flag == 'View Officer Note' then
-                see_note = v
-            end
-        end
-
+    -- Workaround for 7.3.0, where GuildControlSetRank() is protected.
+    local note = gw.GetGMOfficerNote()
+    local result = false
+    if note ~= nil and note ~= '' then
+        result = true
     end
+    gw.Debug(GW_LOG_INFO, 'is_officer: %s', tostring(result))
 
-    local result = see_chat and see_note
-    gw.Debug(GW_LOG_INFO, 'is_officer: %s; rank=%d, see_chat=%s, see_note=%s',
-            tostring(result), tostring(rank), tostring(see_chat), tostring(see_note))
     return result
+end
+
+
+--- Get the officer note for the GM, if possible.
+-- @return The officer note of the GM as a string, or nil.
+function gw.GetGMOfficerNote()
+    local n = GetNumGuildMembers();
+    local name, rank, note
+    for i = 1, n do
+        name, _, rank, _, _, _, _, note = GetGuildRosterInfo(i);
+        if rank == 0 then
+            return note;
+        end
+    end
+    return
 end
 
 

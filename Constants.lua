@@ -24,6 +24,22 @@ SOFTWARE.
 
 --]]-----------------------------------------------------------------------
 
+
+--
+-- Settings
+--
+GW_MODE_ACCOUNT = 'account'
+GW_MODE_CHARACTER = 'character'
+
+
+--
+-- UI
+--
+GW_UI_COLOR_INACTIVE = {0.5, 0.5, 0.5 }
+GW_UI_COLOR_ACTIVE = {1.0, 1.0, 1.0}
+GW_UI_COLOR_MODE = {1.0, 1.0, 0.0 }
+
+
 --
 -- Debugging levels
 --

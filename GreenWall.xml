@@ -68,7 +68,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
             </Layer>
         </Layers>
         <Frames>
-            <CheckButton name="$parentOptionTag" inherits="InterfaceOptionsCheckButtonTemplate">
+            <CheckButton name="$parentOptionMode" inherits="InterfaceOptionsCheckButtonTemplate">
                 <Anchors>
                     <Anchor point="TOPLEFT" relativeTo="$parentSubText"
                             relativePoint="BOTTOMLEFT">
@@ -78,7 +78,24 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                     </Anchor>
                 </Anchors>
                 <Scripts>
-                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show Co-Guild Tags");</OnLoad>
+                    <OnLoad>
+                            getglobal(self:GetName() .. "Text"):SetText("Use these settings for all characters on this account");
+                            getglobal(self:GetName() .. "Text"):SetTextColor(unpack(GW_UI_COLOR_MODE));
+                    </OnLoad>
+                    <OnClick>GreenWallInterfaceFrameOptionMode_OnClick(self)</OnClick>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="$parentOptionTag" inherits="InterfaceOptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parentOptionMode"
+                            relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-8"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild tags");</OnLoad>
                 </Scripts>
             </CheckButton>
             <CheckButton name="$parentOptionAchievements" inherits="InterfaceOptionsCheckButtonTemplate">
@@ -91,7 +108,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                     </Anchor>
                 </Anchors>
                 <Scripts>
-                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show Co-Guild Achievement Announcements");</OnLoad>
+                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild achievement announcements");</OnLoad>
                 </Scripts>
             </CheckButton>
             <CheckButton name="$parentOptionRoster" inherits="InterfaceOptionsCheckButtonTemplate">
@@ -104,7 +121,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                     </Anchor>
                 </Anchors>
                 <Scripts>
-                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show Co-Guild Roster Announcements");</OnLoad>
+                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild roster announcements");</OnLoad>
                 </Scripts>
             </CheckButton>
             <CheckButton name="$parentOptionRank" inherits="InterfaceOptionsCheckButtonTemplate">
@@ -117,7 +134,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                     </Anchor>
                 </Anchors>
                 <Scripts>
-                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show Co-Guild Rank Announcements");</OnLoad>
+                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild rank announcements");</OnLoad>
                 </Scripts>
             </CheckButton>
             <Slider name="$parentOptionJoinDelay" inherits="OptionsSliderTemplate">
@@ -131,7 +148,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                 <Layers>
                     <Layer level="ARTWORK">
                         <FontString name="$parentLabel" inherits="GameFontHighlight" justifyH="LEFT"
-                                    text="Channel Join Delay (seconds)">
+                                    text="Channel join delay (seconds)">
                             <Size>
                                 <AbsDimension x="1024" y="16"/>
                             </Size>
@@ -162,7 +179,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                     </Anchor>
                 </Anchors>
                 <Scripts>
-                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Bridge Officer Chat");</OnLoad>
+                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Bridge officer chat");</OnLoad>
                 </Scripts>
             </CheckButton>
         </Frames>
