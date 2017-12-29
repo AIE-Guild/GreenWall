@@ -7,7 +7,7 @@
 --
 lu = require('luaunit')
 
-require('LIB/ClassLib')
+require('Lib/ClassLib')
 
 TestClassLib = {}
 
