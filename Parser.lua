@@ -159,7 +159,7 @@ function GwParser:get_v1(info, guild_name)
         end
     end
 
-    if conf.guild_id and conf.channel.guild.name:
+    if conf.guild_id and conf.channel.guild.name then
         return conf
     else
         return
