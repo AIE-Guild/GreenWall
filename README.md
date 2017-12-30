@@ -1,7 +1,7 @@
 # GreenWall #
 > A World of Warcraft add-on to bridge guild chat between multiple guilds.
 
-[![Build Status](https://travis-ci.org/AIE-Guild/GreenWall.svg?branch=feature%2F114_config_parser)](https://travis-ci.org/AIE-Guild/GreenWall)
+[![Build Status](https://travis-ci.org/AIE-Guild/GreenWall.svg?branch=master)](https://travis-ci.org/AIE-Guild/GreenWall)
 
 GreenWall implements a common communication channel as a replacement for guild chat in guild confederations.
 
