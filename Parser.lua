@@ -40,6 +40,8 @@ Class Variables
 --]] -----------------------------------------------------------------------
 
 GwParser = GwClass()
+GwV1Parser = GwClass(GwParser)
+GwV2Parser = GwClass(GwParser)
 
 
 --[[-----------------------------------------------------------------------
@@ -62,9 +64,23 @@ Class Methods
 
 --]] -----------------------------------------------------------------------
 
+
+--- Factory method to produce parser instances.
+-- @param info Guild information summary.
+-- @return An instance of a GwParser subclass.
+function GwParser:get_parser(info)
+    local version = self:version(info)
+    if version == 1 then
+        return GwV1Parser:new(info)
+    elseif version == 2 then
+        return GwV2Parser:new(info)
+    end
+    return
+end
+
 --- Determine the configuration version.
--- @param info Guild information field.
--- @return An integer representing configuration version, or nill if no configuration detected.
+-- @param info Guild information summary.
+-- @return An integer representing configuration version, or nil if no configuration detected.
 function GwParser:version(info)
     if string.match(info, 'GWc=".*"') then
         return 2
@@ -72,6 +88,14 @@ function GwParser:version(info)
         return 1
     end
     return
+end
+
+function GwParser:substitute(cstr, xlat)
+    local estr, count = string.gsub(cstr, '%$(%a)', function(s) return xlat[s] end)
+    if count > 0 then
+        gw.Debug(GW_LOG_DEBUG, "expanded '%s' to '%s'", cstr, estr)
+    end
+    return estr
 end
 
 

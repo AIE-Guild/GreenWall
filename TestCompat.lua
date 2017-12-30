@@ -24,6 +24,10 @@ SOFTWARE.
 
 --]]--------------------------------------------------------------------------
 
+--
+-- These functions adapt or mock Lua extensions in the WoW API.
+--
+
 function strmatch(...)
     return string.match(...)
 end
