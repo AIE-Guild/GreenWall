@@ -12,6 +12,7 @@
 ## X-Date: 2017-12-29
 
 Lib\Load.xml
+ClassLib.lua
 Constants.lua
 Globals.lua
 Settings.lua
