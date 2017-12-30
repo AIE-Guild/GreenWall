@@ -30,22 +30,29 @@ SOFTWARE.
 
 --- Generic superclass
 -- @param super An optional superclass.
--- @return A class.
-function Class(super)
+-- @return A class instance.
+function GwClass(super)
     local cls = {}
     cls.__index = cls
     setmetatable(cls, super)
 
+    --- Instance constructor
+    -- @return An object instance.
     function cls:new(...)
         local obj = {}
         setmetatable(obj, cls)
         return obj
     end
 
+    --- Get the inherited superclass
+    -- @return The superclass instance.
     function cls:super()
         return super
     end
 
+    --- Test for inheritance.
+    -- @param target Class to test as an ancestor.
+    -- @return True is target is an ancestor of the object or class.
     function cls:isa(target)
         local this = cls
         while this ~= nil do
@@ -58,11 +65,10 @@ function Class(super)
         return false
     end
 
+    -- Point the metatable to the superclass metatable
     if super ~= nil then
         setmetatable(cls, { __index = super })
     end
 
     return cls
 end
-
-

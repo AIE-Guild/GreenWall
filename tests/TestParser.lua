@@ -25,49 +25,17 @@ SOFTWARE.
 --]]--------------------------------------------------------------------------
 
 lu = require('luaunit')
+require('TestCompat')
 require('ClassLib')
+require('Lib/LibStub')
+require('Lib/SemanticVersion')
+require('Parser')
 
-TestClassLib = {}
+TestParser = {}
 
-function TestClassLib:test_new()
-    Foo = GwClass()
-
-    function Foo:answer()
-        return 42
-    end
-
-    local obj = Foo:new()
-    lu.assertEquals(obj:answer(), 42)
-end
-
-function TestClassLib:test_super()
-    Foo = GwClass()
-    Bar = GwClass(Foo)
-
-    function Foo:answer()
-        return 42
-    end
-
-    function Bar:answer()
-        return 43
-    end
-
-    local obj = Bar:new()
-    local parent = obj:super()
-    lu.assertEquals(obj:answer(), 43)
-    lu.assertEquals(parent:answer(), 42)
-end
-
-function TestClassLib:test_isa()
-    Foo = GwClass()
-    Bar = GwClass(Foo)
-    Baz = GwClass()
-
-    local bar = Bar:new()
-    local baz = Baz:new()
-    lu.assertTrue(bar:isa(Foo))
-    lu.assertTrue(bar:isa(Bar))
-    lu.assertFalse(baz:isa(Foo))
+function TestParser:test_new()
+    parser = GwParser:new()
+    lu.assertTrue(parser:isa(GwParser))
 end
 
 os.exit(lu.run())

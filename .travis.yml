@@ -15,7 +15,8 @@ install:
   - luarocks install luaunit
 
 script:
-  - lua tests/*.lua -v
+  - lua tests/TestClassLib.lua -v
+  - lua tests/TestParser.lua -v
 
 
 notifications:

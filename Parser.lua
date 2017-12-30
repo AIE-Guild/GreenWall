@@ -39,17 +39,7 @@ Class Variables
 
 --]] -----------------------------------------------------------------------
 
-GwParser = {}
-GwParser.__index = GwParser
-
-
---- GwParser constructor function.
--- @return An initialized GwParser instance.
-function GwParser:new()
-    local self = {}
-    setmetatable(self, GwParser)
-    return self
-end
+GwParser = GwClass()
 
 
 --[[-----------------------------------------------------------------------
