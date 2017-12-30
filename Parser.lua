@@ -64,6 +64,11 @@ Class Methods
 
 --]] -----------------------------------------------------------------------
 
+function GwParser:new(info)
+    self.info = info
+    return self
+end
+
 
 --- Factory method to produce parser instances.
 -- @param info Guild information summary.
@@ -90,12 +95,12 @@ function GwParser:version(info)
     return
 end
 
-function GwParser:substitute(cstr, xlat)
-    local estr, count = string.gsub(cstr, '%$(%a)', function(s) return xlat[s] end)
+function GwParser:substitute(text, xlat)
+    local output, count = string.gsub(text, '%$(%a)', function(s) return xlat[s] end)
     if count > 0 then
-        gw.Debug(GW_LOG_DEBUG, "expanded '%s' to '%s'", cstr, estr)
+        gw.Debug(GW_LOG_DEBUG, "expanded '%s' to '%s'", text, output)
     end
-    return estr
+    return output
 end
 
 

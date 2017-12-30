@@ -31,13 +31,33 @@ TestClassLib = {}
 
 function TestClassLib:test_new()
     Foo = GwClass()
+    Bar = GwClass(Foo)
 
-    function Foo:answer()
-        return 42
+    function Foo:new(arg)
+        self.arg = arg
+        return self
     end
 
-    local obj = Foo:new()
-    lu.assertEquals(obj:answer(), 42)
+    function Bar:new(arg)
+        self.arg = arg * 5
+        return self
+    end
+
+    function Foo:a()
+        return self.arg
+    end
+
+    function Foo:b(arg)
+        return arg
+    end
+
+    local foo = Foo:new(5)
+    lu.assertEquals(foo:a(), 5)
+    lu.assertEquals(foo:b(42), 42)
+
+    local bar = Bar:new(5)
+    lu.assertEquals(bar:a(), 25)
+    lu.assertEquals(bar:b(42), 42)
 end
 
 function TestClassLib:test_super()
