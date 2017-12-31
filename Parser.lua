@@ -24,51 +24,19 @@ SOFTWARE.
 
 --]] -----------------------------------------------------------------------
 
---[[-----------------------------------------------------------------------
-
-Imported Libraries
-
---]] -----------------------------------------------------------------------
-
 local semver = LibStub:GetLibrary("SemanticVersion-1.0")
 
 
---[[-----------------------------------------------------------------------
-
-Class Variables
-
---]] -----------------------------------------------------------------------
+--
+-- Parser base class
+--
 
 GwParser = GwClass()
-GwV1Parser = GwClass(GwParser)
-GwV2Parser = GwClass(GwParser)
-
-
---[[-----------------------------------------------------------------------
-
-Local Functions
-
---]] -----------------------------------------------------------------------
-local function substitute(cstr, xlat)
-    local estr, count = string.gsub(cstr, '%$(%a)', function(s) return xlat[s] end)
-    if count > 0 then
-        gw.Debug(GW_LOG_DEBUG, "expanded '%s' to '%s'", cstr, estr)
-    end
-    return estr
-end
-
-
---[[-----------------------------------------------------------------------
-
-Class Methods
-
---]] -----------------------------------------------------------------------
 
 function GwParser:new(info)
     self.info = info
     return self
 end
-
 
 --- Factory method to produce parser instances.
 -- @param info Guild information summary.
@@ -104,15 +72,29 @@ function GwParser:substitute(text, xlat)
 end
 
 
+--
+-- Version 1 parser
+--
+
+GwV1Parser = GwClass(GwParser)
+
+
+--
+-- Version 2 parser
+--
+
+GwV2Parser = GwClass(GwParser)
+
+
 --- Parse version 1 configuration.
 -- @param info The guild info tab contents.
 -- @param guild_name Co-guild name.
 -- @return Configuration table.
 function GwParser:get_v1(info, guild_name)
     local conf = {
-        version=1,
-        channel={},
-        peer={}
+        version = 1,
+        channel = {},
+        peer = {}
     }
     local xlat = {}
 
@@ -129,15 +111,15 @@ function GwParser:get_v1(info, guild_name)
             if field[1] == 'c' then
                 -- Guild channel configuration
                 if field[2] and field[2] ~= '' then
-                    conf.channel.guild = {name=field[2], password=field[3]}
+                    conf.channel.guild = { name = field[2], password = field[3] }
                 else
                     gw.Error('invalid common channel name specified')
                 end
 
             elseif field[1] == 'p' then
                 -- Peer guild
-                local peer_name = gw.GlobalName(substitute(field[2], xlat))
-                local peer_id = substitute(field[3], xlat)
+                local peer_name = gw.GlobalName(self:substitute(field[2], xlat))
+                local peer_id = self:substitute(field[3], xlat)
                 if gw.iCmp(guild_name, peer_name) then
                     conf.guild_id = peer_id
                     gw.Debug(GW_LOG_DEBUG, 'guild=%s (%s)', guild_name, peer_id);
@@ -184,3 +166,5 @@ function GwParser:get_v1(info, guild_name)
         return
     end
 end
+
+
