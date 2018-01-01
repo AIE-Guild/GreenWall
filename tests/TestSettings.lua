@@ -39,27 +39,33 @@ end
 -- Test Cases
 --
 
-TestSettings = {}
+TestSettingsCreate = {}
 
-function TestSettings:test_new()
+function TestSettingsCreate:setUp()
+    GreenWallMeta = nil
+    GreenWall = nil
+    GreenWallAccount = nil
+end
+
+function TestSettingsCreate:test_new()
     local settings = GwSettings:new()
     lu.assertEquals(type(GreenWallMeta), 'table')
     lu.assertEquals(type(GreenWall), 'table')
     lu.assertEquals(type(GreenWallAccount), 'table')
 end
 
-function TestSettings:test_meta()
+function TestSettingsCreate:test_meta()
     local settings = GwSettings:new()
     lu.assertEquals(GreenWallMeta.mode, GW_MODE_ACCOUNT)
-    lu.assertEquals(string.match(GreenWallMeta.created, '%d-%d-%d %d:%d:%d'))
-    lu.assertEquals(string.match(GreenWallMeta.updated, '%d-%d-%d %d:%d:%d'))
+    lu.assertTrue(string.match(GreenWallMeta.created, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d'))
+    lu.assertTrue(string.match(GreenWallMeta.updated, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d'))
 end
 
-function TestSettings:test_initialize()
+function TestSettingsCreate:test_initialize()
     local settings = GwSettings:new()
     for i, tab in ipairs({GreenWall, GreenWallAccount}) do
-        lu.assertEquals(string.match(tab.created, '%d-%d-%d %d:%d:%d'))
-        lu.assertEquals(string.match(tab.updated, '%d-%d-%d %d:%d:%d'))
+        lu.assertTrue(string.match(tab.created, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d'))
+        lu.assertTrue(string.match(tab.updated, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d'))
         lu.assertEquals(tab.tag, true)
         lu.assertEquals(tab.achievements, false)
         lu.assertEquals(tab.roster, true)
@@ -73,5 +79,62 @@ function TestSettings:test_initialize()
         lu.assertEquals(tab.joindelay, 30)
     end
 end
+
+
+TestSettingsLoad = {}
+
+function TestSettingsLoad:setUp()
+    GreenWallMeta = {
+        mode = GW_MODE_CHARACTER,
+        created = "2018-01-01 17:28:47",
+        updated = "2018-01-01 01:04:46",
+    }
+    GreenWall = {
+        created = "2018-01-01 17:28:47",
+        updated = "2018-01-01 01:04:46",
+        achievements = true,
+        roster = false,
+    }
+    GreenWallAccount = {
+        created = "2018-01-01 17:28:47",
+        updated = "2018-01-01 01:04:46",
+        log = true,
+        logsize = 1024,
+        redact = false,
+    }
+end
+
+function TestSettingsLoad:test_new()
+    local settings = GwSettings:new()
+    lu.assertEquals(type(GreenWallMeta), 'table')
+    lu.assertEquals(type(GreenWall), 'table')
+    lu.assertEquals(type(GreenWallAccount), 'table')
+end
+
+function TestSettingsLoad:test_meta()
+    local settings = GwSettings:new()
+    lu.assertEquals(GreenWallMeta.mode, GW_MODE_CHARACTER)
+end
+
+function TestSettingsLoad:test_character()
+    local settings = GwSettings:new()
+    lu.assertEquals(GreenWall.tag, true)
+    lu.assertEquals(GreenWall.achievements, true)
+    lu.assertEquals(GreenWall.roster, false)
+    lu.assertEquals(GreenWall.rank, false)
+end
+
+function TestSettingsLoad:test_account()
+    local settings = GwSettings:new()
+    lu.assertEquals(GreenWallAccount.log, true)
+    lu.assertEquals(GreenWallAccount.logsize, 1024)
+    lu.assertEquals(GreenWallAccount.ochat, false)
+    lu.assertEquals(GreenWallAccount.redact, false)
+end
+
+
+--
+-- Run the tests
+--
 
 os.exit(lu.run())
