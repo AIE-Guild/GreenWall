@@ -40,24 +40,24 @@ Class Variables
 
 --]]-----------------------------------------------------------------------
 
-GwConfig = {}
-GwConfig.__index = GwConfig
+GwState = {}
+GwState.__index = GwState
 
 
---- GwConfig constructor function.
--- @return An initialized GwConfig instance.
-function GwConfig:new()
+--- GwState constructor function.
+-- @return An initialized GwState instance.
+function GwState:new()
     local self = {}
-    setmetatable(self, GwConfig)
+    setmetatable(self, GwState)
     self:initialize_param()
     self:initialize_state()
     return self
 end
 
 
---- Initialize a GwConfig object with the default parameters.
--- @return The initialized GwConfig instance.
-function GwConfig:initialize_param()
+--- Initialize a GwState object with the default parameters.
+-- @return The initialized GwState instance.
+function GwState:initialize_param()
     self.valid = false
     self.cversion = 0
     self.minimum = ''
@@ -67,9 +67,9 @@ function GwConfig:initialize_param()
 end
 
 
---- Initialize a GwConfig object with the default state.
--- @return The initialized GwConfig instance.
-function GwConfig:initialize_state()
+--- Initialize a GwState object with the default state.
+-- @return The initialized GwState instance.
+function GwState:initialize_state()
     self.channel = {
         guild   = GwChannel:new(),
         officer = GwChannel:new(),
@@ -87,7 +87,7 @@ end
 
 
 --- Dump configuration attributes.
-function GwConfig:dump(keep)
+function GwState:dump(keep)
     local function dump_tier(t, level)
         level = level == nil and 0 or level
         local indent = strrep('  ', level)
@@ -121,7 +121,7 @@ function GwConfig:dump(keep)
 end
 
 --- Dump a status summary.
-function GwConfig:dump_status()
+function GwState:dump_status()
     gw.Write('version=%s, cversion=%d, configured=%s', gw.version, self.cversion, tostring(self.valid))
     self.channel.guild:dump_status('guild bridge')
     if gw.IsOfficer() then
@@ -132,7 +132,7 @@ end
 
 --- Parse the guild information page to gather configuration information.
 -- @return True if successful, false otherwise.
-function GwConfig:load()
+function GwState:load()
     local function substitute(cstr, xlat)
         local estr, count = string.gsub(cstr, '%$(%a)', function(s) return xlat[s] end)
         if count > 0 then
@@ -306,7 +306,7 @@ end
 
 --- Initiate a reload of the configuration.
 -- @return True is refresh submitted, false otherwise.
-function GwConfig:reload()
+function GwState:reload()
     self.valid = false
     GuildRoster()
     gw.Debug(GW_LOG_INFO, 'roster update requested.')
@@ -317,7 +317,7 @@ end
 --- Initiate a refresh of the configuration.
 -- This is a reload protected by a hold-down timer.
 -- @return True is refresh submitted, false otherwise.
-function GwConfig:refresh()
+function GwState:refresh()
     if self.timer.config:hold() then
         gw.Debug(GW_LOG_WARNING, 'skipping due to hold-down.')
         return false
@@ -330,7 +330,7 @@ end
 --- Initiate a reset and reload of the configuration.
 -- This is a disruptive reset of the configuration and state.
 -- @return True is refresh submitted, false otherwise.
-function GwConfig:reset()
+function GwState:reset()
     self:initialize_param(true)
     for _, channel in pairs(self.channel) do
         channel:clear()
@@ -342,7 +342,7 @@ end
 --- Check a guild for peer status.
 -- @param guild The name of the guild to check.
 -- @return True if the target guild is a peer co-guild, false otherwise.
-function GwConfig:is_peer(guild)
+function GwState:is_peer(guild)
     for i, v in pairs(self.peer) do
         if v == guild then
             return true
@@ -353,7 +353,7 @@ end
 
 
 --- Refresh the channel state.
-function GwConfig:refresh_channels()
+function GwState:refresh_channels()
     if self.timer.channel:hold() then
         gw.Debug(GW_LOG_INFO, 'channel join blocked.')
     else
@@ -371,7 +371,7 @@ end
 --- Check a guild for membership within the confederation.
 -- @param guild The name of the guild to check.
 -- @return True if the target guild is in the confederation, false otherwise.
-function GwConfig:is_container(guild)
+function GwState:is_container(guild)
     if guild == self:GetGuildName() then
         return self.guild_id ~= nil
     else

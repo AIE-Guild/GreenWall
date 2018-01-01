@@ -316,7 +316,7 @@ function GwChannel:tl_send(type, message)
     end
 
     -- Format the message segment
-    local segment = strsub(strjoin('#', opcode, gw.config.guild_id, '', message), 1, GW_MAX_MESSAGE_LENGTH)
+    local segment = strsub(strjoin('#', opcode, gw.state.guild_id, '', message), 1, GW_MAX_MESSAGE_LENGTH)
 
     -- Send the message
     self:tl_enqueue(segment)
@@ -398,7 +398,7 @@ function GwChannel:receive(f, ...)
                     gw.APIDispatcher(addon, sender, guild_id, api_message)
                 end
             end
-        elseif sender ~= gw.player and guild_id ~= gw.config.guild_id then
+        elseif sender ~= gw.player and guild_id ~= gw.state.guild_id then
             -- Process the chat message if it from another co-guild.
             gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, guild=%s, message=%s',
                     self.number, mtype, sender, guild_id, message)

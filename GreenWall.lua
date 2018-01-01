@@ -124,20 +124,20 @@ local function GwSlashCmd(message, editbox)
     elseif command == 'reload' or command == 'refresh' then
 
         gw.Write('Reloading configuration.')
-        gw.config:reload()
+        gw.state:reload()
 
     elseif command == 'reset' then
 
         gw.Write('Resetting configuration.')
-        gw.config:reset()
+        gw.state:reset()
 
     elseif command == 'dump' then
 
-        gw.config:dump()
+        gw.state:dump()
 
     elseif command == 'status' then
 
-        gw.config:dump_status()
+        gw.state:dump_status()
 
     elseif command == 'version' then
 
@@ -221,7 +221,7 @@ function GreenWall_OnEvent(self, event, ...)
         --
         -- Initialize the confederation configuration
         --
-        gw.config = GwConfig:new()
+        gw.state = GwState:new()
 
         --
         -- Thundercats are go!
@@ -242,10 +242,10 @@ function GreenWall_OnEvent(self, event, ...)
 
         local chanNum = select(8, ...)
 
-        if chanNum == gw.config.channel.guild.number then
-            gw.config.channel.guild:receive(gw.handlerGuildChat, ...)
-        elseif chanNum == gw.config.channel.officer.number then
-            gw.config.channel.officer:receive(gw.handlerOfficerChat, ...)
+        if chanNum == gw.state.channel.guild.number then
+            gw.state.channel.guild:receive(gw.handlerGuildChat, ...)
+        elseif chanNum == gw.state.channel.officer.number then
+            gw.state.channel.officer:receive(gw.handlerOfficerChat, ...)
         end
 
     elseif event == 'CHAT_MSG_GUILD' then
@@ -253,7 +253,7 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
         if gw.iCmp(sender, gw.player) then
-            gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
+            gw.state.channel.guild:send(GW_MTYPE_CHAT, message)
         end
 
     elseif event == 'CHAT_MSG_LOOT' then
@@ -263,7 +263,7 @@ function GreenWall_OnEvent(self, event, ...)
         item = gw.GetItemString(message)
         if gw.IsLegendary(item) then
             if gw.iCmp(sender, gw.player) then
-                gw.config.channel.guild:send(GW_MTYPE_LOOT, message)
+                gw.state.channel.guild:send(GW_MTYPE_LOOT, message)
             end
         end
 
@@ -272,7 +272,7 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
         if gw.iCmp(sender, gw.player) and gw.settings:get('ochat') then
-            gw.config.channel.officer:send(GW_MTYPE_CHAT, message)
+            gw.state.channel.officer:send(GW_MTYPE_CHAT, message)
         end
 
     elseif event == 'CHAT_MSG_ADDON' then
@@ -287,7 +287,7 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
         if gw.iCmp(sender, gw.player) then
-            gw.config.channel.guild:send(GW_MTYPE_ACHIEVEMENT, message)
+            gw.state.channel.guild:send(GW_MTYPE_ACHIEVEMENT, message)
         end
 
     elseif event == 'CHAT_MSG_CHANNEL_JOIN' then
@@ -295,9 +295,9 @@ function GreenWall_OnEvent(self, event, ...)
         local _, player, _, _, _, _, _, number = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, channel=%s, player=%s', event, number, player)
 
-        if number == gw.config.channel.guild.number then
+        if number == gw.state.channel.guild.number then
             if GetCVar('guildMemberNotify') == '1' and gw.settings:get('roster') then
-                if gw.config.comember_cache:hold(gw.GlobalName(player)) then
+                if gw.state.comember_cache:hold(gw.GlobalName(player)) then
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', gw.GlobalName(player))
                 else
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: miss %s', gw.GlobalName(player))
@@ -311,9 +311,9 @@ function GreenWall_OnEvent(self, event, ...)
         local _, player, _, _, _, _, _, number = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, channel=%s, player=%s', event, number, player)
 
-        if number == gw.config.channel.guild.number then
+        if number == gw.state.channel.guild.number then
             if GetCVar('guildMemberNotify') == '1' and gw.settings:get('roster') then
-                if gw.config.comember_cache:hold(gw.GlobalName(player)) then
+                if gw.state.comember_cache:hold(gw.GlobalName(player)) then
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: hit %s', gw.GlobalName(player))
                 else
                     gw.Debug(GW_LOG_DEBUG, 'comember_cache: miss %s', gw.GlobalName(player))
@@ -325,13 +325,13 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHANNEL_UI_UPDATE' then
 
         if gw.GetGuildName() ~= nil then
-            gw.config:refresh_channels()
+            gw.state:refresh_channels()
         end
 
-        if gw.config.timer.channel:hold() then
+        if gw.state.timer.channel:hold() then
             for _, v in ipairs({ GetChannelList() }) do
                 if v == 'General' then
-                    gw.config.timer.channel:clear()
+                    gw.state.timer.channel:clear()
                 end
             end
         end
@@ -341,26 +341,26 @@ function GreenWall_OnEvent(self, event, ...)
         local action, _, _, _, _, _, type, number, name = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, type=%s, number=%s, name=%s, action=%s', event, type, number, gw.Redact(tostring(name)), action)
 
-        if number == gw.config.channel.guild.number then
+        if number == gw.state.channel.guild.number then
 
             if action == 'YOU_LEFT' then
-                gw.config.channel.guild.stats.disco = gw.config.channel.guild.stats.disco + 1
-                gw.config:refresh_channels()
+                gw.state.channel.guild.stats.disco = gw.state.channel.guild.stats.disco + 1
+                gw.state:refresh_channels()
             end
 
-        elseif number == gw.config.channel.officer.number then
+        elseif number == gw.state.channel.officer.number then
 
             if action == 'YOU_LEFT' then
-                gw.config.channel.officer.stats.disco = gw.config.channel.officer.stats.disco + 1
-                gw.config:refresh_channels()
+                gw.state.channel.officer.stats.disco = gw.state.channel.officer.stats.disco + 1
+                gw.state:refresh_channels()
             end
 
         elseif type == 1 then
 
             if action == 'YOU_JOINED' or action == 'YOU_CHANGED' then
                 gw.Debug(GW_LOG_NOTICE, 'world channel joined, unblocking reconnect.')
-                gw.config.timer.channel:clear()
-                gw.config:refresh_channels()
+                gw.state.timer.channel:clear()
+                gw.state:refresh_channels()
             end
         end
 
@@ -384,14 +384,14 @@ function GreenWall_OnEvent(self, event, ...)
 
             local _, player = message:match(pat_online)
             player = gw.GlobalName(player)
-            gw.config.comember_cache:hold(player)
+            gw.state.comember_cache:hold(player)
             gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
 
         elseif message:match(pat_offline) then
 
             local player = message:match(pat_offline)
             player = gw.GlobalName(player)
-            gw.config.comember_cache:hold(player)
+            gw.state.comember_cache:hold(player)
             gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
 
         elseif message:match(pat_join) then
@@ -400,7 +400,7 @@ function GreenWall_OnEvent(self, event, ...)
             if gw.GlobalName(player) == gw.player then
                 -- We have joined the guild.
                 gw.Debug(GW_LOG_NOTICE, 'guild join detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'join')
+                gw.state.channel.guild:send(GW_MTYPE_BROADCAST, 'join')
             end
 
         elseif message:match(pat_leave) then
@@ -409,8 +409,8 @@ function GreenWall_OnEvent(self, event, ...)
             if gw.GlobalName(player) == gw.player then
                 -- We have left the guild.
                 gw.Debug(GW_LOG_NOTICE, 'guild quit detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
-                gw.config:reset()
+                gw.state.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
+                gw.state:reset()
             end
 
         elseif message:match(pat_quit) then
@@ -419,8 +419,8 @@ function GreenWall_OnEvent(self, event, ...)
             if gw.GlobalName(player) == gw.player then
                 -- We have left the guild.
                 gw.Debug(GW_LOG_NOTICE, 'guild quit detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
-                gw.config:reset()
+                gw.state.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
+                gw.state:reset()
             end
 
         elseif message:match(pat_removed) then
@@ -429,8 +429,8 @@ function GreenWall_OnEvent(self, event, ...)
             if gw.GlobalName(player) == gw.player then
                 -- We have been kicked from the guild.
                 gw.Debug(GW_LOG_NOTICE, 'guild kick detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
-                gw.config:reset()
+                gw.state.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
+                gw.state:reset()
             end
 
         elseif message:match(pat_kick) then
@@ -438,7 +438,7 @@ function GreenWall_OnEvent(self, event, ...)
             local target, player = message:match(pat_kick)
             if gw.GlobalName(player) == gw.player then
                 gw.Debug(GW_LOG_NOTICE, 'you kicked %s', target)
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'remove', target)
+                gw.state.channel.guild:send(GW_MTYPE_BROADCAST, 'remove', target)
             end
 
         elseif message:match(pat_promote) then
@@ -446,7 +446,7 @@ function GreenWall_OnEvent(self, event, ...)
             local player, target, rank = message:match(pat_promote)
             if gw.GlobalName(player) == gw.player then
                 gw.Debug(GW_LOG_NOTICE, 'you promoted %s to %s', target, rank)
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'promote', target, rank)
+                gw.state.channel.guild:send(GW_MTYPE_BROADCAST, 'promote', target, rank)
             end
 
         elseif message:match(pat_demote) then
@@ -454,14 +454,14 @@ function GreenWall_OnEvent(self, event, ...)
             local player, target, rank = message:match(pat_demote)
             if gw.GlobalName(player) == gw.player then
                 gw.Debug(GW_LOG_NOTICE, 'you demoted %s to %s', target, rank)
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'demote', target, rank)
+                gw.state.channel.guild:send(GW_MTYPE_BROADCAST, 'demote', target, rank)
             end
         end
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
 
-        if gw.config:load() then
-            gw.config:refresh_channels()
+        if gw.state:load() then
+            gw.state:refresh_channels()
         end
 
     elseif event == 'PLAYER_ENTERING_WORLD' then
@@ -480,17 +480,17 @@ function GreenWall_OnEvent(self, event, ...)
         local new_status = gw.GetGuildStatus()
         if gw.guild_status ~= new_status then
             -- Looks like our status has changed.
-            gw.config:reset()
+            gw.state:reset()
             gw.guild_status = new_status
         end
 
     elseif event == 'PLAYER_LOGIN' then
 
         -- Defer joining to allow General to grab slot 1
-        gw.config.timer.channel:start(function() gw.config:refresh_channels() end)
+        gw.state.timer.channel:start(function() gw.state:refresh_channels() end)
 
         -- Initiate the comms
-        gw.config:refresh()
+        gw.state:refresh()
     end
 end
 

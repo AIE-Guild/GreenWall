@@ -45,7 +45,7 @@ GreenWallAPI = {
 function GreenWallAPI.SendMessage(addon, message)
     -- Validate addon id
     assert(addon == GetAddOnInfo(addon))
-    gw.config.channel.guild:send(GW_MTYPE_EXTERNAL, addon, message)
+    gw.state.channel.guild:send(GW_MTYPE_EXTERNAL, addon, message)
 end
 
 
@@ -136,7 +136,7 @@ end
 -- @param message The message contents
 function gw.APIDispatcher(addon, sender, guild_id, message)
     local echo = sender == gw.player
-    local guild = guild_id == gw.config.guild_id
+    local guild = guild_id == gw.state.guild_id
     for _, e in ipairs(gw.api_table) do
         if addon == e[2] or addon == '*' then
             gw.Debug(GW_LOG_INFO, 'dispatch API handler; id=%s, addon=%s, priority=%d', e[1], e[2], e[3])

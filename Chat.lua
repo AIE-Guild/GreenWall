@@ -185,12 +185,12 @@ function gw.ReceiveLocal(sender, message)
 
             if message == 'reload' then
                 if gw.IsOfficer(sender) then
-                    if gw.config.timer.reload:hold() then
+                    if gw.state.timer.reload:hold() then
                         gw.Write('Received configuration reload request from %s; hold-down in effect, skipping.', sender)
                     else
                         gw.Write('Received configuration reload request from %s.', sender)
-                        gw.config:reload()
-                        gw.config.timer.reload:start()
+                        gw.state:reload()
+                        gw.state.timer.reload:start()
                     end
                 end
             end
@@ -211,11 +211,11 @@ function gw.ReceiveLocal(sender, message)
                 if gw.IsOfficer(sender) then
                     if gw.IsOfficer() then
                         gw.Debug(GW_LOG_NOTICE, 'giving %s moderator status', sender)
-                        ChannelModerator(gw.config.channel.guild.name, sender)
+                        ChannelModerator(gw.state.channel.guild.name, sender)
                     else
                         gw.Debug(GW_LOG_NOTICE, 'giving %s owner status', sender)
-                        SetChannelOwner(gw.config.channel.guild.name, sender)
-                        ChannelUnmoderator(gw.config.channel.guild.name, gw.player)
+                        SetChannelOwner(gw.state.channel.guild.name, sender)
+                        ChannelUnmoderator(gw.state.channel.guild.name, gw.player)
                     end
                 else
                     gw.Debug(GW_LOG_WARNING, 'officer spoofing attempt from %s', sender)

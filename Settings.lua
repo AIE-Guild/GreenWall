@@ -339,10 +339,10 @@ function GwSettings:set(name, value, mode)
             end
         elseif name == 'joindelay' then
             gw.Debug(GW_LOG_INFO, 'updating channel timers')
-            gw.config.timer.channel:set(value)
+            gw.state.timer.channel:set(value)
         elseif name == 'ochat' then
             gw.Debug(GW_LOG_INFO, 'reloading officer chat channel')
-            gw.config:reload()
+            gw.state:reload()
         end
     end
 

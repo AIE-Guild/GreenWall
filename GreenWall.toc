@@ -19,7 +19,7 @@ Settings.lua
 Utility.lua
 HoldDown.lua
 Parser.lua
-Config.lua
+State.lua
 Compat.lua
 Chat.lua
 Channel.lua
