@@ -42,10 +42,36 @@ end
 TestSettings = {}
 
 function TestSettings:test_new()
-    local parser = GwSettings:new()
+    local settings = GwSettings:new()
     lu.assertEquals(type(GreenWallMeta), 'table')
     lu.assertEquals(type(GreenWall), 'table')
     lu.assertEquals(type(GreenWallAccount), 'table')
+end
+
+function TestSettings:test_meta()
+    local settings = GwSettings:new()
+    lu.assertEquals(GreenWallMeta.mode, GW_MODE_ACCOUNT)
+    lu.assertEquals(string.match(GreenWallMeta.created, '%d-%d-%d %d:%d:%d'))
+    lu.assertEquals(string.match(GreenWallMeta.updated, '%d-%d-%d %d:%d:%d'))
+end
+
+function TestSettings:test_initialize()
+    local settings = GwSettings:new()
+    for i, tab in ipairs({GreenWall, GreenWallAccount}) do
+        lu.assertEquals(string.match(tab.created, '%d-%d-%d %d:%d:%d'))
+        lu.assertEquals(string.match(tab.updated, '%d-%d-%d %d:%d:%d'))
+        lu.assertEquals(tab.tag, true)
+        lu.assertEquals(tab.achievements, false)
+        lu.assertEquals(tab.roster, true)
+        lu.assertEquals(tab.rank, false)
+        lu.assertEquals(tab.debug, GW_LOG_NONE)
+        lu.assertEquals(tab.verbose, false)
+        lu.assertEquals(tab.log, false)
+        lu.assertEquals(tab.logsize, 2048)
+        lu.assertEquals(tab.ochat, false)
+        lu.assertEquals(tab.redact, true)
+        lu.assertEquals(tab.joindelay, 30)
+    end
 end
 
 os.exit(lu.run())
