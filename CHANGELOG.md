@@ -10,6 +10,7 @@ This project uses [Semantic Versioning](http://semver.org/).
 - Added confederation announcements of legendary items looted.
 - Moved configuration handling to a proxy class to allow a single point
   of access for all configuration data.
+- Added Travis CI build testing.
 
 ### Updated
 - Pointed documentation to new CurseForge URL.
