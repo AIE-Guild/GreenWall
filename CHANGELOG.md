@@ -12,7 +12,10 @@ This project uses [Semantic Versioning](http://semver.org/).
   of access for all configuration data.
 - Added Travis CI build testing.
 
-### Updated
+### Fixed
+- Corrected item string matching for legendary loot toasts.
+
+### Changed
 - Pointed documentation to new CurseForge URL.
 
 ### Removed
