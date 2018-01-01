@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2017 Mark Rogaski
+Copyright (c) 2010-2018 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -76,7 +76,7 @@ function GwSettings:new()
         debug = {
             value = GW_LOG_NONE,
             min = 0,
-            max = 4294967295,
+            max = 5,
             desc = "debugging level"
         },
         verbose = {
@@ -114,7 +114,11 @@ function GwSettings:new()
     end
 
     -- Initialize saved settings
-    GreenWallMeta = self:initialize(GreenWallMeta, true)
+    local compat = false
+    if type(GreenWall) == 'table' then
+        compat = true
+    end
+    GreenWallMeta = self:initialize(GreenWallMeta, true, compat)
     GreenWall = self:initialize(GreenWall, false)
     GreenWallAccount = self:initialize(GreenWallAccount, false)
     self._meta = GreenWallMeta
@@ -137,8 +141,9 @@ end
 --- Set the default values and attributes.
 -- @param svtable Settings table reference (may be nil).
 -- @param meta True if the table is metadata for settings, false otherwise.
+-- @param compat True is compatibility with a previous installation is needed, false otherwsie.
 -- @return An initialized settings table reference.
-function GwSettings:initialize(svtable, meta)
+function GwSettings:initialize(svtable, meta, compat)
     local store
     local init = false
 
@@ -146,7 +151,7 @@ function GwSettings:initialize(svtable, meta)
 
     -- Create the store if necessary
     if svtable == nil then
-        ts = date('%Y-%m-%d %H:%M:%S')
+        local ts = date('%Y-%m-%d %H:%M:%S')
         store = {
             created = ts,
             updated = ts
@@ -160,11 +165,9 @@ function GwSettings:initialize(svtable, meta)
     for k, v in pairs(self._default) do
         if not meta == not v.meta then  -- Negate both to coerce any to false
             if store[k] == nil or self:validate(k, store[k]) then
-                if v.compat and not init then
-                    -- use compatibility setting
+                if compat then
                     store[k] = v.compat
                 else
-                    -- use default
                     store[k] = v.value
                 end
                 gw.Debug(GW_LOG_DEBUG, 'initialized %s to "%s"', k, tostring(store[k]))

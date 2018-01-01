@@ -12,12 +12,14 @@ before_install:
   - export PATH=$PATH:$PWD/lua_install/bin
 
 install:
+  - luarocks install bitlib
   - luarocks install luaunit
 
 script:
   - lua tests/TestClassLib.lua -v
+  - lua tests/TestUtility.lua -v
+  - lua tests/TestSettings.lua -v
   - lua tests/TestParser.lua -v
-
 
 notifications:
   email:

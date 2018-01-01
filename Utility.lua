@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2017 Mark Rogaski
+Copyright (c) 2010-2018 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -262,7 +262,7 @@ end
 -- @param message A chat message.
 -- @return An itemString.
 function gw.GetItemString(message)
-    return string.match(message, '|H(item.+)|h')
+    return string.match(message, '|H(item[0-9:]+)|h')
 end
 
 --- Extract an embedded itemString from a chat message.
