@@ -145,11 +145,15 @@ function TestSettingsAccess:setUp()
         created = "2018-01-01 17:28:47",
         updated = "2018-01-01 01:04:46",
         tag = true,
+        achievements = true,
+        logsize = 1024,
     }
     GreenWallAccount = {
         created = "2018-01-01 17:28:47",
         updated = "2018-01-01 01:04:46",
         tag = false,
+        achievements = false,
+        logsize = 2048,
     }
 end
 
@@ -182,17 +186,17 @@ function TestSettingsAccess:test_set()
     local settings = GwSettings:new()
 
     settings:set('mode', GW_MODE_ACCOUNT)
-    lu.assertEquals(settings:get('tag', GW_MODE_ACCOUNT), true)
-    lu.assertEquals(settings:get('tag', GW_MODE_CHARACTER), false)
-
-    settings:set('tag', false)
-    lu.assertEquals(settings:get('tag', GW_MODE_ACCOUNT), false)
-    lu.assertEquals(settings:get('tag', GW_MODE_CHARACTER), false)
-
-    settings:set('mode', GW_MODE_CHARACTER)
-    settings:set('tag', true)
     lu.assertEquals(settings:get('tag', GW_MODE_ACCOUNT), false)
     lu.assertEquals(settings:get('tag', GW_MODE_CHARACTER), true)
+
+    settings:set('tag', true)
+    lu.assertEquals(settings:get('tag', GW_MODE_ACCOUNT), true)
+    lu.assertEquals(settings:get('tag', GW_MODE_CHARACTER), true)
+
+    settings:set('mode', GW_MODE_CHARACTER)
+    settings:set('tag', false)
+    lu.assertEquals(settings:get('tag', GW_MODE_ACCOUNT), true)
+    lu.assertEquals(settings:get('tag', GW_MODE_CHARACTER), false)
 end
 
 
