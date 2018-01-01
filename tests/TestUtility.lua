@@ -49,9 +49,12 @@ require('Utility')
 TestItemInfo = {}
 
 function TestItemInfo:test_GetItemString()
-    local message = 'Testing |Hitem:18832:2564:0:0:0:0:0:0:80:0:0:0:0|h and |Hitem:10242:0:0:0:0:0:0:614:0:80:0:0:0:0|h in a string.'
-    local result = gw.GetItemString(message)
-    lu.assertEquals(result, 'item:18832:2564:0:0:0:0:0:0:80:0:0:0:0')
+    local single = 'Testing |Hitem:6948::::::::80::::|h in a string.'
+    local multi = 'Testing |Hitem:6948::::::::80::::|h and |Hitem:4388:0:0:0:0:0:0:210677200:80:0:0:0:0|h in a string.'
+    lu.assertEquals(gw.GetItemString(single), 'item:6948::::::::80::::')
+    lu.assertEquals(gw.GetItemString(multi), 'item:6948::::::::80::::')
+    lu.assertEquals(gw.GetItemString('nothing here'), nil)
+    lu.assertError(gw.GetItemString)
 end
 
 

@@ -262,7 +262,7 @@ end
 -- @param message A chat message.
 -- @return An itemString.
 function gw.GetItemString(message)
-    return string.match(message, '|H(item.+)|h')
+    return string.match(message, '|H(item[0-9:]+)|h')
 end
 
 --- Extract an embedded itemString from a chat message.
