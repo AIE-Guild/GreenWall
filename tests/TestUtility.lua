@@ -1,6 +1,6 @@
 --[[--------------------------------------------------------------------------
 The MIT License (MIT)
-Copyright (c) 2015-2017 Mark Rogaski
+Copyright (c) 2010-2017 Mark Rogaski
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -19,14 +19,44 @@ SOFTWARE.
 --]]--------------------------------------------------------------------------
 
 --
--- These functions adapt or mock Lua extensions in the WoW API.
+-- Mocks
 --
-require('bit')
 
-function date(...)
-    return os.date(...)
+gw = { logmsg = '' }
+
+function gw.Debug(level, format, ...)
+    gw.logmsg = string.format(format, ...)
 end
 
-function strmatch(...)
-    return string.match(...)
+
+--
+-- Includes
+--
+
+lu = require('luaunit')
+require('TestCompat')
+require('Lib/LibStub')
+require('Lib/CRC16-CCITT')
+require('Constants')
+require('Utility')
+
+
+
+--
+-- Test Cases
+--
+
+TestItemInfo = {}
+
+function TestItemInfo:test_GetItemString()
+    local message = 'Testing |Hitem:18832:2564:0:0:0:0:0:0:80:0:0:0:0|h and |Hitem:10242:0:0:0:0:0:0:614:0:80:0:0:0:0|h in a string.'
+    local result = gw.GetItemString(message)
+    lu.assertEquals(result, 'item:18832:2564:0:0:0:0:0:0:80:0:0:0:0')
 end
+
+
+--
+-- Run the tests
+--
+
+os.exit(lu.run())
