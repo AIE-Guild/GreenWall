@@ -151,7 +151,7 @@ function GwSettings:initialize(svtable, meta, compat)
 
     -- Create the store if necessary
     if svtable == nil then
-        ts = date('%Y-%m-%d %H:%M:%S')
+        local ts = date('%Y-%m-%d %H:%M:%S')
         store = {
             created = ts,
             updated = ts
