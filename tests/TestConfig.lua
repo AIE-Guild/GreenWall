@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2018 Mark Rogaski
+Copyright (c) 2010-2017 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ require('ClassLib')
 require('Constants')
 require('Lib/LibStub')
 require('Lib/SemanticVersion')
-require('Parser')
+require('Config')
 
 --
 -- Mocks
@@ -44,63 +44,49 @@ end
 
 
 --
--- Fixtures
---
-
-info_a = [[
-GWc:secretSquirrels:pencil
-GWv:1.4.1
-GWs:alea iacta est:n
-GWp:$n:prime
-GWp:$n audacia:audacia
-GWp:$n fortuna-EarthenRing:fortuna
-]]
-info_b = [[
-GWt=prime
-GWc=secretSquirrels:pencil
-GWv=1.4.1
-GWp=alea iacta est audacia:audacia
-GWp=alea iacta est fortuna-EarthenRing:fortuna
-]]
-info_c = [[
-GWt="prime"
-GWc="secretSquirrels:pencil"
-GWv="1.4.1"
-GWp="alea iacta est audacia:audacia"
-GWp="alea iacta est fortuna-EarthenRing:fortuna"
-]]
-note_a = 'GWa:secretSquirrels:rosebud'
-note_b = 'GWa=secretSquirrels:rosebud'
-note_c = 'GWa="secretSquirrels:rosebud"'
-
-
---
 -- Test Cases
 --
 
-TestParser = {}
+TestConfig = {}
 
-function TestParser:test_new()
-    local parser = GwParser:new()
-    lu.assertTrue(parser:isa(GwParser))
+function TestConfig:test_new()
+    local config = GwConfig:new()
+    lu.assertTrue(config:isa(GwConfig))
+    lu.assertEquals(config.version, nil)
+    lu.assertEquals(config.guild_name, nil)
+    lu.assertEquals(config.guild_id, nil)
+    lu.assertEquals(config.channel.guild, nil)
+    lu.assertEquals(config.channel.officer, nil)
+    lu.assertEquals(config.peer, {})
+    lu.assertEquals(config.minimum_version, nil)
 end
 
-function TestParser:test_version()
-    lu.assertEquals(GwParser:version('GWc:somechannel:password'), 1)
-    lu.assertEquals(GwParser:version('GWc="somechannel:password"'), 2)
+
+TestConfigBuilder = {}
+
+function TestConfigBuilder:test_new()
+    local builder = GwConfigBuilder:new()
+    lu.assertTrue(builder:isa(GwConfigBuilder))
 end
 
-function TestParser:test_factory()
-    local parser = GwParser:get_parser('GWc:somechannel:password')
-    lu.assertTrue(parser:isa(GwV1Parser))
-    local parser = GwParser:get_parser('GWc="somechannel:password"')
-    lu.assertTrue(parser:isa(GwV2Parser))
+function TestConfigBuilder:test_get_config()
+    local builder = GwConfigBuilder:new()
+    local config = builder:get_config()
+    lu.assertTrue(config:isa(GwConfig))
 end
 
-function TestParser:test_substitute()
-    s = GwParser:substitute('one $n three', { n = 'two' })
-    lu.assertEquals(s, 'one two three')
-    lu.assertEquals(gw.logmsg, "expanded 'one $n three' to 'one two three'")
+
+function TestConfigBuilder:test_version()
+    local builder = GwConfigBuilder:new()
+    builder:set_version(1)
+    lu.assertEquals(builder:get_config().version, 1)
+    builder:set_version(2)
+    lu.assertEquals(builder:get_config().version, 2)
+    lu.assertError(builder.set_version, builder, 3)
 end
+
+--
+-- Run the tests
+--
 
 os.exit(lu.run())
