@@ -13,7 +13,7 @@
     <a href="#guides">Guides</a> •
     <a href="#credits">Credits</a> •
     <a href="#license">License</a> •
-    <a href="#dedication"></a>
+    <a href="#dedication">Dedication</a>
 </p>
 
 ## Overview
@@ -130,25 +130,43 @@ You will be able to enable or disable the following options.
     </dd>
 </dl>
 
-**Show Co-Guild Tags**
-> Show co-guild identifier in messages. 
-> Default: on
+- __Show Co-Guild Tags__
 
-**Show Co-Guild Achievement Announcements**
-> Show achievements from other co-guilds. 
-> Default: off
+  Show co-guild identifier in messages. 
+  
+  Default: on
 
-**Show Co-Guild Roster Announcements**
-> Show guild join and leave messages from other co-guilds. 
-> Default: on 
+- __Show Co-Guild Achievement Announcements__
 
-**Show Co-Guild Rank Announcements**
-> Show promotion and demotion messages from other co-guilds. 
-> Default: off 
+  Show achievements from other co-guilds. 
+  
+  Default: off
 
-**Bridge Officer Chat**
-> Show bridge officer chat between the co-guilds. This only works for members who have privileges to view officer notes.
-> Default: off 
+- __Show Co-Guild Roster Announcements__
+
+  Show guild join and leave messages from other co-guilds. 
+  
+  Default: on 
+
+- __Show Co-Guild Rank Announcements__
+
+  Show promotion and demotion messages from other co-guilds. 
+
+  Default: off 
+  
+- __Channel Join Delay__
+
+  Adjust the time in seconds GreenWall will wait for a the system default channels (e.g. General, Local Defense). 
+  If you have explicitly left these channels, set this low.
+  
+  Default: 30 seconds
+
+- __Bridge Officer Chat__
+
+  Show bridge officer chat between the co-guilds. This only works for members who have privileges to view officer notes.
+
+  Default: off 
+
 
 #### Command Line Interface
 
@@ -218,6 +236,39 @@ refresh
 version
 > Print the installed version of GreenWall. 
 
+
+## Guides
+
+
+## Credits
+
+
+## License
+
+```
+
+The MIT License (MIT)
+
+Copyright (c) 2010-2018 Mark Rogaski
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
 
 ## Dedication
 
