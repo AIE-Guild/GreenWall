@@ -1,0 +1,8 @@
+title: Greenwall
+description: Common communication channel as a replacement for guild chat in guild confederations.
+google_analytics: 
+show_downloads: true
+theme: jekyll-theme-midnight
+
+gems:
+  - jekyll-mentions
