@@ -261,7 +261,7 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
         item = gw.GetItemString(message)
-        if gw.IsLegendary(item) then
+        if item and gw.IsLegendary(item) then
             if gw.iCmp(sender, gw.player) then
                 gw.state.channel.guild:send(GW_MTYPE_LOOT, message)
             end

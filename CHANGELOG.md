@@ -19,6 +19,9 @@ This project uses [Semantic Versioning](http://semver.org/).
 - Pointed documentation to new CurseForge URL.
 - Renamed GwConfig to GwState.
 
+### Updated
+- Rewrote the project README.
+
 ### Removed
 - Removed luadoc HTML output.
 - HTML copies of other documentation.
