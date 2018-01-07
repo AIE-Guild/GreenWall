@@ -9,8 +9,9 @@
 <p align="center">
     <a href="#overview">Overview</a> •
     <a href="#installation">Installation</a> •
-    <a href="#configuration">Configuration</a> •
-    <a href="#guides">Guides</a> •
+    <a href="#user-configuration">User Configuration</a> •
+    <a href="#guild-configuration">Guild Configuration</a> •
+    <a href="#support">Support</a> •
     <a href="#license">License</a> •
     <a href="#dedication">Dedication</a>
 </p>
@@ -19,6 +20,7 @@
 
 [![Build Status](https://travis-ci.org/AIE-Guild/GreenWall.svg?branch=master)](https://travis-ci.org/AIE-Guild/GreenWall)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg?style=flat-square)](https://www.patreon.com/mrogaski)
 
 GreenWall is a World of Warcraft add-on that allows multiple guilds within a single realm, or 
 [connected realms](https://worldofwarcraft.com/en-us/news/11393305) to share guild chat as if they were one guild.
@@ -81,11 +83,9 @@ and installed manually.
 6. Enable the add-on for your character.
 
 
-## Configuration
+## User Configuration
 
-### Guild Members
-
-#### Graphical Interface
+### Graphical Interface
 
 GreenWall was designed to minimize the amount of configuration necessary by most members.  If your officers have 
 set up the guild configuration correctly, you don't need to do anything to participate in the conversation between
@@ -155,7 +155,7 @@ You will be able to set the following options.
   Default: off 
 
 
-#### Command Line Interface
+### Command Line Interface
 
 In addition to the graphical user interface, you can also modify the add-on settings from the prompt in the chat 
 window.
@@ -179,7 +179,7 @@ To view the current configuration, you would enter one of the following.
   
   Default: on
   
-  _If GreenWall has been used on the character prior to version 1.9.0, this will default to _off_.
+  _If GreenWall has been used on the character prior to version 1.9.0, this will default to off_.
 
 - tag [ on | off ]
   
@@ -260,7 +260,138 @@ To view the current configuration, you would enter one of the following.
   Print the installed version of GreenWall. 
 
 
-## Guides
+## Guild Configuration
+
+This section covers the somewhat more difficult part, setting up the co-guild configuration that GreenWall uses 
+to establish communication with other co-guilds in a confederation.
+
+### Definitions
+
+- Bridging
+
+  Replication of chat events within one guild into the guild, achievement, and officer chat of another guild.
+
+- Confederation
+
+  A large WoW guild that is partitioned into smaller guilds to comply with Blizzard's guild size limit.
+
+- Container Guild or Co-Guild
+
+  One of the component members of a guild confederation.
+
+- Officer
+
+  A member of any of the co-guilds within a confederation who can view officer notes for members.
+  
+- Fully Qualified Guild Name
+
+  The name of the guild suffixed with a dash and the name of the realm on which the guild resides. An example is
+  `Nightlife-EarthenRing`
+  
+  Note that there are no spaces in the realm name.
+  
+- Connected Realms
+
+  In their announcement of [connected realms](https://worldofwarcraft.com/en-us/news/10551009), 
+  Bizzard described them as such.
+  
+  > In Patch 5.4, we’re looking to address this with a new feature called Connected Realms. 
+  > Building on our existing cross-realm technology, a Connected Realm is a set of two or 
+  > more standard realms that have been permanently and seamless “linked.” These linked realms
+  > will behave as if they were one cohesive realm, meaning you’ll be able to join the same guilds,
+  > access a single Auction House, run the same Raids and Dungeons, and join other adventurers to
+  > complete quests.
+  
+  You can find a list of North American connected realms [here](https://worldofwarcraft.com/en-us/news/11393305) and
+  EU connected realms [here](https://eu.battle.net/forums/en/wow/topic/8715582685).
+  
+  This is the limit of the scope for GreenWall's communication. If two guilds are on the same realm, or on 
+  separate realms that are connected, they can be bridged with GreenWall. 
+
+
+### Bridging Guild Chat
+
+All configuration for general guild chat is stored in the "Guild Information" field in the "Guild" window (`J`).
+The block of configuration text will be read by GreenWall on the member machines.  The benefit of this approach
+is that a member can join and use GreenWall without having to perform any special configuration.
+
+All configuration directives use the following format.
+
+    GWx:arglist
+
+The *x* is substituted with a specific opcode and the *arglist* portion is a colon separated list of arguments.
+
+#### Required Configuration
+ 
+- Common Channel
+    
+      GWc:channel_name:password
+
+  This specifies the custom chat channel to use for all general confederation bridging.
+
+        
+- Peer Co-Guild
+
+      GWp:guild_name:tag
+
+  You must specify one of these directives for each co-guild in the confederation, **including the co-guild you
+  are configuring**.
+
+  Additionally, the "guild_name" must be match the name of the guild exactly and the tag (a short nickname that
+  will be shown if the member enables tagging) must be the same in all of the configurations across the co-guilds.
+
+
+#### Optional Configuration
+
+- Minimum Version
+
+      GWv:x.y.z
+
+  This disables the GreenWall client if the member is running a version prior to version x.y.z.
+
+
+#### Example
+
+    GWc:topSekritChan:pencil
+    GWv:1.1.00
+    GWp:Darkmoon Clan:DMC
+    GWp:Baseball Dandies:BBD
+    GWp:Nightlife:NL
+        
+
+### Bridging Officer Chat
+
+
+#### Configuration
+
+There is only a single configuration directive for officer chat.  It is stored in the officer note of the guild leader.
+
+    GWa:channel_name:password
+        
+This specifies the custom chat channel to use for bridging of the officer chat among co-guilds.
+
+By default, officer chat bridging is disabled in the client.  To participate across co-guilds, an officer will need to issue the following command and make sure that officer chat is enabled in one of the chat windows.
+
+    /greenwall ochat on
+
+
+#### Example
+
+    GWa:secretSquirrels:rosebud
+
+
+## Support
+
+Support for the GreenWall add-on is voluntary and considered "best effort".  I make a reasonable attempt to respond
+to [e-mail](mailto:greenwall@aie-guild.org), comments and questions on the 
+[CurseForge page](https://www.curseforge.com/wow/addons/greenwall), and issues raised in 
+[Github](https://github.com/AIE-Guild/GreenWall/issues).
+
+The best way to provide information about significant problems you encounter or bugs you find is to follow the guide,
+[Collecting Debugging Information](https://github.com/AIE-Guild/GreenWall/wiki/Collecting-Debugging-Information).
+  
+All bug reports and feature requests should be submitted on Github.  If you aren't comfortable with the Github
+issue tracker, please e-mail the details and I will add an issue record.
 
 
 ## Credits
