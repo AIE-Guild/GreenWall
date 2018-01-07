@@ -109,27 +109,6 @@ To access the user configuration screen:
 
 You will be able to enable or disable the following options.
 
-<dl>
-    <dt>Show Co-Guild Tags</dt>
-    <dd>Show co-guild identifier in messages. (Default: on)</dd>
-    <dt>Show Co-Guild Achievement Announcements</dt>
-    <dd>Show achievements from other co-guilds. (Default: off)</dd>
-    <dt>Show Co-Guild Roster Announcements</dt>
-    <dd>Show guild join and leave messages from other co-guilds. (Default: on)</dd>
-    <dt>Show Co-Guild Rank Announcements</dt>
-    <dd>Show promotion and demotion messages from other co-guilds. (Default: off)</dd>
-    <dt>Channel Join Delay (seconds)</dt>
-    <dd>
-        Adjust the time GreenWall will wait for a the system default channels (e.g. General, Local Defense). 
-        If you have explicitly left these channels, set this low.  (Default: 30 seconds)
-    </dd>
-    <dt>Bridge Officer Chat</dt>
-    <dd>
-        Show bridge officer chat between the co-guilds. 
-        This only works for members who have privileges to view officer notes. (Default: off)
-    </dd>
-</dl>
-
 - __mode__ - _Use these settings for all characters on this account_
 
   If this options is selected, the configuration will be used that is shared will all other characters that have
