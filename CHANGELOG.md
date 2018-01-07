@@ -18,6 +18,9 @@ This project uses [Semantic Versioning](http://semver.org/).
 ### Changed
 - Pointed documentation to new CurseForge URL.
 
+### Updated
+- Rewrote the project README.
+
 ### Removed
 - Removed luadoc HTML output.
 - HTML copies of other documentation.
