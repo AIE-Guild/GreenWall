@@ -11,7 +11,6 @@
     <a href="#installation">Installation</a> •
     <a href="#configuration">Configuration</a> •
     <a href="#guides">Guides</a> •
-    <a href="#credits">Credits</a> •
     <a href="#license">License</a> •
     <a href="#dedication">Dedication</a>
 </p>
@@ -107,7 +106,7 @@ To access the user configuration screen:
 </p>
 
 
-You will be able to enable or disable the following options.
+You will be able to set the following options.
 
 - __mode__ - _Use these settings for all characters on this account_
 
@@ -116,7 +115,7 @@ You will be able to enable or disable the following options.
   
   Default: on
   
-  _If GreenWall has been used on the character prior to version 1.9.0, this will default to __off__.
+  _If GreenWall has been used on the character prior to version 1.9.0, this will default to _off_.
 
 - __tag__ - _Show Co-Guild Tags_
 
@@ -158,6 +157,9 @@ You will be able to enable or disable the following options.
 
 #### Command Line Interface
 
+In addition to the graphical user interface, you can also modify the add-on settings from the prompt in the chat 
+window.
+
 All commands must be prefixed with `/greenwall` or `/gw`.
 
 As an example, the configuration option for co-guild tagging is `tag`. To turn it on, you would enter one of the following commands. In the command descriptions, optional arguments are in square brackets and alternatives are separated by the pipe character.
@@ -170,59 +172,92 @@ To view the current configuration, you would enter one of the following.
     /greenwall tag
     /gw tag
 
-tag [ on | off ]
-> Show co-guild identifier in messages. 
-> Default: on
+- mode [ account | character ]
 
-achievements [ on | off ]
-> Show achievements from other co-guilds. 
-> Default: off
+  If `account` is specified, the configuration will be used that is shared will all other characters that have
+  this option selected.  Otherwise, a character-specific configuration will be used. 
+  
+  Default: on
+  
+  _If GreenWall has been used on the character prior to version 1.9.0, this will default to _off_.
 
-roster [ on | off ]
-> Show guild join and leave messages from other co-guilds. 
-> Default: on 
+- tag [ on | off ]
+  
+  Show co-guild identifier in messages. 
+  
+  Default: on
 
-rank [ on | off ]
-> Show promotion and demotion messages from other co-guilds. 
-> Default: off 
+- achievements [ on | off ]
+  
+  Show achievements from other co-guilds. 
 
-ochat [ on | off ]
-> Show bridge officer chat between the co-guilds. This only works for members who have privileges to view officer notes.
-> Default: off 
+  Default: off
 
-debug level
-> Enable debugging at the specified level. The level argument is an integer from 0 to 5. Setting the level to 0 disables debugging. 
-> Default: 0 
+- roster [ on | off ]
 
-log [ on | off ]
-> Capture debugging output in the `SavedVariables` file. 
-> Default: off 
+  Show guild join and leave messages from other co-guilds. 
 
-logsize length
-> Keep length number log entries in the `SavedVariables` file. 
-> Default: 2048 
+  Default: on 
 
-verbose [ on | off ]
-> Display the debugging output in your chat window. Only do this if you are masochistic. 
-> Default: off 
+- rank [ on | off ]
 
-help
-> Print a summary of available commands. 
+  Show promotion and demotion messages from other co-guilds. 
+  
+  Default: off 
 
-stats
-> Prints a summary of the connection statistics for the common communication channel(s). 
+- ochat [ on | off ]
 
-status
-> Prints a summary of the GreenWall communication parameters and state variables. 
+  Show bridge officer chat between the co-guilds. This only works for members who have privileges to view officer notes.
+  
+  Default: off 
 
-reload
-> Issues a request to all members of the confederated guilds to reload the configuration. 
+- debug _level_
 
-refresh
-> Checks and corrects the communications status for the common channel(s). 
+  Enable debugging at the specified level. The level argument is an integer from 0 to 5. Setting the level to 0 disables debugging. 
+  
+  Default: 0 
 
-version
-> Print the installed version of GreenWall. 
+- log [ on | off ]
+
+  Capture debugging output in the `SavedVariables` file. 
+
+  Default: off 
+
+- logsize _length_
+
+  Keep length number log entries in the `SavedVariables` file. 
+
+  Default: 2048 
+
+- verbose [ on | off ]
+
+  Display the debugging output in your chat window. Only do this if you are masochistic. 
+  
+  Default: off 
+
+- help
+
+  Print a summary of available commands. 
+
+- stats
+
+  Prints a summary of the connection statistics for the common communication channel(s). 
+
+- status
+  
+  Prints a summary of the GreenWall communication parameters and state variables. 
+
+- reload
+
+  Issues a request to all members of the confederated guilds to reload the configuration. 
+
+- refresh
+
+  Checks and corrects the communications status for the common channel(s). 
+
+- version
+
+  Print the installed version of GreenWall. 
 
 
 ## Guides
