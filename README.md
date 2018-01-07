@@ -393,7 +393,7 @@ The best way to provide information about significant problems you encounter or 
 All bug reports and feature requests should be submitted on Github.  If you aren't comfortable with the Github
 issue tracker, please e-mail the details and I will add an issue record.
 
-S
+
 ## License
 
 ```
