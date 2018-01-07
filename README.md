@@ -130,38 +130,47 @@ You will be able to enable or disable the following options.
     </dd>
 </dl>
 
-- __Show Co-Guild Tags__
+- __mode__ - _Use these settings for all characters on this account_
+
+  If this options is selected, the configuration will be used that is shared will all other characters that have
+  this option selected.  Otherwise, a character-specific configuration will be used. 
+  
+  Default: on
+  
+  _If GreenWall has been used on the character prior to version 1.9.0, this will default to __off__.
+
+- __tag__ - _Show Co-Guild Tags_
 
   Show co-guild identifier in messages. 
   
   Default: on
 
-- __Show Co-Guild Achievement Announcements__
+- __achievements__ - _Show Co-Guild Achievement Announcements_
 
   Show achievements from other co-guilds. 
   
   Default: off
 
-- __Show Co-Guild Roster Announcements__
+- __roster__ - _Show Co-Guild Roster Announcements_
 
   Show guild join and leave messages from other co-guilds. 
   
   Default: on 
 
-- __Show Co-Guild Rank Announcements__
+- __rank__ - _Show Co-Guild Rank Announcements_
 
   Show promotion and demotion messages from other co-guilds. 
 
   Default: off 
   
-- __Channel Join Delay__
+- __joindelay__ - _Channel Join Delay_
 
   Adjust the time in seconds GreenWall will wait for a the system default channels (e.g. General, Local Defense). 
   If you have explicitly left these channels, set this low.
   
   Default: 30 seconds
 
-- __Bridge Officer Chat__
+- __ochat__ - _Bridge Officer Chat_
 
   Show bridge officer chat between the co-guilds. This only works for members who have privileges to view officer notes.
 
