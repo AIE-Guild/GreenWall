@@ -33,20 +33,21 @@ local semver = LibStub:GetLibrary("SemanticVersion-1.0")
 
 GwParser = GwClass()
 
-function GwParser:new(info)
+function GwParser:new(info, note)
     self.info = info
+    self.note = note
     return self
 end
 
 --- Factory method to produce parser instances.
 -- @param info Guild information summary.
 -- @return An instance of a GwParser subclass.
-function GwParser:get_parser(info)
+function GwParser:get_parser(info, note)
     local version = self:version(info)
     if version == 1 then
-        return GwV1Parser:new(info)
+        return GwV1Parser:new(info, note)
     elseif version == 2 then
-        return GwV2Parser:new(info)
+        return GwV2Parser:new(info, note)
     end
     return
 end
@@ -63,12 +64,12 @@ function GwParser:version(info)
     return
 end
 
-function GwParser:substitute(text, xlat)
-    local output, count = string.gsub(text, '%$(%a)', function(s) return xlat[s] end)
-    if count > 0 then
-        gw.Debug(GW_LOG_DEBUG, "expanded '%s' to '%s'", text, output)
+function GwParser:split_args(buffer)
+    local fields = {}
+    for i, v in ipairs({ strsplit(':', buffer) }) do
+        fields[i] = strtrim(v)
     end
-    return output
+    return unpack(fields)
 end
 
 
@@ -77,6 +78,22 @@ end
 --
 
 GwV1Parser = GwClass(GwParser)
+
+function GwV1Parser:new(info, note)
+    self.info = info
+    self.note = note
+    self.xlat = {}
+    return self
+end
+
+function GwV1Parser:substitute(text)
+    local output, count = string.gsub(text, '%$(%a)', function(s) return self.xlat[s] end)
+    if count > 0 then
+        gw.Debug(GW_LOG_DEBUG, "expanded '%s' to '%s'", text, output)
+    end
+    return output
+end
+
 
 
 --
