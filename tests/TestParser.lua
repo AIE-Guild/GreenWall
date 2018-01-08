@@ -97,8 +97,13 @@ function TestParser:test_factory()
     lu.assertTrue(parser:isa(GwV2Parser))
 end
 
-function TestParser:test_substitute()
-    s = GwParser:substitute('one $n three', { n = 'two' })
+
+TestV1Parser = {}
+
+function TestV1Parser:test_substitute()
+    local parser = GwV1Parser:new()
+    parser.xlat = { n = 'two' }
+    s = parser:substitute('one $n three')
     lu.assertEquals(s, 'one two three')
     lu.assertEquals(gw.logmsg, "expanded 'one $n three' to 'one two three'")
 end
