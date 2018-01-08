@@ -1,0 +1,25 @@
+# .travis.yml
+
+language: python
+sudo: false
+
+env:
+  - LUA="lua=5.1"
+
+before_install:
+  - pip install hererocks
+  - hererocks lua_install -r^ --$LUA
+  - export PATH=$PATH:$PWD/lua_install/bin
+
+install:
+  - luarocks install bitlib
+  - luarocks install luaunit
+
+script:
+  - lua tests/TestUtility.lua -v
+  - lua tests/TestSettings.lua -v
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always

@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2017 Mark Rogaski
+Copyright (c) 2010-2018 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,34 +43,6 @@ gw.realm        = GetRealmName()
 gw.player       = UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
 gw.guild_status = ''
 
-
---
--- Default configuration values
---
-gw.option = {
-    tag             = { default=true,
-                        desc="co-guild tagging" },
-    achievements    = { default=false,
-                        desc="co-guild achievement announcements" },
-    roster          = { default=true,
-                        desc="co-guild roster announcements" },
-    rank            = { default=false,
-                        desc="co-guild rank announcements" },
-    debug           = { default=GW_LOG_NONE, min=0, max=4294967295,
-                        desc="debugging level" },
-    verbose         = { default=false,
-                        desc="verbose debugging" },
-    log             = { default=false,
-                        desc="event logging" },
-    logsize         = { default=2048, min=0, max=8192,
-                        desc="maximum log buffer size" },
-    ochat           = { default=false,
-                        desc="officer chat bridging" },
-    redact          = { default=true,
-                        desc="obfuscate sensitive data in debug output" },
-    joindelay       = { default=30, min=0, max=120, step=1,
-                        desc="channel join delay" }
-}
 
 gw.usage = [[
 

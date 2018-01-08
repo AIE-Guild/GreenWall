@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2017 Mark Rogaski
+Copyright (c) 2010-2018 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,29 +35,33 @@ function gw.handlerGuildChat(type, guild_id, content, arglist)
     if type == GW_MTYPE_CHAT then
         gw.ReplicateMessage('GUILD', content[1], guild_id, arglist)
     elseif type == GW_MTYPE_ACHIEVEMENT then
-        if GreenWall.achievements then
+        if gw.settings:get('achievements') then
             gw.ReplicateMessage('GUILD_ACHIEVEMENT', content[1], guild_id, arglist)
+        end
+    elseif type == GW_MTYPE_LOOT then
+        if gw.settings:get('achievements') then
+            gw.ReplicateMessage('LOOT', content[1], guild_id, arglist)
         end
     elseif type == GW_MTYPE_BROADCAST then
         local action, target, rank = unpack(content)
         if action == 'join' then
-            if GreenWall.roster then
+            if gw.settings:get('roster') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_JOIN_S, sender), guild_id, arglist)
             end
         elseif action == 'leave' then
-            if GreenWall.roster then
+            if gw.settings:get('roster') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_LEAVE_S, sender), guild_id, arglist)
             end
         elseif action == 'remove' then
-            if GreenWall.rank then
+            if gw.settings:get('rank') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_REMOVE_SS, target, sender), guild_id, arglist)
             end
         elseif action == 'promote' then
-            if GreenWall.rank then
+            if gw.settings:get('rank') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_PROMOTE_SSS, sender, target, rank), guild_id, arglist)
             end
         elseif action == 'demote' then
-            if GreenWall.rank then
+            if gw.settings:get('rank') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_DEMOTE_SSS, sender, target, rank), guild_id, arglist)
             end
         end
@@ -89,6 +93,7 @@ end
 --     'GUILD'
 --     'OFFICER'
 --     'GUILD_ACHIEVEMENT'
+--     'LOOT'
 --     'SYSTEM'
 -- @param message The message to replicate.
 -- @param guild_id (optional) Guild ID of the sender.
@@ -104,7 +109,7 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
 
     gw.Debug(GW_LOG_INFO, 'event=%s, guild_id=%s, message=%s', event, guild_id, message)
 
-    if GreenWall.tag and event ~= 'SYSTEM' then
+    if gw.settings:get('tag') and event ~= 'SYSTEM' then
         message = format('<%s> %s', guild_id, message)
     end
 
