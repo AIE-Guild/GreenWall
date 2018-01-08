@@ -426,9 +426,9 @@ SOFTWARE.
     <img src="https://raw.githubusercontent.com/AIE-Guild/GreenWall/assets/img/ralff.png" alt="Ralff" />
 </p>
 
-GreenWall is dedicated to the memory of Roger Keith White (1962-2017), known to the members of Alea Iacta Est as Ralff.
-Not only was he instrumental in the initial release and refinement of GreenWall, he was the soul of our community writ 
-in flesh and blood.  
+GreenWall is dedicated in memoriam to the memory of Roger Keith White (1962-2017), known to the members of 
+Alea Iacta Est as Ralff.  Not only was he instrumental in the creation and refinement of GreenWall, he was 
+the soul of our community writ in flesh and blood.  
 
 _Never again shall we meet such a formidable mountain of intelligence, curiosity, hospitality, 
 and non-stop innuendo._
