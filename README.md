@@ -20,7 +20,6 @@
 
 [![Build Status](https://travis-ci.org/AIE-Guild/GreenWall.svg?branch=master)](https://travis-ci.org/AIE-Guild/GreenWall)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
-[![Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg?style=flat)](https://www.patreon.com/mrogaski)
 
 GreenWall is a World of Warcraft add-on that allows multiple guilds within a single realm, or 
 [connected realms](https://worldofwarcraft.com/en-us/news/11393305) to share guild chat as if they were one guild.
