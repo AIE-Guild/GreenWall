@@ -24,6 +24,9 @@ SOFTWARE.
 
 --]]-----------------------------------------------------------------------
 
+local semver = LibStub:GetLibrary("SemanticVersion-1.0")
+
+
 --- Callback handler for guild chat messages.
 -- @param type Message type received.
 -- @param guild_id ID of the guild the message was received from.
@@ -163,7 +166,12 @@ function gw.SendLocal(type, message)
 
     local payload = strsub(strjoin('#', opcode, message), 1, 255)
     gw.Debug(GW_LOG_DEBUG, 'message=%s', payload)
-    SendAddonMessage('GreenWall', payload, 'GUILD')
+    if semver(gw.build['version']) >= semver('8.0.1') then
+        C_ChatInfo.SendAddonMessage('GreenWall', payload, 'GUILD')
+    else
+        -- TODO: Remove in 8.0.1
+        SendAddonMessage('GreenWall', payload, 'GUILD')
+    end
 
 end
 
