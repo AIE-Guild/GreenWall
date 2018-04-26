@@ -18,6 +18,7 @@
 
 ## Overview
 
+[![Join the chat at https://gitter.im/AIE-Guild/GreenWall](https://badges.gitter.im/AIE-Guild/GreenWall.svg)](https://gitter.im/AIE-Guild/GreenWall?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/AIE-Guild/GreenWall.svg?branch=master)](https://travis-ci.org/AIE-Guild/GreenWall)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 
