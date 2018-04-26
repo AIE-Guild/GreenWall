@@ -2,6 +2,13 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.9.1 -- Unreleased
+### Fixed
+- Calling SendAddonMessage in C_ChatInfo namespace for 8.0.x.
+
+### Changed
+- Storing WoW build information in gw.build.
+
 ## [1.9.0] -- 2018-01-08
 ### Added
 - Added support for shared, account-level settings per character.  Each character can either use the account
