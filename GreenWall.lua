@@ -31,6 +31,7 @@ Imported Libraries
 --]] -----------------------------------------------------------------------
 
 local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
+local semver = LibStub:GetLibrary("SemanticVersion-1.0")
 
 
 --
@@ -465,8 +466,10 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'PLAYER_ENTERING_WORLD' then
 
-        -- Added for 4.1
-        if RegisterAddonMessagePrefix then
+        if semver(gw.build['version']) >= semver('8.0.1') then
+            C_ChatInfo.RegisterAddonMessagePrefix("GreenWall")
+        else
+            -- TODO: Remove in 8.0.1
             RegisterAddonMessagePrefix("GreenWall")
         end
 
