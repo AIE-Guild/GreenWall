@@ -22,27 +22,34 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
---]]-----------------------------------------------------------------------
+--]] -----------------------------------------------------------------------
 
 --[[-----------------------------------------------------------------------
 
 Global Variables
 
---]]-----------------------------------------------------------------------
+--]] -----------------------------------------------------------------------
 
 --
 -- State variables
 --
 gw = {
-    addon_loaded    = false,
-    frame_table     = {},
-    api_table       = {},
+    addon_loaded = false,
+    frame_table = {},
+    api_table = {},
 }
-gw.version      = GetAddOnMetadata('GreenWall', 'Version')
-gw.realm        = GetRealmName()
-gw.player       = UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
+gw.version = GetAddOnMetadata('GreenWall', 'Version')
+gw.realm = GetRealmName()
+gw.player = UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
 gw.guild_status = ''
 
+local build_info = { GetBuildInfo() }
+gw.build = {
+    version = build_info[1],
+    number = build_info[2],
+    date = build_info[3],
+    interface = build_info[4]
+}
 
 gw.usage = [[
 

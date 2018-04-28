@@ -63,15 +63,15 @@ end
 function TestSettingsCreate:test_meta()
     local settings = GwSettings:new()
     lu.assertEquals(GreenWallMeta.mode, GW_MODE_ACCOUNT)
-    lu.assertTrue(string.match(GreenWallMeta.created, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d'))
-    lu.assertTrue(string.match(GreenWallMeta.updated, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d'))
+    lu.assertStrMatches(GreenWallMeta.created, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d')
+    lu.assertStrMatches(GreenWallMeta.updated, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d')
 end
 
 function TestSettingsCreate:test_initialize()
     local settings = GwSettings:new()
     for i, tab in ipairs({GreenWall, GreenWallAccount}) do
-        lu.assertTrue(string.match(tab.created, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d'))
-        lu.assertTrue(string.match(tab.updated, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d'))
+        lu.assertStrMatches(tab.created, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d')
+        lu.assertStrMatches(tab.updated, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d')
         lu.assertEquals(tab.tag, true)
         lu.assertEquals(tab.achievements, false)
         lu.assertEquals(tab.roster, true)
