@@ -2,12 +2,12 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## 1.9.1 -- Unreleased
+## [1.9.1] -- 2018-04-28
 ### Fixed
-- Calling SendAddonMessage in C_ChatInfo namespace for 8.0.x.
+- SendAddonMessage is now called in the C_ChatInfo namespace for 8.0.x.
 
 ### Changed
-- Storing WoW build information in gw.build.
+- Moved WoW build information to gw.build global.
 
 ## [1.9.0] -- 2018-01-08
 ### Added
@@ -528,6 +528,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.9.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.5...v1.9.0
 [1.8.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.4...v1.8.5
 [1.8.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.3...v1.8.4
