@@ -118,25 +118,22 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
 
     local i
     for i = 1, NUM_CHAT_WINDOWS do
-
-        gw.frame_table = { GetChatWindowMessages(i) }
-
-        local v
-        for _, v in ipairs(gw.frame_table) do
-
-            if v == event then
-
-                local frame = 'ChatFrame' .. i
-                if _G[frame] then
-                    gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%s', frame, event, sender, message)
-                    gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message, sender, language, '', target, flags, 0, 0, '', 0, 0, guid)
+        if i ~= 2 then  -- skip combat log
+            gw.frame_table = { GetChatWindowMessages(i) }
+            local v
+            for _, v in ipairs(gw.frame_table) do
+                if v == event then
+                    local frame = 'ChatFrame' .. i
+                    if _G[frame] then
+                        gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%s',
+                            frame, event, sender, message)
+                        gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message,
+                            sender, language, '', target, flags, 0, 0, '', 0, 0, guid)
+                    end
+                    break
                 end
-                break
-
             end
-
         end
-
     end
 
 end

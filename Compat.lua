@@ -43,7 +43,7 @@ function gw.EnableCompatibility()
         -- Use ElvUI's event handler for sending messages to the chat windows
         if ElvUI[3].chat.enable then
             local ElvUIChat = ElvUI[1]:GetModule('Chat')
-            gw.ChatFrame_MessageEventHandler = ElvUIChat.ChatFrame_OnEvent
+            gw.ChatFrame_MessageEventHandler = function(...) ElvUIChat:FloatingChatFrame_OnEvent(...) end
             gw.Debug(GW_LOG_NOTICE, 'ElvUI compatibility enabled.')
         end
     elseif IsAddOnLoaded('Prat-3.0') then
