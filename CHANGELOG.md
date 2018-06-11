@@ -2,6 +2,13 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.9.2] -- 2018-06-11
+### Fixed
+- Updated compatibility mode for ElvUI 10.74 changes to chat.
+- Removed combat log from chat window scanning.
+
+_Thank you to Simpy from the ElvUI team for the fix._
+
 ## [1.9.1] -- 2018-04-28
 ### Fixed
 - SendAddonMessage is now called in the C_ChatInfo namespace for 8.0.x.
@@ -528,6 +535,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.9.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.5...v1.9.0
 [1.8.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.4...v1.8.5
