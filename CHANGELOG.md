@@ -7,7 +7,7 @@ This project uses [Semantic Versioning](http://semver.org/).
 - Updated compatibility mode for ElvUI 10.74 changes to chat.
 - Removed combat log from chat window scanning.
 
-_Thank you to Simpy from the ElvUI team for the fix._
+_Thank you to Simpy from the ElvUI team for the fixes._
 
 ## [1.9.1] -- 2018-04-28
 ### Fixed
