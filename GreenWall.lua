@@ -252,7 +252,7 @@ function GreenWall_OnEvent(self, event, ...)
 
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
-        if gw.iCmp(sender, gw.player) then
+        if gw.iCmp(gw.GlobalName(sender), gw.player) then
             gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
         end
 
@@ -262,7 +262,7 @@ function GreenWall_OnEvent(self, event, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
         item = gw.GetItemString(message)
         if item and gw.IsLegendary(item) then
-            if gw.iCmp(sender, gw.player) then
+            if gw.iCmp(gw.GlobalName(sender), gw.player) then
                 gw.config.channel.guild:send(GW_MTYPE_LOOT, message)
             end
         end
@@ -271,7 +271,7 @@ function GreenWall_OnEvent(self, event, ...)
 
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
-        if gw.iCmp(sender, gw.player) and gw.settings:get('ochat') then
+        if gw.iCmp(gw.GlobalName(sender), gw.player) and gw.settings:get('ochat') then
             gw.config.channel.officer:send(GW_MTYPE_CHAT, message)
         end
 
@@ -279,14 +279,14 @@ function GreenWall_OnEvent(self, event, ...)
 
         local prefix, payload, dist, sender = select(1, ...)
         if prefix == 'GreenWall' and dist == 'GUILD' then
-            gw.ReceiveLocal(sender, payload)
+            gw.ReceiveLocal(gw.GlobalName(sender), payload)
         end
 
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
 
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
-        if gw.iCmp(sender, gw.player) then
+        if gw.iCmp(gw.GlobalName(sender), gw.player) then
             gw.config.channel.guild:send(GW_MTYPE_ACHIEVEMENT, message)
         end
 
