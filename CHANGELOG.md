@@ -6,6 +6,9 @@ This project uses [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Applied workaround for chat channel sender regression introduced in 8.0.1.
 
+### Removed
+- Removed pre-8.0 call to bare SendLocal.
+
 ## [1.9.3] -- 2018-07-17
 ### Updated
 - Updated the TOC for WoW 8.0.
