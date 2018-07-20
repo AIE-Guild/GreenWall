@@ -41,7 +41,8 @@ gw.ChatFrame_MessageEventHandler = ChatFrame_MessageEventHandler
 function gw.EnableCompatibility()
     if IsAddOnLoaded('ElvUI') then
         -- Use ElvUI's event handler for sending messages to the chat windows
-        if ElvUI[3].chat.enable then
+        local status, enabled = pcall(function () return ElvUI[1].private.chat.enable end)
+        if status and enabled then
             local ElvUIChat = ElvUI[1]:GetModule('Chat')
             gw.ChatFrame_MessageEventHandler = function(...) ElvUIChat:FloatingChatFrame_OnEvent(...) end
             gw.Debug(GW_LOG_NOTICE, 'ElvUI compatibility enabled.')
