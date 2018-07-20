@@ -146,13 +146,6 @@ function gw.GlobalName(name, realm)
 end
 
 
---- Get the player's fully-qualified name.
--- @return A qualified player name.
-function gw.GetPlayerName(target)
-    return UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
-end
-
-
 --- Get the player's fully-qualified guild name.
 -- @param target (optional) unit ID, default is 'Player'.
 -- @return A qualified guild name or nil if the player is not in a guild.

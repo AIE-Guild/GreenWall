@@ -22,7 +22,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
---]]-----------------------------------------------------------------------
+--]] -----------------------------------------------------------------------
 
 local semver = LibStub:GetLibrary("SemanticVersion-1.0")
 
@@ -92,12 +92,12 @@ end
 --- Copies a message received on a common channel to all chat window instances of a
 -- target chat channel.
 -- @param event Chat message event to generate.
---   Accepted values:
---     'GUILD'
---     'OFFICER'
---     'GUILD_ACHIEVEMENT'
---     'LOOT'
---     'SYSTEM'
+-- Accepted values:
+-- 'GUILD'
+-- 'OFFICER'
+-- 'GUILD_ACHIEVEMENT'
+-- 'LOOT'
+-- 'SYSTEM'
 -- @param message The message to replicate.
 -- @param guild_id (optional) Guild ID of the sender.
 -- @param arglist (optional) API event arguments.
@@ -118,7 +118,7 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
 
     local i
     for i = 1, NUM_CHAT_WINDOWS do
-        if i ~= 2 then  -- skip combat log
+        if i ~= 2 then -- skip combat log
             gw.frame_table = { GetChatWindowMessages(i) }
             local v
             for _, v in ipairs(gw.frame_table) do
@@ -135,7 +135,6 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
             end
         end
     end
-
 end
 
 
@@ -163,13 +162,7 @@ function gw.SendLocal(type, message)
 
     local payload = strsub(strjoin('#', opcode, message), 1, 255)
     gw.Debug(GW_LOG_DEBUG, 'message=%s', payload)
-    if semver(gw.build['version']) >= semver('8.0.1') then
-        C_ChatInfo.SendAddonMessage('GreenWall', payload, 'GUILD')
-    else
-        -- TODO: Remove in 8.0.1
-        SendAddonMessage('GreenWall', payload, 'GUILD')
-    end
-
+    C_ChatInfo.SendAddonMessage('GreenWall', payload, 'GUILD')
 end
 
 --- Parses and handles an encoded message from the add-on channel.
@@ -226,12 +219,9 @@ function gw.ReceiveLocal(sender, message)
                     gw.Debug(GW_LOG_WARNING, 'officer spoofing attempt from %s', sender)
                 end
             end
-
         end
-
     end
 
     return true
-
 end
 

@@ -2,6 +2,13 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.9.4] -- 2018-07-19
+### Fixed
+- Applied workaround for chat channel sender regression introduced in 8.0.1.
+
+### Removed
+- Removed pre-8.0 call to bare SendLocal.
+
 ## [1.9.3] -- 2018-07-17
 ### Updated
 - Updated the TOC for WoW 8.0.
@@ -539,6 +546,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.9.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.3...v1.9.4
 [1.9.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.2...v1.9.3
 [1.9.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.0...v1.9.1
