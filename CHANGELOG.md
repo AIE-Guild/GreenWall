@@ -4,6 +4,12 @@ This project uses [Semantic Versioning](http://semver.org/).
 
 ## [1.9.4] -- 2018-07-19
 ### Fixed
+- Checks for ElvUI compatibility now recognize ElvUI user profiles.
+
+_Thank you, again, to Simpy from the ElvUI team._
+
+## [1.9.4] -- 2018-07-19
+### Fixed
 - Applied workaround for chat channel sender regression introduced in 8.0.1.
 
 ### Removed
