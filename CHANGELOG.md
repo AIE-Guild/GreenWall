@@ -2,7 +2,7 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## [1.9.6] -- 2018-08-11
+## [1.9.7] -- 2018-08-11
 ### Fixed
 - Removed a debug statement that was raising format errors.
 
