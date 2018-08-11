@@ -108,9 +108,12 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
     local language = arglist[3]
     local target = arglist[5]
     local flags = arglist[6]
+    local line = arglist[11]
     local guid = arglist[12]
 
     gw.Debug(GW_LOG_INFO, 'event=%s, guild_id=%s, message=%s', event, guild_id, message)
+    gw.Debug(GW_LOG_DEBUG, 'sender=%s, language=%s, target=%s, flags=%s, line=%s, guid=%s',
+        sender, language, target, flags, line, guid)
 
     if gw.settings:get('tag') and event ~= 'SYSTEM' then
         message = format('<%s> %s', guild_id, message)
@@ -128,7 +131,7 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
                         gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%s',
                             frame, event, sender, message)
                         gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message,
-                            sender, language, '', target, flags, 0, 0, '', 0, 0, guid)
+                            sender, language, '', target, flags, 0, 0, '', 0, line, guid)
                     end
                     break
                 end
