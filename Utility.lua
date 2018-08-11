@@ -97,9 +97,9 @@ function gw.Debug(level, ...)
         return fun and loc .. '(' .. fun .. ')' or loc
     end
 
-    local msg = string.format(unpack({...}))
     if gw.settings then
         if level <= gw.settings:get('debug') then
+            local msg = string.format(unpack({...}))
             local trace = format('[debug/%d@%s] %s', level, get_caller(), msg)
             gw.Log(trace)
             if gw.settings:get('verbose') then

@@ -2,6 +2,15 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.9.6] -- 2018-08-11
+### Fixed
+- Removed a debug statement that was raising format errors.
+
+_Thank you to Legracen from AIE for helping with the fault isolation._
+
+### Changed
+- Refactored gw.Debug to test the debug level before formatting the message.
+
 ## [1.9.6] -- 2018-08-10
 ### Fixed
 - Restored context menu availability for speakers in other co-guilds.
@@ -556,6 +565,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.9.7]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.6...v1.9.7
 [1.9.6]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.5...v1.9.6
 [1.9.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.4...v1.9.5
 [1.9.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.3...v1.9.4
