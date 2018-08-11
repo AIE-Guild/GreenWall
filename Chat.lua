@@ -111,7 +111,16 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
     local line = arglist[11]
     local guid = arglist[12]
 
+    -- Fix the variables if they are blank to make debuging work as expected.
+    sender = sender or ''
+    language = language or ''
+    target = target or ''
+    flags = flags or ''
+    line = line or ''
+
     gw.Debug(GW_LOG_INFO, 'event=%s, guild_id=%s, message=%s', event, guild_id, message)
+    gw.Debug(GW_LOG_DEBUG, 'sender=%s, language=%s, target=%s, flags=%s, line=%s, guid=%s',
+        sender, language, target, flags, line, guid)
 
     if gw.settings:get('tag') and event ~= 'SYSTEM' then
         message = format('<%s> %s', guild_id, message)
