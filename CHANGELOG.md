@@ -2,6 +2,74 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.9.7] -- 2018-08-11
+### Fixed
+- Removed a debug statement that was raising format errors.
+
+_Thank you to Legracen from AIE for helping with the fault isolation._
+
+### Changed
+- Refactored gw.Debug to test the debug level before formatting the message.
+
+## [1.9.6] -- 2018-08-10
+### Fixed
+- Restored context menu availability for speakers in other co-guilds.
+
+## [1.9.5] -- 2018-07-19
+### Fixed
+- Checks for ElvUI compatibility now recognize ElvUI user profiles.
+
+_Thank you, again, to Simpy from the ElvUI team._
+
+## [1.9.4] -- 2018-07-19
+### Fixed
+- Applied workaround for chat channel sender regression introduced in 8.0.1.
+
+### Removed
+- Removed pre-8.0 call to bare SendLocal.
+
+## [1.9.3] -- 2018-07-17
+### Updated
+- Updated the TOC for WoW 8.0.
+
+## [1.9.2] -- 2018-06-11
+### Fixed
+- Updated compatibility mode for ElvUI 10.74 changes to chat.
+- Removed combat log from chat window scanning.
+
+_Thank you to Simpy from the ElvUI team for the fixes._
+
+## [1.9.1] -- 2018-04-28
+### Fixed
+- SendAddonMessage is now called in the C_ChatInfo namespace for 8.0.x.
+
+### Changed
+- Moved WoW build information to gw.build global.
+
+## [1.9.0] -- 2018-01-08
+### Added
+- Added support for shared, account-level settings per character.  Each character can either use the account
+  settings or a character-specific configuration.  If an existing GreenWall configuration exists for the character
+  character mode will be the default, otherwise account mode is the default.
+- Added confederation announcements of legendary items looted.
+- Moved configuration handling to a proxy class to allow a single point
+  of access for all configuration data.
+- Added Travis CI build testing with luaunit for unit tests.
+- Added a dedication in memoriam to Roger K White (aka Ralff), we will always miss you.
+
+### Fixed
+- Corrected item string matching for legendary loot toasts.
+
+### Changed
+- Pointed documentation to new CurseForge URL.
+
+### Updated
+- Rewrote the project README.
+
+### Removed
+- Removed luadoc HTML output.
+- HTML copies of other documentation.
+
 ## [1.8.5] -- 2017-08-29
 ### Fixed
 - Applied a workaround for 7.3.0 where GuildControlSetRank() was made
@@ -497,6 +565,14 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.9.7]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.6...v1.9.7
+[1.9.6]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.5...v1.9.6
+[1.9.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.4...v1.9.5
+[1.9.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.3...v1.9.4
+[1.9.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.2...v1.9.3
+[1.9.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.1...v1.9.2
+[1.9.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.0...v1.9.1
+[1.9.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.5...v1.9.0
 [1.8.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.4...v1.8.5
 [1.8.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.3...v1.8.4
 [1.8.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.2...v1.8.3

@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2017 Mark Rogaski
+Copyright (c) 2010-2018 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,54 +22,33 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
---]]-----------------------------------------------------------------------
+--]] -----------------------------------------------------------------------
 
 --[[-----------------------------------------------------------------------
 
 Global Variables
 
---]]-----------------------------------------------------------------------
+--]] -----------------------------------------------------------------------
 
 --
 -- State variables
 --
 gw = {
-    addon_loaded    = false,
-    frame_table     = {},
-    api_table       = {},
+    addon_loaded = false,
+    frame_table = {},
+    api_table = {},
 }
-gw.version      = GetAddOnMetadata('GreenWall', 'Version')
-gw.realm        = GetRealmName()
-gw.player       = UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
+gw.version = GetAddOnMetadata('GreenWall', 'Version')
+gw.realm = GetRealmName()
+gw.player = UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
 gw.guild_status = ''
 
-
---
--- Default configuration values
---
-gw.option = {
-    tag             = { default=true,
-                        desc="co-guild tagging" },
-    achievements    = { default=false,
-                        desc="co-guild achievement announcements" },
-    roster          = { default=true,
-                        desc="co-guild roster announcements" },
-    rank            = { default=false,
-                        desc="co-guild rank announcements" },
-    debug           = { default=GW_LOG_NONE, min=0, max=4294967295,
-                        desc="debugging level" },
-    verbose         = { default=false,
-                        desc="verbose debugging" },
-    log             = { default=false,
-                        desc="event logging" },
-    logsize         = { default=2048, min=0, max=8192,
-                        desc="maximum log buffer size" },
-    ochat           = { default=false,
-                        desc="officer chat bridging" },
-    redact          = { default=true,
-                        desc="obfuscate sensitive data in debug output" },
-    joindelay       = { default=30, min=0, max=120, step=1,
-                        desc="channel join delay" }
+local build_info = { GetBuildInfo() }
+gw.build = {
+    version = build_info[1],
+    number = build_info[2],
+    date = build_info[3],
+    interface = build_info[4]
 }
 
 gw.usage = [[

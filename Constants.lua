@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2017 Mark Rogaski
+Copyright (c) 2010-2018 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 --]]-----------------------------------------------------------------------
+
+
+--
+-- Settings
+--
+GW_MODE_ACCOUNT = 'account'
+GW_MODE_CHARACTER = 'character'
+
+
+--
+-- UI
+--
+GW_UI_COLOR_INACTIVE = {0.5, 0.5, 0.5 }
+GW_UI_COLOR_ACTIVE = {1.0, 1.0, 1.0}
+GW_UI_COLOR_MODE = {1.0, 1.0, 0.0 }
+
 
 --
 -- Debugging levels
@@ -49,13 +65,14 @@ GW_CTYPE_ADDON      = 2
 GW_MTYPE_NONE           = 0
 GW_MTYPE_CHAT           = 1
 GW_MTYPE_ACHIEVEMENT    = 2
-GW_MTYPE_BROADCAST      = 3
-GW_MTYPE_CONTROL        = 4
-GW_MTYPE_REQUEST        = 5
-GW_MTYPE_RESPONSE       = 6
-GW_MTYPE_NOTICE         = 7
-GW_MTYPE_ADDON          = 8
-GW_MTYPE_EXTERNAL       = 9
+GW_MTYPE_LOOT           = 3
+GW_MTYPE_BROADCAST      = 4
+GW_MTYPE_CONTROL        = 5
+GW_MTYPE_REQUEST        = 6
+GW_MTYPE_RESPONSE       = 7
+GW_MTYPE_NOTICE         = 8
+GW_MTYPE_ADDON          = 9
+GW_MTYPE_EXTERNAL       = 10
 
 
 --

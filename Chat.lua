@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2017 Mark Rogaski
+Copyright (c) 2010-2018 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
---]]-----------------------------------------------------------------------
+--]] -----------------------------------------------------------------------
+
+local semver = LibStub:GetLibrary("SemanticVersion-1.0")
+
 
 --- Callback handler for guild chat messages.
 -- @param type Message type received.
@@ -35,29 +38,33 @@ function gw.handlerGuildChat(type, guild_id, content, arglist)
     if type == GW_MTYPE_CHAT then
         gw.ReplicateMessage('GUILD', content[1], guild_id, arglist)
     elseif type == GW_MTYPE_ACHIEVEMENT then
-        if GreenWall.achievements then
+        if gw.settings:get('achievements') then
             gw.ReplicateMessage('GUILD_ACHIEVEMENT', content[1], guild_id, arglist)
+        end
+    elseif type == GW_MTYPE_LOOT then
+        if gw.settings:get('achievements') then
+            gw.ReplicateMessage('LOOT', content[1], guild_id, arglist)
         end
     elseif type == GW_MTYPE_BROADCAST then
         local action, target, rank = unpack(content)
         if action == 'join' then
-            if GreenWall.roster then
+            if gw.settings:get('roster') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_JOIN_S, sender), guild_id, arglist)
             end
         elseif action == 'leave' then
-            if GreenWall.roster then
+            if gw.settings:get('roster') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_LEAVE_S, sender), guild_id, arglist)
             end
         elseif action == 'remove' then
-            if GreenWall.rank then
+            if gw.settings:get('rank') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_REMOVE_SS, target, sender), guild_id, arglist)
             end
         elseif action == 'promote' then
-            if GreenWall.rank then
+            if gw.settings:get('rank') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_PROMOTE_SSS, sender, target, rank), guild_id, arglist)
             end
         elseif action == 'demote' then
-            if GreenWall.rank then
+            if gw.settings:get('rank') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_DEMOTE_SSS, sender, target, rank), guild_id, arglist)
             end
         end
@@ -85,11 +92,12 @@ end
 --- Copies a message received on a common channel to all chat window instances of a
 -- target chat channel.
 -- @param event Chat message event to generate.
---   Accepted values:
---     'GUILD'
---     'OFFICER'
---     'GUILD_ACHIEVEMENT'
---     'SYSTEM'
+-- Accepted values:
+-- 'GUILD'
+-- 'OFFICER'
+-- 'GUILD_ACHIEVEMENT'
+-- 'LOOT'
+-- 'SYSTEM'
 -- @param message The message to replicate.
 -- @param guild_id (optional) Guild ID of the sender.
 -- @param arglist (optional) API event arguments.
@@ -100,37 +108,34 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
     local language = arglist[3]
     local target = arglist[5]
     local flags = arglist[6]
+    local line = arglist[11]
     local guid = arglist[12]
 
     gw.Debug(GW_LOG_INFO, 'event=%s, guild_id=%s, message=%s', event, guild_id, message)
 
-    if GreenWall.tag and event ~= 'SYSTEM' then
+    if gw.settings:get('tag') and event ~= 'SYSTEM' then
         message = format('<%s> %s', guild_id, message)
     end
 
     local i
     for i = 1, NUM_CHAT_WINDOWS do
-
-        gw.frame_table = { GetChatWindowMessages(i) }
-
-        local v
-        for _, v in ipairs(gw.frame_table) do
-
-            if v == event then
-
-                local frame = 'ChatFrame' .. i
-                if _G[frame] then
-                    gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%s', frame, event, sender, message)
-                    gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message, sender, language, '', target, flags, 0, 0, '', 0, 0, guid)
+        if i ~= 2 then -- skip combat log
+            gw.frame_table = { GetChatWindowMessages(i) }
+            local v
+            for _, v in ipairs(gw.frame_table) do
+                if v == event then
+                    local frame = 'ChatFrame' .. i
+                    if _G[frame] then
+                        gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%s',
+                            frame, event, sender, message)
+                        gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message,
+                            sender, language, '', target, flags, 0, 0, '', 0, line, guid)
+                    end
+                    break
                 end
-                break
-
             end
-
         end
-
     end
-
 end
 
 
@@ -158,8 +163,7 @@ function gw.SendLocal(type, message)
 
     local payload = strsub(strjoin('#', opcode, message), 1, 255)
     gw.Debug(GW_LOG_DEBUG, 'message=%s', payload)
-    SendAddonMessage('GreenWall', payload, 'GUILD')
-
+    C_ChatInfo.SendAddonMessage('GreenWall', payload, 'GUILD')
 end
 
 --- Parses and handles an encoded message from the add-on channel.
@@ -216,12 +220,9 @@ function gw.ReceiveLocal(sender, message)
                     gw.Debug(GW_LOG_WARNING, 'officer spoofing attempt from %s', sender)
                 end
             end
-
         end
-
     end
 
     return true
-
 end
 

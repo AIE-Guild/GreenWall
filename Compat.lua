@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2017 Mark Rogaski
+Copyright (c) 2010-2018 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,10 @@ gw.ChatFrame_MessageEventHandler = ChatFrame_MessageEventHandler
 function gw.EnableCompatibility()
     if IsAddOnLoaded('ElvUI') then
         -- Use ElvUI's event handler for sending messages to the chat windows
-        if ElvUI[3].chat.enable then
+        local status, enabled = pcall(function () return ElvUI[1].private.chat.enable end)
+        if status and enabled then
             local ElvUIChat = ElvUI[1]:GetModule('Chat')
-            gw.ChatFrame_MessageEventHandler = ElvUIChat.ChatFrame_OnEvent
+            gw.ChatFrame_MessageEventHandler = function(...) ElvUIChat:FloatingChatFrame_OnEvent(...) end
             gw.Debug(GW_LOG_NOTICE, 'ElvUI compatibility enabled.')
         end
     elseif IsAddOnLoaded('Prat-3.0') then
