@@ -370,15 +370,15 @@ function GreenWall_OnEvent(self, event, ...)
 
         gw.Debug(GW_LOG_DEBUG, 'event=%s, message=%s', event, message)
 
-        local pat_online = string.gsub(format(ERR_FRIEND_ONLINE_SS, '(.+)', '(.+)'), '%[', '%%[')
-        local pat_offline = format(ERR_FRIEND_OFFLINE_S, '(.+)')
-        local pat_join = format(ERR_GUILD_JOIN_S, '(.+)')
-        local pat_leave = format(ERR_GUILD_LEAVE_S, '(.+)')
-        local pat_quit = format(ERR_GUILD_QUIT_S, gw.player)
-        local pat_removed = format(ERR_GUILD_REMOVE_SS, '(.+)', '(.+)')
-        local pat_kick = format(ERR_GUILD_REMOVE_SS, '(.+)', '(.+)')
-        local pat_promote = format(ERR_GUILD_PROMOTE_SSS, '(.+)', '(.+)', '(.+)')
-        local pat_demote = format(ERR_GUILD_DEMOTE_SSS, '(.+)', '(.+)', '(.+)')
+        local pat_online = ERR_FRIEND_ONLINE_SS:format('(.+)', '(.+)'):gsub('([%[%]])', '%%%1')
+        local pat_offline = ERR_FRIEND_OFFLINE_S:format('(.+)')
+        local pat_join = ERR_GUILD_JOIN_S:format('(.+)')
+        local pat_leave = ERR_GUILD_LEAVE_S:format('(.+)')
+        local pat_quit = ERR_GUILD_QUIT_S:format(gw.player)
+        local pat_removed = ERR_GUILD_REMOVE_SS:format('(.+)', '(.+)')
+        local pat_kick = ERR_GUILD_REMOVE_SS:format('(.+)', '(.+)')
+        local pat_promote = ERR_GUILD_PROMOTE_SSS:format('(.+)', '(.+)', '(.+)')
+        local pat_demote = ERR_GUILD_DEMOTE_SSS:format('(.+)', '(.+)', '(.+)')
 
         if message:match(pat_online) then
 
