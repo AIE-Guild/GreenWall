@@ -2,6 +2,12 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.9.9] -- 2018-12-13
+### Fixed
+- Added chat interception workaround for guild chat changes in BFA 8.1.
+
+_Thank you to Ashayo for the patch._
+
 ## [1.9.8] -- 2018-08-23
 ### Changed
 - Refactored system message pattern matching.
@@ -569,6 +575,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.9.9]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.8...v1.9.9
 [1.9.8]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.7...v1.9.8
 [1.9.7]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.6...v1.9.7
 [1.9.6]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.5...v1.9.6
