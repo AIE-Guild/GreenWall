@@ -61,8 +61,8 @@ local function GwSettingCmd(key, value)
             end
         end
         gw.Write('%s is turned %s.',
-            gw.settings:getattr(key, 'desc'),
-            gw.settings:get(key) and 'ON' or 'OFF'
+                gw.settings:getattr(key, 'desc'),
+                gw.settings:get(key) and 'ON' or 'OFF'
         )
     elseif gw.settings:getattr(key, 'type') == 'number' then
         if value and value ~= '' then
@@ -73,23 +73,22 @@ local function GwSettingCmd(key, value)
             end
         end
         gw.Write('%s is set to %s.',
-            gw.settings:getattr(key, 'desc'),
-            tostring(gw.settings:get(key))
+                gw.settings:getattr(key, 'desc'),
+                tostring(gw.settings:get(key))
         )
     elseif gw.settings:getattr(key, 'type') == 'string' then
         if value and value ~= '' then
             gw.settings:set(key, value)
         end
         gw.Write('%s is set to %s.',
-            gw.settings:getattr(key, 'desc'),
-            gw.settings:get(key)
+                gw.settings:getattr(key, 'desc'),
+                gw.settings:get(key)
         )
     else
         gw.Error('cannot parse value for %s', key)
     end
 
 end
-
 
 local function GwSlashCmd(message, editbox)
 
@@ -144,7 +143,7 @@ local function GwSlashCmd(message, editbox)
 
         gw.Write('GreenWall version %s.', gw.version)
         gw.Write('World of Warcraft version %s, build %s (%s), interface %s.',
-            gw.build['version'], gw.build['number'], gw.build['date'], gw.build['interface'])
+                gw.build['version'], gw.build['number'], gw.build['date'], gw.build['interface'])
 
     else
 
@@ -191,13 +190,42 @@ function GreenWall_OnLoad(self)
     -- Add a tab to the Interface Options panel.
     --
     self.name = 'GreenWall'
-    self.refresh = function(self) GreenWallInterfaceFrame_OnShow(self) end
-    self.okay = function(self) GreenWallInterfaceFrame_SaveUpdates(self) end
-    self.cancel = function(self) return end
-    self.default = function(self) GreenWallInterfaceFrame_SetDefaults(self) end
+    self.refresh = function(self)
+        GreenWallInterfaceFrame_OnShow(self)
+    end
+    self.okay = function(self)
+        GreenWallInterfaceFrame_SaveUpdates(self)
+    end
+    self.cancel = function(self)
+        return
+    end
+    self.default = function(self)
+        GreenWallInterfaceFrame_SetDefaults(self)
+    end
     InterfaceOptions_AddCategory(self)
 end
 
+
+--[[ -----------------------------------------------------------------------
+
+Hooks
+
+--]] -----------------------------------------------------------------------
+function GreenWall_ParseText(chat, send)
+    if (send == 1) then
+        local message = chat:GetText()
+        if (message ~= '') then
+            local chatType = chat:GetAttribute('chatType')
+            if (chatType == 'GUILD') then
+                gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
+            elseif (chatType == 'OFFICER') then
+                gw.config.channel.officer:send(GW_MTYPE_CHAT, message)
+            end
+        end
+    end
+end
+
+hooksecurefunc("ChatEdit_ParseText", GreenWall_ParseText)
 
 --[[ -----------------------------------------------------------------------
 
@@ -250,11 +278,9 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'CHAT_MSG_GUILD' then
 
+        -- Messages will be forwarded by the ChatEdit_ParseText hook
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
-        if gw.iCmp(gw.GlobalName(sender), gw.player) then
-            gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
-        end
 
     elseif event == 'CHAT_MSG_LOOT' then
 
@@ -269,11 +295,9 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'CHAT_MSG_OFFICER' then
 
+        -- Messages will be forwarded by the ChatEdit_ParseText hook
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
-        if gw.iCmp(gw.GlobalName(sender), gw.player) and gw.settings:get('ochat') then
-            gw.config.channel.officer:send(GW_MTYPE_CHAT, message)
-        end
 
     elseif event == 'CHAT_MSG_ADDON' then
 
@@ -489,7 +513,9 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'PLAYER_LOGIN' then
 
         -- Defer joining to allow General to grab slot 1
-        gw.config.timer.channel:start(function() gw.config:refresh_channels() end)
+        gw.config.timer.channel:start(function()
+            gw.config:refresh_channels()
+        end)
 
         -- Initiate the comms
         gw.config:refresh()
