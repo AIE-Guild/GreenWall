@@ -213,9 +213,10 @@ Hooks
 --]] -----------------------------------------------------------------------
 function GreenWall_ParseText(chat, send)
     if (send == 1) then
+        local chatType = chat:GetAttribute('chatType')
         local message = chat:GetText()
-        if (message ~= '') then
-            local chatType = chat:GetAttribute('chatType')
+        gw.Debug(GW_LOG_DEBUG, 'type=%s, message=%q', chatType, message, message:len())
+        if (message:match('%S')) then
             if (chatType == 'GUILD') then
                 gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
             elseif (chatType == 'OFFICER') then
