@@ -111,7 +111,7 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
     local line = arglist[11]
     local guid = arglist[12]
 
-    gw.Debug(GW_LOG_INFO, 'event=%s, guild_id=%s, message=%s', event, guild_id, message)
+    gw.Debug(GW_LOG_INFO, 'event=%s, guild_id=%s, message=%q', event, guild_id, message)
 
     if gw.settings:get('tag') and event ~= 'SYSTEM' then
         message = format('<%s> %s', guild_id, message)
@@ -126,7 +126,7 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
                 if v == event then
                     local frame = 'ChatFrame' .. i
                     if _G[frame] then
-                        gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%s',
+                        gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%q',
                             frame, event, sender, message)
                         gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message,
                             sender, language, '', target, flags, 0, 0, '', 0, line, guid)
@@ -144,7 +144,7 @@ end
 -- @param message Text of the message.
 function gw.SendLocal(type, message)
 
-    gw.Debug(GW_LOG_INFO, 'type=%s, message=%s', type, message)
+    gw.Debug(GW_LOG_INFO, 'type=%s, message=%q', type, message)
 
     local opcode
     if type == nil then
@@ -162,7 +162,7 @@ function gw.SendLocal(type, message)
     end
 
     local payload = strsub(strjoin('#', opcode, message), 1, 255)
-    gw.Debug(GW_LOG_DEBUG, 'message=%s', payload)
+    gw.Debug(GW_LOG_DEBUG, 'message=%q', payload)
     C_ChatInfo.SendAddonMessage('GreenWall', payload, 'GUILD')
 end
 
@@ -172,7 +172,7 @@ end
 -- @return True on successful handling, false on failure.
 function gw.ReceiveLocal(sender, message)
 
-    gw.Debug(GW_LOG_INFO, 'sender=%s, message=%s', sender, message)
+    gw.Debug(GW_LOG_INFO, 'sender=%s, message=%q', sender, message)
 
     if not gw.iCmp(gw.GlobalName(sender), gw.player) then
 
