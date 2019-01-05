@@ -2,6 +2,16 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.9.10] -- Unreleased
+### Fixed
+- Fixed GreenWall_ParseText message filtering to filter blank messages.
+
+### Added
+- Added warning for any transmission of a blank message on a channel.
+
+### Changed
+- Removed unused CRC import.
+
 ## [1.9.9] -- 2018-12-13
 ### Fixed
 - Added chat interception workaround for guild chat changes in BFA 8.1.
@@ -575,6 +585,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.9.10]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.9...v1.9.10
 [1.9.9]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.8...v1.9.9
 [1.9.8]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.7...v1.9.8
 [1.9.7]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.6...v1.9.7
