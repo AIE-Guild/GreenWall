@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2018 Mark Rogaski
+Copyright (c) 2010-2019 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@ Imported Libraries
 
 --]] -----------------------------------------------------------------------
 
-local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
 local semver = LibStub:GetLibrary("SemanticVersion-1.0")
 
 
@@ -213,9 +212,10 @@ Hooks
 --]] -----------------------------------------------------------------------
 function GreenWall_ParseText(chat, send)
     if (send == 1) then
+        local chatType = chat:GetAttribute('chatType')
         local message = chat:GetText()
-        if (message ~= '') then
-            local chatType = chat:GetAttribute('chatType')
+        gw.Debug(GW_LOG_DEBUG, 'type=%s, message=%q', chatType, message, message:len())
+        if (message:match('%S')) then
             if (chatType == 'GUILD') then
                 gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
             elseif (chatType == 'OFFICER') then
@@ -280,12 +280,12 @@ function GreenWall_OnEvent(self, event, ...)
 
         -- Messages will be forwarded by the ChatEdit_ParseText hook
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
 
     elseif event == 'CHAT_MSG_LOOT' then
 
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
         item = gw.GetItemString(message)
         if item and gw.IsLegendary(item) then
             if gw.iCmp(gw.GlobalName(sender), gw.player) then
@@ -297,7 +297,7 @@ function GreenWall_OnEvent(self, event, ...)
 
         -- Messages will be forwarded by the ChatEdit_ParseText hook
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
 
     elseif event == 'CHAT_MSG_ADDON' then
 
@@ -309,7 +309,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
 
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
         if gw.iCmp(gw.GlobalName(sender), gw.player) then
             gw.config.channel.guild:send(GW_MTYPE_ACHIEVEMENT, message)
         end
@@ -392,7 +392,7 @@ function GreenWall_OnEvent(self, event, ...)
 
         local message = select(1, ...)
 
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, message=%s', event, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, message=%q', event, message)
 
         local pat_online = ERR_FRIEND_ONLINE_SS:format('(.+)', '(.+)'):gsub('([%[%]])', '%%%1')
         local pat_offline = ERR_FRIEND_OFFLINE_S:format('(.+)')
