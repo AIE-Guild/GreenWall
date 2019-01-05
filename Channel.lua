@@ -272,13 +272,15 @@ Transmit Methods
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
     local message = self:al_encode(type, ...)
+    if not message:match('%S') then
+        gw.Debug(GW_LOG_WARNING, 'sending a blank message on channel %d', self.number)
+    end
     gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, message=%q', self.number, type, message)
     return self:tl_send(type, message)
 end
 
 function GwChannel:al_encode(type, ...)
     local arg = {...}
-    local message
     if type == GW_MTYPE_BROADCAST then
         assert(#arg >= 1)
         assert(#arg <= 3)
