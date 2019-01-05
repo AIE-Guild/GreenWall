@@ -272,7 +272,7 @@ Transmit Methods
 function GwChannel:send(type, ...)
     -- Apply adaptation layer encoding
     local message = self:al_encode(type, ...)
-    gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, message=%s', self.number, type, message)
+    gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, message=%q', self.number, type, message)
     return self:tl_send(type, message)
 end
 
@@ -328,7 +328,7 @@ end
 -- @return Number of segments in queue after the insertion.
 function GwChannel:tl_enqueue(segment)
     tinsert(self.tx_queue, segment)
-    gw.Debug(GW_LOG_DEBUG, 'enqueued segment: %s', segment)
+    gw.Debug(GW_LOG_DEBUG, 'enqueued segment: %q', segment)
     return #self.tx_queue
 end
 
@@ -337,7 +337,7 @@ end
 function GwChannel:tl_dequeue()
     local segment = tremove(self.tx_queue, 1)
     if segment then
-        gw.Debug(GW_LOG_DEBUG, 'dequeued segment: %s', segment)
+        gw.Debug(GW_LOG_DEBUG, 'dequeued segment: %q', segment)
     end
     return segment
 end
@@ -359,7 +359,7 @@ function GwChannel:tl_flush()
                     self.tx_hash[hash] = self.tx_hash[hash] + 1
                 end
                 -- Send the segment
-                gw.Debug(GW_LOG_INFO, 'channel=%d, segment=%s', self.number, segment)
+                gw.Debug(GW_LOG_INFO, 'channel=%d, segment=%q', self.number, segment)
                 SendChatMessage(segment, 'CHANNEL', nil, self.number)
                 self.stats.txcnt = self.stats.txcnt + 1
                 count = count + 1
@@ -400,7 +400,7 @@ function GwChannel:receive(f, ...)
             end
         elseif sender ~= gw.player and guild_id ~= gw.config.guild_id then
             -- Process the chat message if it from another co-guild.
-            gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, guild=%s, message=%s',
+            gw.Debug(GW_LOG_NOTICE, 'channel=%d, type=%d, sender=%s, guild=%s, message=%q',
                     self.number, mtype, sender, guild_id, message)
             return f(mtype, guild_id, content, {...})
         end
@@ -422,7 +422,7 @@ function GwChannel:al_decode(mtype, message)
         return t
     end
 
-    gw.Debug(GW_LOG_DEBUG, 'type=%d, message=%s', mtype, message)
+    gw.Debug(GW_LOG_DEBUG, 'type=%d, message=%q', mtype, message)
     if mtype == GW_MTYPE_BROADCAST then
         return expand(message, 3)
     elseif mtype == GW_MTYPE_EXTERNAL then
@@ -442,7 +442,7 @@ end
 function GwChannel:tl_receive(...)
     local segment, sender = select(1, ...)
     sender = gw.GlobalName(sender)
-    gw.Debug(GW_LOG_INFO, 'channel=%d, sender=%s, segment=%s', self.number, sender, segment)
+    gw.Debug(GW_LOG_INFO, 'channel=%d, sender=%s, segment=%q', self.number, sender, segment)
     self.stats.rxcnt = self.stats.rxcnt + 1
 
     -- Check the segment hash
@@ -464,7 +464,7 @@ function GwChannel:tl_receive(...)
     local opcode, guild_id, _, message = strsplit('#', segment, 4)
     guild_id = guild_id or '-'
     message = message or ''
-    gw.Debug(GW_LOG_DEBUG, 'opcode=%s, guild_id=%s, message=%s', opcode, guild_id, message)
+    gw.Debug(GW_LOG_DEBUG, 'opcode=%s, guild_id=%s, message=%q', opcode, guild_id, message)
 
     local type = GW_MTYPE_NONE
     if opcode == 'C' then

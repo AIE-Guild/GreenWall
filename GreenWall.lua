@@ -280,12 +280,12 @@ function GreenWall_OnEvent(self, event, ...)
 
         -- Messages will be forwarded by the ChatEdit_ParseText hook
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
 
     elseif event == 'CHAT_MSG_LOOT' then
 
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
         item = gw.GetItemString(message)
         if item and gw.IsLegendary(item) then
             if gw.iCmp(gw.GlobalName(sender), gw.player) then
@@ -297,7 +297,7 @@ function GreenWall_OnEvent(self, event, ...)
 
         -- Messages will be forwarded by the ChatEdit_ParseText hook
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
 
     elseif event == 'CHAT_MSG_ADDON' then
 
@@ -309,7 +309,7 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
 
         local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%s', event, sender, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
         if gw.iCmp(gw.GlobalName(sender), gw.player) then
             gw.config.channel.guild:send(GW_MTYPE_ACHIEVEMENT, message)
         end
@@ -392,7 +392,7 @@ function GreenWall_OnEvent(self, event, ...)
 
         local message = select(1, ...)
 
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, message=%s', event, message)
+        gw.Debug(GW_LOG_DEBUG, 'event=%s, message=%q', event, message)
 
         local pat_online = ERR_FRIEND_ONLINE_SS:format('(.+)', '(.+)'):gsub('([%[%]])', '%%%1')
         local pat_offline = ERR_FRIEND_OFFLINE_S:format('(.+)')
