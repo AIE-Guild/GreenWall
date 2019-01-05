@@ -30,7 +30,6 @@ Imported Libraries
 
 --]] -----------------------------------------------------------------------
 
-local crc = LibStub:GetLibrary("Hash:CRC:16ccitt-1.0")
 local semver = LibStub:GetLibrary("SemanticVersion-1.0")
 
 
