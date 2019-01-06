@@ -289,7 +289,8 @@ function GreenWall_OnEvent(self, event, ...)
         item = gw.GetItemString(message)
         if item and gw.IsLegendary(item) then
             if gw.iCmp(gw.GlobalName(sender), gw.player) then
-                gw.config.channel.guild:send(GW_MTYPE_LOOT, message)
+                newmsg = message:gsub('You receive', gw.player .. ' receives') -- Convert to third-person
+                gw.config.channel.guild:send(GW_MTYPE_LOOT, newmsg)
             end
         end
 
