@@ -214,7 +214,10 @@ function GreenWall_ParseText(chat, send)
     if (send == 1) then
         local chatType = chat:GetAttribute('chatType')
         local message = chat:GetText()
-        gw.Debug(GW_LOG_DEBUG, 'type=%s, message=%q', chatType, message, message:len())
+        gw.Debug(GW_LOG_DEBUG, 'type=%s, message=%q', chatType, message)
+        if gw.compatibility.identity then
+            message = Identity2:AlterMessage(message, Identity2.db.profile.channels[chatType])
+        end
         if (message:match('%S')) then
             if (chatType == 'GUILD') then
                 gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
