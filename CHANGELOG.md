@@ -2,7 +2,12 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## [1.9.10] -- Unreleased
+## [1.9.11] -- Unreleased
+### Fixed
+- Added ID tagging support for Identity-2 and Name2Chat under the WoW 8.1.0 changes.
+- Changed legendary loot notifications from second-person to third-person.
+
+## [1.9.10] -- 2018-01-04
 ### Fixed
 - Fixed GreenWall_ParseText message filtering to filter blank messages.
 
@@ -585,6 +590,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.9.11]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.10...v1.9.11
 [1.9.10]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.9...v1.9.10
 [1.9.9]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.8...v1.9.9
 [1.9.8]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.7...v1.9.8
