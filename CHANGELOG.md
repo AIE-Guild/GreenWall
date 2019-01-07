@@ -2,12 +2,12 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## [1.9.11] -- Unreleased
+## [1.9.11] -- 2019-01-06
 ### Fixed
 - Added ID tagging support for Identity-2 and Name2Chat under the WoW 8.1.0 changes.
 - Changed legendary loot notifications from second-person to third-person.
 
-## [1.9.10] -- 2018-01-04
+## [1.9.10] -- 2019-01-04
 ### Fixed
 - Fixed GreenWall_ParseText message filtering to filter blank messages.
 
