@@ -214,8 +214,11 @@ function GreenWall_ParseText(chat, send)
     if (send == 1) then
         local chatType = chat:GetAttribute('chatType')
         local message = chat:GetText()
-        gw.Debug(GW_LOG_DEBUG, 'type=%s, message=%q', chatType, message, message:len())
+        gw.Debug(GW_LOG_DEBUG, 'type=%s, message=%q', chatType, message)
         if (message:match('%S')) then
+            if gw.compatibility.identity then
+                message = Identity2:AlterMessage(message, Identity2.db.profile.channels[chatType])
+            end
             if (chatType == 'GUILD') then
                 gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
             elseif (chatType == 'OFFICER') then
@@ -289,7 +292,8 @@ function GreenWall_OnEvent(self, event, ...)
         item = gw.GetItemString(message)
         if item and gw.IsLegendary(item) then
             if gw.iCmp(gw.GlobalName(sender), gw.player) then
-                gw.config.channel.guild:send(GW_MTYPE_LOOT, message)
+                newmsg = message:gsub('You receive', gw.player .. ' receives') -- Convert to third-person
+                gw.config.channel.guild:send(GW_MTYPE_LOOT, newmsg)
             end
         end
 
