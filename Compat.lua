@@ -39,7 +39,7 @@ gw.ChatFrame_MessageEventHandler = ChatFrame_MessageEventHandler
 -- Apply workarounds
 --
 function gw.EnableCompatibility()
-    if IsAddOnLoaded('Identity-2') then
+    if IsAddOnLoaded('Identity-2') or IsAddOnLoaded('Identity') then
         -- Use Identity-2 for adding a chat identifier.
         gw.compatibility.identity = true
         gw.Debug(GW_LOG_NOTICE, 'Identity-2 compatibility enabled.')
