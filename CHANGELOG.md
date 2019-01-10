@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.9.12] -- 2019-01-10
+### Fixed
+- Added missing message alteration for Name2Chat.
+
 ## [1.9.11] -- 2019-01-06
 ### Fixed
 - Added ID tagging support for Identity-2 and Name2Chat under the WoW 8.1.0 changes.
@@ -590,6 +594,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.9.12]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.11...v1.9.12
 [1.9.11]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.10...v1.9.11
 [1.9.10]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.9...v1.9.10
 [1.9.9]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.8...v1.9.9
