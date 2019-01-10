@@ -216,6 +216,9 @@ function GreenWall_ParseText(chat, send)
         local message = chat:GetText()
         gw.Debug(GW_LOG_DEBUG, 'type=%s, message=%q', chatType, message)
         if (message:match('%S')) then
+            if gw.compatibility.name2chat then
+                message = string.format('(%s) %s', Name2Chat.db.profile.name, message)
+            end
             if gw.compatibility.identity then
                 message = Identity2:AlterMessage(message, Identity2.db.profile.channels[chatType])
             end
