@@ -6,6 +6,9 @@ This project uses [Semantic Versioning](http://semver.org/).
 ### Updated
 - Updated the TOC for WoW 8.2.
 
+### Removed
+- Removed Gitter badge from documentation.
+
 ## [1.9.12] -- 2019-01-10
 ### Fixed
 - Added missing message alteration for Name2Chat.
