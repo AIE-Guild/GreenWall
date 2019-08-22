@@ -49,6 +49,11 @@ function gw.EnableCompatibility()
         gw.compatibility.name2chat = true
         gw.Debug(GW_LOG_NOTICE, 'Name2Chat compatibility enabled.')
     end
+    if IsAddOnLoaded('Incognito') then
+        -- Use Incognito for adding a chat identifier.
+        gw.compatibility.incognito = true
+        gw.Debug(GW_LOG_NOTICE, 'Incognito compatibility enabled.')
+    end
     if IsAddOnLoaded('ElvUI') then
         -- Use ElvUI's event handler for sending messages to the chat windows
         local status, enabled = pcall(function()
