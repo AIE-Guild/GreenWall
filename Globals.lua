@@ -37,7 +37,7 @@ gw = {
     addon_loaded = false,
     frame_table = {},
     api_table = {},
-    compatibility = { identity = false, name2chat = false, elvui = false, prat = false, },
+    compatibility = { identity = false, name2chat = false, incognito = false, elvui = false, prat = false, },
 }
 gw.version = GetAddOnMetadata('GreenWall', 'Version')
 gw.realm = GetRealmName()

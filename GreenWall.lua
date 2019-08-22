@@ -223,6 +223,15 @@ function GreenWall_ParseText(chat, send)
                 message = Identity2:AlterMessage(message, Identity2.db.profile.channels[chatType])
             end
             if (chatType == 'GUILD') then
+                if gw.compatibility.incognito then
+                    if Incognito.db.profile.enable and
+                            Incognito.db.profile.name and
+                            Incognito.db.profile.name ~= "" and
+                            Incognito.db.profile.guild then
+                        message = "(" .. Incognito.db.profile.name .. "): " .. message
+                    end
+
+                end
                 gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
             elseif (chatType == 'OFFICER') then
                 gw.config.channel.officer:send(GW_MTYPE_CHAT, message)
