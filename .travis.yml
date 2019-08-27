@@ -5,6 +5,7 @@ sudo: false
 
 env:
   - LUA="lua=5.1"
+  - LUA_PATH="?;?.lua;tests/?;tests/?.lua"
 
 before_install:
   - pip install hererocks
