@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.9.15] -- 2019-08-27
+### Changed
+- Cleaned up project to support CurseForge automatic packaging.
+
 ## [1.9.14] -- 2019-08-22
 ### Added
 - Added compatibility support for Incognito.
@@ -605,6 +609,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.9.15]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.14...v1.9.15
 [1.9.14]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.13...v1.9.14
 [1.9.13]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.12...v1.9.13
 [1.9.12]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.11...v1.9.12
