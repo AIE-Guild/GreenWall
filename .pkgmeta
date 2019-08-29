@@ -1,0 +1,5 @@
+package-as: GreenWall
+manual-changelog: CHANGELOG.md
+license-output: LICENSE
+ignore:
+  - tests
