@@ -1,5 +1,7 @@
 package-as: GreenWall
-manual-changelog: CHANGELOG.md
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
 license-output: LICENSE
 ignore:
   - tests
