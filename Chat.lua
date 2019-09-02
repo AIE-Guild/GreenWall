@@ -118,7 +118,8 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
 
     local i
     for i = 1, NUM_CHAT_WINDOWS do
-        if i ~= 2 then  -- skip combat log
+        if i ~= 2 then
+            -- skip combat log
             gw.frame_table = { GetChatWindowMessages(i) }
             local v
             for _, v in ipairs(gw.frame_table) do
@@ -126,9 +127,9 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
                     local frame = 'ChatFrame' .. i
                     if _G[frame] then
                         gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%s',
-                            frame, event, sender, message)
+                                frame, event, sender, message)
                         gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message,
-                            sender, language, '', target, flags, 0, 0, '', 0, 0, guid)
+                                sender, language, '', target, flags, 0, 0, '', 0, 0, guid)
                     end
                     break
                 end
@@ -163,12 +164,7 @@ function gw.SendLocal(type, message)
 
     local payload = strsub(strjoin('#', opcode, message), 1, 255)
     gw.Debug(GW_LOG_DEBUG, 'message=%s', payload)
-    if semver(gw.build['version']) >= semver('8.0.1') then
-        C_ChatInfo.SendAddonMessage('GreenWall', payload, 'GUILD')
-    else
-        -- TODO: Remove in 8.0.1
-        SendAddonMessage('GreenWall', payload, 'GUILD')
-    end
+    C_ChatInfo.SendAddonMessage('GreenWall', payload, 'GUILD')
 
 end
 
