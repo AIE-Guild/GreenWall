@@ -9,7 +9,7 @@
 ## SavedVariables: GreenWallAccount
 ## SavedVariablesPerCharacter: GreenWall,GreenWallMeta,GreenWallLog
 ## X-Category: Guild
-## X-Date: 2019-08-29
+## X-Date: 2019-09-02
 
 Lib\Load.xml
 Constants.lua
