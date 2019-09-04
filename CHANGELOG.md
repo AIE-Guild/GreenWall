@@ -2,6 +2,21 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.9.15] -- 2019-08-27
+### Changed
+- Cleaned up project to support CurseForge automatic packaging.
+
+## [1.9.14] -- 2019-08-22
+### Added
+- Added compatibility support for Incognito.
+
+## [1.9.13] -- 2019-07-02
+### Updated
+- Updated the TOC for WoW 8.2.
+
+### Removed
+- Removed Gitter badge from documentation.
+
 ## [1.9.12] -- 2019-01-10
 ### Fixed
 - Added missing message alteration for Name2Chat.
@@ -594,6 +609,9 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.9.15]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.14...v1.9.15
+[1.9.14]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.13...v1.9.14
+[1.9.13]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.12...v1.9.13
 [1.9.12]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.11...v1.9.12
 [1.9.11]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.10...v1.9.11
 [1.9.10]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.9...v1.9.10
