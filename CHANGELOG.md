@@ -2,6 +2,13 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.10.0] -- 2019-09-05
+### Changed
+- Moved to customer branch approach for WoW Classic releases.
+
+### Removed
+- Removed transitional code for handling PLAYER_ENTERING_WORLD.
+
 ## [1.9.15] -- 2019-08-27
 ### Changed
 - Cleaned up project to support CurseForge automatic packaging.
@@ -609,6 +616,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.10.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.15...v1.10.0
 [1.9.15]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.14...v1.9.15
 [1.9.14]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.13...v1.9.14
 [1.9.13]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.12...v1.9.13
