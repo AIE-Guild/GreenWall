@@ -2,9 +2,9 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## [1.10.0] -- Unreleased
+## [1.10.0] -- 2019-09-05
 ### Changed
-- Moved to customer branch approach for WoW Classic.
+- Moved to customer branch approach for WoW Classic releases.
 
 ### Removed
 - Removed transitional code for handling PLAYER_ENTERING_WORLD.
