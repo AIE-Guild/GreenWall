@@ -506,13 +506,7 @@ function GreenWall_OnEvent(self, event, ...)
 
     elseif event == 'PLAYER_ENTERING_WORLD' then
 
-        if semver(gw.build['version']) >= semver('8.0.1') then
-            C_ChatInfo.RegisterAddonMessagePrefix("GreenWall")
-        else
-            -- TODO: Remove in 8.0.1
-            RegisterAddonMessagePrefix("GreenWall")
-        end
-
+        C_ChatInfo.RegisterAddonMessagePrefix("GreenWall")
         -- Apply compatibility workarounds
         gw.EnableCompatibility()
 
