@@ -29,6 +29,21 @@ SOFTWARE.
 --
 require('bit')
 
+-- Read the TOC file
+local TOC = {}
+f = io.open('GreenWall.toc')
+while true do
+    line = f:read()
+    if line == nil then
+        break
+    end
+    k, v = string.match(line, '## (%a+): (.*)%s*$')
+    if k ~= nil then
+        TOC[k] = v
+    end
+end
+f:close()
+
 function date(...)
     return os.date(...)
 end
@@ -38,15 +53,25 @@ function strmatch(...)
 end
 
 function GetAddOnMetadata(addon, field)
-    local version
-    f = io.open(addon .. ".toc")
-    while true do
-        line = f:read()
-        version = string.match(line, "## Version: ([^%s]+)")
-        if version ~= nil then
-            break
-        end
+    if addon == TOC['Title'] then
+        return TOC['Version']
     end
-    f:close()
-    return version
+    return
+end
+
+function GetRealmName()
+    return 'EarthenRing'
+end
+
+function UnitName(target)
+    if target == 'player' then
+        return 'Ralff'
+    end
+    return
+end
+
+function GetBuildInfo()
+    x, y, z = string.match(TOC['Interface'], '(%d)(%d%d)(%d%d)')
+    version = string.format('%d.%d.%d', x, y, z)
+    return version, '12345', os.date(), TOC['Interface']
 end
