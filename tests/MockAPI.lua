@@ -36,3 +36,17 @@ end
 function strmatch(...)
     return string.match(...)
 end
+
+function GetAddOnMetadata(addon, field)
+    local version
+    f = io.open(addon .. ".toc")
+    while true do
+        line = f:read()
+        version = string.match(line, "## Version: ([^%s]+)")
+        if version ~= nil then
+            break
+        end
+    end
+    f:close()
+    return version
+end
