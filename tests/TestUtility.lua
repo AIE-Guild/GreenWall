@@ -34,7 +34,12 @@ end
 --
 
 lu = require('luaunit')
-require('Loader')
+require('TestCompat')
+require('Lib/LibStub')
+require('Lib/CRC16-CCITT')
+require('Constants')
+require('Utility')
+
 
 
 --

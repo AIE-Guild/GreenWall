@@ -25,7 +25,9 @@ SOFTWARE.
 --]]--------------------------------------------------------------------------
 
 lu = require('luaunit')
-require('Loader')
+require('TestCompat')
+require('Constants')
+require('Settings')
 
 
 --

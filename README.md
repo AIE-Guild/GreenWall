@@ -19,7 +19,6 @@
 ## Overview
 
 [![Build Status](https://travis-ci.org/AIE-Guild/GreenWall.svg?branch=master)](https://travis-ci.org/AIE-Guild/GreenWall)
-[![Coverage Status](https://coveralls.io/repos/github/AIE-Guild/GreenWall/badge.svg?branch=master)](https://coveralls.io/github/AIE-Guild/GreenWall?branch=master)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 
 GreenWall is a World of Warcraft add-on that allows multiple guilds within a single realm, or 

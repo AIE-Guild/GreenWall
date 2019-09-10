@@ -2,10 +2,6 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## 1.10.1 -- Unreleased
-### Added
-- Added unit test coverage reporting through Coveralls.
-
 ## [1.10.0] -- 2019-09-05
 ### Changed
 - Moved to customer branch approach for WoW Classic releases.
