@@ -12,10 +12,15 @@ before_install:
 install:
   - luarocks install bitlib
   - luarocks install luaunit
+  - luarocks install luacov
+  - luarocks install luacov-coveralls
 
 script:
-  - lua tests/TestUtility.lua -v
-  - lua tests/TestSettings.lua -v
+  - lua -lluacov tests/TestUtility.lua -v
+  - lua -lluacov tests/TestSettings.lua -v
+
+after_success:
+  - luacov-coveralls
 
 notifications:
   email:
