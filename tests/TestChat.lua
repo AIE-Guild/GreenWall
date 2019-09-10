@@ -25,11 +25,7 @@ SOFTWARE.
 --]]--------------------------------------------------------------------------
 
 lu = require('luaunit')
-require('MockAPI')
-require('Globals')
-require('Lib/LibStub')
-require('Lib/SemanticVersion')
-require('Chat')
+require('Loader')
 
 --
 -- Run the tests

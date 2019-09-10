@@ -25,12 +25,7 @@ SOFTWARE.
 --]]--------------------------------------------------------------------------
 
 lu = require('luaunit')
-require('MockAPI')
-require('Globals')
-require('Lib/LibStub')
-require('Lib/CRC16-CCITT')
-require('Lib/Base64BCA')
-require('Channel')
+require('Loader')
 
 --
 -- Run the tests

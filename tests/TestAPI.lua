@@ -25,9 +25,7 @@ SOFTWARE.
 --]]--------------------------------------------------------------------------
 
 lu = require('luaunit')
-require('MockAPI')
-require('Globals')
-require('API')
+require('Loader')
 
 --
 -- Run the tests

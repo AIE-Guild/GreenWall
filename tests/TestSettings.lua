@@ -25,9 +25,7 @@ SOFTWARE.
 --]]--------------------------------------------------------------------------
 
 lu = require('luaunit')
-require('MockAPI')
-require('Constants')
-require('Settings')
+require('Loader')
 
 
 --

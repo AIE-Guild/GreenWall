@@ -34,12 +34,7 @@ end
 --
 
 lu = require('luaunit')
-require('MockAPI')
-require('Lib/LibStub')
-require('Lib/CRC16-CCITT')
-require('Constants')
-require('Utility')
-
+require('Loader')
 
 
 --

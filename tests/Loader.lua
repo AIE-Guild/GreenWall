@@ -24,58 +24,21 @@ SOFTWARE.
 
 --]]--------------------------------------------------------------------------
 
---
--- These functions adapt or mock Lua extensions in the WoW API.
---
-require('bit')
+require('MockAPI')
 
--- Read the TOC file
-local TOC = {}
-f = io.open('GreenWall.toc')
-while true do
-    line = f:read()
-    if line == nil then
-        break
-    end
-    k, v = string.match(line, '## (%a+): (.*)%s*$')
-    if k ~= nil then
-        TOC[k] = v
-    end
-end
-f:close()
-
-function date(...)
-    return os.date(...)
-end
-
-function strmatch(...)
-    return string.match(...)
-end
-
-function GetAddOnMetadata(addon, field)
-    if addon == TOC['Title'] then
-        return TOC['Version']
-    end
-    return
-end
-
-function GetRealmName()
-    return 'EarthenRing'
-end
-
-function UnitName(target)
-    if target == 'player' then
-        return 'Ralff'
-    end
-    return
-end
-
-function GetBuildInfo()
-    x, y, z = string.match(TOC['Interface'], '(%d)(%d%d)(%d%d)')
-    version = string.format('%d.%d.%d', x, y, z)
-    return version, '12345', os.date(), TOC['Interface']
-end
-
-function hooksecurefunc(...)
-    return
-end
+require('Lib/LibStub')
+require('Lib/CRC16-CCITT')
+require('Lib/Base64BCA')
+require('Lib/SemanticVersion')
+require('Constants')
+require('Globals')
+require('Settings')
+require('Utility')
+require('HoldDown')
+require('Config')
+require('Compat')
+require('Chat')
+require('Channel')
+require('API')
+require('Interface')
+require('GreenWall')
