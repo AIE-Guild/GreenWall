@@ -24,15 +24,21 @@ SOFTWARE.
 
 --]]--------------------------------------------------------------------------
 
---
--- These functions adapt or mock Lua extensions in the WoW API.
---
-require('bit')
+require('MockAPI')
 
-function date(...)
-    return os.date(...)
-end
-
-function strmatch(...)
-    return string.match(...)
-end
+require('Lib/LibStub')
+require('Lib/CRC16-CCITT')
+require('Lib/Base64BCA')
+require('Lib/SemanticVersion')
+require('Constants')
+require('Globals')
+require('Settings')
+require('Utility')
+require('HoldDown')
+require('Config')
+require('Compat')
+require('Chat')
+require('Channel')
+require('API')
+require('Interface')
+require('GreenWall')
