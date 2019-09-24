@@ -2,7 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## 1.10.1 -- Unreleased
+## [1.10.1] -- 2019-09-24
+### Updated
+- Updated the TOC for WoW 8.2.5.
+
 ### Added
 - Added unit test coverage reporting through Coveralls.
 
@@ -620,6 +623,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.10.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.15...v1.10.0
 [1.9.15]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.14...v1.9.15
 [1.9.14]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.13...v1.9.14
