@@ -60,7 +60,7 @@ function gw.Log(msg)
     if gw.settings and gw.settings:get('log') then
         local ts = date('%Y-%m-%d %H:%M:%S')
         tinsert(GreenWallLog, format('%s -- %s', ts, msg))
-        while # GreenWallLog > gw.settings:get('logsize') do
+        while #GreenWallLog > gw.settings:get('logsize') do
             tremove(GreenWallLog, 1)
         end
     end
@@ -70,7 +70,7 @@ end
 --- Write a message to the default chat frame.
 -- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Write(...)
-    local msg = string.format(unpack({...}))
+    local msg = string.format(unpack({ ... }))
     DEFAULT_CHAT_FRAME:AddMessage('|cff0bda51GreenWall:|r ' .. msg)
     gw.Log(msg)
 end
@@ -79,7 +79,7 @@ end
 --- Write an error message to the default chat frame.
 -- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Error(...)
-    local msg = string.format(unpack({...}))
+    local msg = string.format(unpack({ ... }))
     DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r |cffff6000[ERROR] ' .. msg)
     gw.Log('[ERROR] ' .. msg)
 end
@@ -99,7 +99,7 @@ function gw.Debug(level, ...)
 
     if gw.settings then
         if level <= gw.settings:get('debug') then
-            local msg = string.format(unpack({...}))
+            local msg = string.format(unpack({ ... }))
             local trace = format('[debug/%d@%s] %s', level, get_caller(), msg)
             gw.Log(trace)
             if gw.settings:get('verbose') then
@@ -131,6 +131,10 @@ end
 -- @param realm Name of the realm.
 -- @return A formatted cross-realm address.
 function gw.GlobalName(name, realm)
+    if name == nil then
+        return
+    end
+
     -- Pass formatted names without modification.
     if name:match("[^-]+-[^-]+$") then
         return name
@@ -234,7 +238,7 @@ end
 -- @return True is the player has joined any world channels, false otherwise.
 function gw.WorldChannelFound()
     gw.Debug(GW_LOG_DEBUG, 'scanning for world channels')
-    for i, v in pairs({GetChannelList()}) do
+    for i, v in pairs({ GetChannelList() }) do
         local name, header, _, _, _, _, category = GetChannelDisplayInfo(i)
         if not header then
             if category == 'CHANNEL_CATEGORY_WORLD' then
