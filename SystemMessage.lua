@@ -44,9 +44,22 @@ function GwSystemMessage:new(obj)
     return obj
 end
 
+function GwSystemMessage:process()
+end
+
 GwOnlineSystemMessage = GwSystemMessage:new()
 
+function GwOnlineSystemMessage:process()
+    gw.config.comember_cache:hold(self.player)
+    gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', self.player)
+end
+
 GwOfflineSystemMessage = GwSystemMessage:new()
+
+function GwOfflineSystemMessage:process()
+    gw.config.comember_cache:hold(self.player)
+    gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', self.player)
+end
 
 GwJoinSystemMessage = GwSystemMessage:new()
 
