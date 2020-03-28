@@ -21,6 +21,7 @@ Config.lua
 Compat.lua
 Chat.lua
 Channel.lua
+SystemEventHandler.lua
 API.lua
 Interface.lua
 GreenWall.lua
