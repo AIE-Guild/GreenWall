@@ -18,6 +18,7 @@ install:
 script:
   - lua -lluacov tests/TestUtility.lua -v
   - lua -lluacov tests/TestSettings.lua -v
+  - lua -lluacov tests/TestSystemEventHandler.lua -v
 
 after_success:
   - luacov-coveralls

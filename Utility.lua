@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -60,7 +60,7 @@ function gw.Log(msg)
     if gw.settings and gw.settings:get('log') then
         local ts = date('%Y-%m-%d %H:%M:%S')
         tinsert(GreenWallLog, format('%s -- %s', ts, msg))
-        while # GreenWallLog > gw.settings:get('logsize') do
+        while #GreenWallLog > gw.settings:get('logsize') do
             tremove(GreenWallLog, 1)
         end
     end
@@ -70,7 +70,7 @@ end
 --- Write a message to the default chat frame.
 -- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Write(...)
-    local msg = string.format(unpack({...}))
+    local msg = string.format(unpack({ ... }))
     DEFAULT_CHAT_FRAME:AddMessage('|cff0bda51GreenWall:|r ' .. msg)
     gw.Log(msg)
 end
@@ -79,7 +79,7 @@ end
 --- Write an error message to the default chat frame.
 -- @param ... A list of the string and arguments for substitution using the syntax of string.format.
 function gw.Error(...)
-    local msg = string.format(unpack({...}))
+    local msg = string.format(unpack({ ... }))
     DEFAULT_CHAT_FRAME:AddMessage('|cffabd473GreenWall:|r |cffff6000[ERROR] ' .. msg)
     gw.Log('[ERROR] ' .. msg)
 end
@@ -92,15 +92,18 @@ end
 function gw.Debug(level, ...)
     local function get_caller()
         local s = debugstack(3, 1, 0)
-        local loc = strmatch(s, '([%a%._-]+:%d+): in function')
-        local fun = strmatch(s, 'in function \`([%a_-]+)\'')
-        return fun and loc .. '(' .. fun .. ')' or loc
+        local file, loc = strmatch(s, '%[string "(.+)"%]:(%d+): in function')
+        local f = strmatch(s, 'in function \`([%a_-]+)\'')
+        file = file == nil and "" or file
+        loc = loc == nil and "" or loc
+        f = f == nil and "?" or f
+        return format('%s:%s:%s', file, loc, f)
     end
 
     if gw.settings then
         if level <= gw.settings:get('debug') then
-            local msg = string.format(unpack({...}))
-            local trace = format('[debug/%d@%s] %s', level, get_caller(), msg)
+            local msg = string.format(unpack({ ... }))
+            local trace = format('debug/%d [%s] %s', level, get_caller(), msg)
             gw.Log(trace)
             if gw.settings:get('verbose') then
                 DEFAULT_CHAT_FRAME:AddMessage(format('|cff009a7dGreenWall:|r |cff778899%s|r', trace))
@@ -131,6 +134,10 @@ end
 -- @param realm Name of the realm.
 -- @return A formatted cross-realm address.
 function gw.GlobalName(name, realm)
+    if name == nil then
+        return
+    end
+
     -- Pass formatted names without modification.
     if name:match("[^-]+-[^-]+$") then
         return name
@@ -234,7 +241,7 @@ end
 -- @return True is the player has joined any world channels, false otherwise.
 function gw.WorldChannelFound()
     gw.Debug(GW_LOG_DEBUG, 'scanning for world channels')
-    for i, v in pairs({GetChannelList()}) do
+    for i, v in pairs({ GetChannelList() }) do
         local name, header, _, _, _, _, category = GetChannelDisplayInfo(i)
         if not header then
             if category == 'CHANNEL_CATEGORY_WORLD' then
