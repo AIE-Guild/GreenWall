@@ -51,7 +51,7 @@ end
 
 --- Insert a handler for addon messages from the guild confederation.
 -- @param handler A callback function.
--- @param addon The name of the addon that you want to receive meaasges from
+-- @param addon The name of the addon that you want to receive messages from
 --  (the same one used for the name of the TOC file).  If the value '*' is
 --  supplied, messages from all addons will be handled.
 -- @param priority A signed integer indicating relative priority, lower value
@@ -109,7 +109,7 @@ end
 --  all table entries will be removed.
 --
 -- Note: A '*' value passed as addon is not a wildcard in this context,
--- it will only matche instances where the handler was installed with
+-- it will only match instances where the handler was installed with
 -- '*' as the addon.
 function GreenWallAPI.ClearMessageHandlers(addon)
     if addon == nil then
