@@ -176,9 +176,7 @@ function GreenWall_OnLoad(self)
     self:RegisterEvent('CHAT_MSG_CHANNEL_LEAVE')
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE')
     self:RegisterEvent('CHAT_MSG_GUILD')
-    self:RegisterEvent('CHAT_MSG_LOOT')
     self:RegisterEvent('CHAT_MSG_OFFICER')
-    self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT')
     self:RegisterEvent('CHAT_MSG_SYSTEM')
     self:RegisterEvent('GUILD_ROSTER_UPDATE')
     self:RegisterEvent('PLAYER_ENTERING_WORLD')
@@ -297,18 +295,6 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
 
-    elseif event == 'CHAT_MSG_LOOT' then
-
-        local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
-        item = gw.GetItemString(message)
-        if item and gw.IsLegendary(item) then
-            if gw.iCmp(gw.GlobalName(sender), gw.player) then
-                newmsg = message:gsub('You receive', gw.player .. ' receives') -- Convert to third-person
-                gw.config.channel.guild:send(GW_MTYPE_LOOT, newmsg)
-            end
-        end
-
     elseif event == 'CHAT_MSG_OFFICER' then
 
         -- Messages will be forwarded by the ChatEdit_ParseText hook
@@ -320,14 +306,6 @@ function GreenWall_OnEvent(self, event, ...)
         local prefix, payload, dist, sender = select(1, ...)
         if prefix == 'GreenWall' and dist == 'GUILD' then
             gw.ReceiveLocal(gw.GlobalName(sender), payload)
-        end
-
-    elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
-
-        local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
-        if gw.iCmp(gw.GlobalName(sender), gw.player) then
-            gw.config.channel.guild:send(GW_MTYPE_ACHIEVEMENT, message)
         end
 
     elseif event == 'CHAT_MSG_CHANNEL_JOIN' then

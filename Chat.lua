@@ -37,14 +37,6 @@ function gw.handlerGuildChat(type, guild_id, content, arglist)
     local sender = arglist[2]
     if type == GW_MTYPE_CHAT then
         gw.ReplicateMessage('GUILD', content[1], guild_id, arglist)
-    elseif type == GW_MTYPE_ACHIEVEMENT then
-        if gw.settings:get('achievements') then
-            gw.ReplicateMessage('GUILD_ACHIEVEMENT', content[1], guild_id, arglist)
-        end
-    elseif type == GW_MTYPE_LOOT then
-        if gw.settings:get('achievements') then
-            gw.ReplicateMessage('LOOT', content[1], guild_id, arglist)
-        end
     elseif type == GW_MTYPE_BROADCAST then
         local action, target, rank = unpack(content)
         if action == 'join' then
@@ -95,8 +87,6 @@ end
 -- Accepted values:
 -- 'GUILD'
 -- 'OFFICER'
--- 'GUILD_ACHIEVEMENT'
--- 'LOOT'
 -- 'SYSTEM'
 -- @param message The message to replicate.
 -- @param guild_id (optional) Guild ID of the sender.

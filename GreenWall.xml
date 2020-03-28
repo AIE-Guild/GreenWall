@@ -98,22 +98,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                     <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild tags");</OnLoad>
                 </Scripts>
             </CheckButton>
-            <CheckButton name="$parentOptionAchievements" inherits="InterfaceOptionsCheckButtonTemplate">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionTag"
-                            relativePoint="BOTTOMLEFT">
-                        <Offset>
-                            <AbsDimension x="0" y="-8"/>
-                        </Offset>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild achievement announcements");</OnLoad>
-                </Scripts>
-            </CheckButton>
             <CheckButton name="$parentOptionRoster" inherits="InterfaceOptionsCheckButtonTemplate">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionAchievements"
+                    <Anchor point="TOPLEFT" relativeTo="$parentOptionTag"
                             relativePoint="BOTTOMLEFT">
                         <Offset>
                             <AbsDimension x="0" y="-8"/>
