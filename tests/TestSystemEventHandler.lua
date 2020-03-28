@@ -35,92 +35,92 @@ require('Loader')
 -- Test Cases
 --
 
-TestSystemMessage = {}
+TestSystemEventHandler = {}
 
-function TestSystemMessage:test_online()
+function TestSystemEventHandler:test_online()
     message = "|Hplayer:Eggolas|h[Eggolas]|h has come online."
-    sysmsg = GwSystemMessage:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwOnlineSystemMessage)
+    sysmsg = GwSystemEventHandler:factory(message)
+    lu.assertEquals(getmetatable(sysmsg), GwOnlineSystemEventHandler)
     lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
     lu.assertNil(sysmsg.rank)
 end
 
-function TestSystemMessage:test_online_raw()
+function TestSystemEventHandler:test_online_raw()
     message = "Eggolas has come |cff298F00online|r."
-    sysmsg = GwSystemMessage:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwOnlineSystemMessage)
+    sysmsg = GwSystemEventHandler:factory(message)
+    lu.assertEquals(getmetatable(sysmsg), GwOnlineSystemEventHandler)
     lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
     lu.assertNil(sysmsg.rank)
 end
 
-function TestSystemMessage:test_offline()
+function TestSystemEventHandler:test_offline()
     message = "Eggolas has gone offline."
-    sysmsg = GwSystemMessage:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwOfflineSystemMessage)
+    sysmsg = GwSystemEventHandler:factory(message)
+    lu.assertEquals(getmetatable(sysmsg), GwOfflineSystemEventHandler)
     lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
     lu.assertNil(sysmsg.rank)
 end
 
-function TestSystemMessage:test_join()
+function TestSystemEventHandler:test_join()
     message = "Eggolas has joined the guild."
-    sysmsg = GwSystemMessage:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwJoinSystemMessage)
+    sysmsg = GwSystemEventHandler:factory(message)
+    lu.assertEquals(getmetatable(sysmsg), GwJoinSystemEventHandler)
     lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
     lu.assertNil(sysmsg.rank)
 end
 
-function TestSystemMessage:test_leave()
+function TestSystemEventHandler:test_leave()
     message = "Eggolas has left the guild."
-    sysmsg = GwSystemMessage:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwLeaveSystemMessage)
+    sysmsg = GwSystemEventHandler:factory(message)
+    lu.assertEquals(getmetatable(sysmsg), GwLeaveSystemEventHandler)
     lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
     lu.assertNil(sysmsg.rank)
 end
 
-function TestSystemMessage:test_quit()
+function TestSystemEventHandler:test_quit()
     message = "You are no longer a member of SparkleMotion."
-    sysmsg = GwSystemMessage:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwQuitSystemMessage)
+    sysmsg = GwSystemEventHandler:factory(message)
+    lu.assertEquals(getmetatable(sysmsg), GwQuitSystemEventHandler)
     lu.assertEquals(sysmsg.player, "Ralff-EarthenRing")
     lu.assertNil(sysmsg.rank)
 end
 
-function TestSystemMessage:test_remove()
+function TestSystemEventHandler:test_remove()
     message = "Eggolas has been kicked out of the guild by Ralff."
-    sysmsg = GwSystemMessage:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwRemoveSystemMessage)
+    sysmsg = GwSystemEventHandler:factory(message)
+    lu.assertEquals(getmetatable(sysmsg), GwRemoveSystemEventHandler)
     lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
     lu.assertNil(sysmsg.rank)
 end
 
-function TestSystemMessage:test_kick()
+function TestSystemEventHandler:test_kick()
     message = "You have been kicked out of the guild."
-    sysmsg = GwSystemMessage:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwKickSystemMessage)
+    sysmsg = GwSystemEventHandler:factory(message)
+    lu.assertEquals(getmetatable(sysmsg), GwKickSystemEventHandler)
     lu.assertEquals(sysmsg.player, "Ralff-EarthenRing")
     lu.assertNil(sysmsg.rank)
 end
 
-function TestSystemMessage:test_promote()
+function TestSystemEventHandler:test_promote()
     message = "Rallf has promoted Eggolas to Cohort."
-    sysmsg = GwSystemMessage:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwPromoteSystemMessage)
+    sysmsg = GwSystemEventHandler:factory(message)
+    lu.assertEquals(getmetatable(sysmsg), GwPromoteSystemEventHandler)
     lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
     lu.assertEquals(sysmsg.rank, "Cohort")
 end
 
-function TestSystemMessage:test_demote()
+function TestSystemEventHandler:test_demote()
     message = "Rallf has demoted Eggolas to Pleb."
-    sysmsg = GwSystemMessage:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwDemoteSystemMessage)
+    sysmsg = GwSystemEventHandler:factory(message)
+    lu.assertEquals(getmetatable(sysmsg), GwDemoteSystemEventHandler)
     lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
     lu.assertEquals(sysmsg.rank, "Pleb")
 end
 
-function TestSystemMessage:test_no_match()
+function TestSystemEventHandler:test_no_match()
     message = "Don't panic."
-    sysmsg = GwSystemMessage:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwSystemMessage)
+    sysmsg = GwSystemEventHandler:factory(message)
+    lu.assertEquals(getmetatable(sysmsg), GwSystemEventHandler)
     lu.assertNil(sysmsg.player)
     lu.assertNil(sysmsg.rank)
 end

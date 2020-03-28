@@ -35,47 +35,47 @@ local pat_kick = ERR_GUILD_REMOVE_SELF
 local pat_promote = ERR_GUILD_PROMOTE_SSS:format('(.+)', '(.+)', '(.+)')
 local pat_demote = ERR_GUILD_DEMOTE_SSS:format('(.+)', '(.+)', '(.+)')
 
-GwSystemMessage = { player = nil, rank = nil }
+GwSystemEventHandler = { player = nil, rank = nil }
 
-function GwSystemMessage:new(obj)
+function GwSystemEventHandler:new(obj)
     obj = obj or {}
     setmetatable(obj, self)
     self.__index = self
     return obj
 end
 
-function GwSystemMessage:process()
+function GwSystemEventHandler:process()
 end
 
-GwOnlineSystemMessage = GwSystemMessage:new()
+GwOnlineSystemEventHandler = GwSystemEventHandler:new()
 
-function GwOnlineSystemMessage:process()
+function GwOnlineSystemEventHandler:process()
     gw.config.comember_cache:hold(self.player)
     gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', self.player)
 end
 
-GwOfflineSystemMessage = GwSystemMessage:new()
+GwOfflineSystemEventHandler = GwSystemEventHandler:new()
 
-function GwOfflineSystemMessage:process()
+function GwOfflineSystemEventHandler:process()
     gw.config.comember_cache:hold(self.player)
     gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', self.player)
 end
 
-GwJoinSystemMessage = GwSystemMessage:new()
+GwJoinSystemEventHandler = GwSystemEventHandler:new()
 
-GwLeaveSystemMessage = GwSystemMessage:new()
+GwLeaveSystemEventHandler = GwSystemEventHandler:new()
 
-GwQuitSystemMessage = GwSystemMessage:new()
+GwQuitSystemEventHandler = GwSystemEventHandler:new()
 
-GwRemoveSystemMessage = GwSystemMessage:new()
+GwRemoveSystemEventHandler = GwSystemEventHandler:new()
 
-GwKickSystemMessage = GwSystemMessage:new()
+GwKickSystemEventHandler = GwSystemEventHandler:new()
 
-GwPromoteSystemMessage = GwSystemMessage:new()
+GwPromoteSystemEventHandler = GwSystemEventHandler:new()
 
-GwDemoteSystemMessage = GwSystemMessage:new()
+GwDemoteSystemEventHandler = GwSystemEventHandler:new()
 
-function GwSystemMessage:factory(message)
+function GwSystemEventHandler:factory(message)
     -- Remove coloring
     message = string.gsub(message, "|c%w%w%w%w%w%w%w%w([^|]*)|r", "%1")
 
@@ -84,75 +84,75 @@ function GwSystemMessage:factory(message)
         local _, player = message:match(pat_online)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player online: %s', player)
-        return GwOnlineSystemMessage:new({ player = player })
+        return GwOnlineSystemEventHandler:new({ player = player })
 
     elseif message:match(pat_online_raw) then
 
         local player = message:match(pat_online_raw)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player online: %s', player)
-        return GwOnlineSystemMessage:new({ player = player })
+        return GwOnlineSystemEventHandler:new({ player = player })
 
     elseif message:match(pat_offline) then
 
         local player = message:match(pat_offline)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player offline: %s', player)
-        return GwOfflineSystemMessage:new({ player = player })
+        return GwOfflineSystemEventHandler:new({ player = player })
 
     elseif message:match(pat_join) then
 
         local player = message:match(pat_join)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player join: %s', player)
-        return GwJoinSystemMessage:new({ player = player })
+        return GwJoinSystemEventHandler:new({ player = player })
 
     elseif message:match(pat_leave) then
 
         local player = message:match(pat_leave)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player leave: %s', player)
-        return GwLeaveSystemMessage:new({ player = player })
+        return GwLeaveSystemEventHandler:new({ player = player })
 
     elseif message:match(pat_quit) then
 
         local player = UnitName('player')
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player leave: %s', player)
-        return GwQuitSystemMessage:new({ player = player })
+        return GwQuitSystemEventHandler:new({ player = player })
 
     elseif message:match(pat_removed) then
 
         local player = message:match(pat_removed)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player removed: %s', player)
-        return GwRemoveSystemMessage:new({ player = player })
+        return GwRemoveSystemEventHandler:new({ player = player })
 
     elseif message:match(pat_kick) then
 
         local player = UnitName('player')
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player removed: %s', player)
-        return GwKickSystemMessage:new({ player = player })
+        return GwKickSystemEventHandler:new({ player = player })
 
     elseif message:match(pat_promote) then
 
         local _, player, rank = message:match(pat_promote)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player promoted: %s, %s', player, rank)
-        return GwPromoteSystemMessage:new({ player = player, rank = rank })
+        return GwPromoteSystemEventHandler:new({ player = player, rank = rank })
 
     elseif message:match(pat_demote) then
 
         local _, player, rank = message:match(pat_demote)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player demoted: %s, %s', player, rank)
-        return GwDemoteSystemMessage:new({ player = player, rank = rank })
+        return GwDemoteSystemEventHandler:new({ player = player, rank = rank })
 
     else
 
         -- Unhandled system message
-        return GwSystemMessage:new()
+        return GwSystemEventHandler:new()
 
     end
 
