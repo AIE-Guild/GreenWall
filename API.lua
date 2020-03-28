@@ -132,7 +132,7 @@ end
 
 
 --- Query the hidden channels used by Greenwall.
--- @return An array of integer values for the channels in use.return
+-- @return An array of integer values for the channels in use.
 function GreenWallAPI.GetChannelNumbers()
     local rv = {}
     if gw.config.channel.guild ~= nil then
