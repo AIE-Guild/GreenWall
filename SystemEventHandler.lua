@@ -35,7 +35,7 @@ local pat_kick = ERR_GUILD_REMOVE_SELF
 local pat_promote = ERR_GUILD_PROMOTE_SSS:format('(.+)', '(.+)', '(.+)')
 local pat_demote = ERR_GUILD_DEMOTE_SSS:format('(.+)', '(.+)', '(.+)')
 
-GwSystemEventHandler = { player = nil, rank = nil }
+GwSystemEventHandler = { config = nil, player = nil, rank = nil }
 
 function GwSystemEventHandler:new(obj)
     obj = obj or {}
@@ -44,38 +44,87 @@ function GwSystemEventHandler:new(obj)
     return obj
 end
 
-function GwSystemEventHandler:process()
+function GwSystemEventHandler:run()
 end
 
 GwOnlineSystemEventHandler = GwSystemEventHandler:new()
 
-function GwOnlineSystemEventHandler:process()
-    gw.config.comember_cache:hold(self.player)
+function GwOnlineSystemEventHandler:run()
+    self.config.comember_cache:hold(self.player)
     gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', self.player)
 end
 
 GwOfflineSystemEventHandler = GwSystemEventHandler:new()
 
-function GwOfflineSystemEventHandler:process()
-    gw.config.comember_cache:hold(self.player)
+function GwOfflineSystemEventHandler:run()
+    self.config.comember_cache:hold(self.player)
     gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', self.player)
 end
 
 GwJoinSystemEventHandler = GwSystemEventHandler:new()
 
+function GwJoinSystemEventHandler:run()
+    if self.player == gw.player then
+        gw.Debug(GW_LOG_NOTICE, 'guild join detected.')
+        self.config.channel.guild:send(GW_MTYPE_BROADCAST, 'join')
+    end
+end
+
 GwLeaveSystemEventHandler = GwSystemEventHandler:new()
+
+function GwLeaveSystemEventHandler:run()
+    if self.player == gw.player then
+        gw.Debug(GW_LOG_NOTICE, 'guild quit detected.')
+        self.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
+        self.config:reset()
+    end
+end
 
 GwQuitSystemEventHandler = GwSystemEventHandler:new()
 
+function GwQuitSystemEventHandler:run()
+    gw.Debug(GW_LOG_NOTICE, 'guild quit detected.')
+    self.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
+    self.config:reset()
+end
+
 GwRemoveSystemEventHandler = GwSystemEventHandler:new()
+
+function GwRemoveSystemEventHandler:run()
+    if self.player == gw.player then
+        gw.Debug(GW_LOG_NOTICE, 'guild kick detected.')
+        self.config.channel.guild:send(GW_MTYPE_BROADCAST, 'remove')
+        self.config:reset()
+    end
+end
 
 GwKickSystemEventHandler = GwSystemEventHandler:new()
 
+function GwKickSystemEventHandler:run()
+    gw.Debug(GW_LOG_NOTICE, 'guild kick detected.')
+    self.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
+    self.config:reset()
+end
+
 GwPromoteSystemEventHandler = GwSystemEventHandler:new()
+
+function GwPromoteSystemEventHandler:run()
+    if self.player == gw.player then
+        gw.Debug(GW_LOG_NOTICE, 'you promoted %s to %s', self.target, self.rank)
+        self.config.channel.guild:send(GW_MTYPE_BROADCAST, 'promote', self.target, self.rank)
+    end
+end
 
 GwDemoteSystemEventHandler = GwSystemEventHandler:new()
 
-function GwSystemEventHandler:factory(message)
+function GwDemoteSystemEventHandler:run()
+    if self.player == gw.player then
+        gw.Debug(GW_LOG_NOTICE, 'you demoted %s to %s', self.target, self.rank)
+        self.config.channel.guild:send(GW_MTYPE_BROADCAST, 'demote', self.target, self.rank)
+    end
+end
+
+function GwSystemEventHandler:factory(config, message)
     -- Remove coloring
     message = string.gsub(message, "|c%w%w%w%w%w%w%w%w([^|]*)|r", "%1")
 
@@ -84,75 +133,77 @@ function GwSystemEventHandler:factory(message)
         local _, player = message:match(pat_online)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player online: %s', player)
-        return GwOnlineSystemEventHandler:new({ player = player })
+        return GwOnlineSystemEventHandler:new({ config = config, player = player })
 
     elseif message:match(pat_online_raw) then
 
         local player = message:match(pat_online_raw)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player online: %s', player)
-        return GwOnlineSystemEventHandler:new({ player = player })
+        return GwOnlineSystemEventHandler:new({ config = config, player = player })
 
     elseif message:match(pat_offline) then
 
         local player = message:match(pat_offline)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player offline: %s', player)
-        return GwOfflineSystemEventHandler:new({ player = player })
+        return GwOfflineSystemEventHandler:new({ config = config, player = player })
 
     elseif message:match(pat_join) then
 
         local player = message:match(pat_join)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player join: %s', player)
-        return GwJoinSystemEventHandler:new({ player = player })
+        return GwJoinSystemEventHandler:new({ config = config, player = player })
 
     elseif message:match(pat_leave) then
 
         local player = message:match(pat_leave)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player leave: %s', player)
-        return GwLeaveSystemEventHandler:new({ player = player })
+        return GwLeaveSystemEventHandler:new({ config = config, player = player })
 
     elseif message:match(pat_quit) then
 
         local player = UnitName('player')
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player leave: %s', player)
-        return GwQuitSystemEventHandler:new({ player = player })
+        return GwQuitSystemEventHandler:new({ config = config, player = player })
 
     elseif message:match(pat_removed) then
 
         local player = message:match(pat_removed)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player removed: %s', player)
-        return GwRemoveSystemEventHandler:new({ player = player })
+        return GwRemoveSystemEventHandler:new({ config = config, player = player })
 
     elseif message:match(pat_kick) then
 
         local player = UnitName('player')
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player removed: %s', player)
-        return GwKickSystemEventHandler:new({ player = player })
+        return GwKickSystemEventHandler:new({ config = config, player = player })
 
     elseif message:match(pat_promote) then
 
-        local _, player, rank = message:match(pat_promote)
+        local player, target, rank = message:match(pat_promote)
         player = gw.GlobalName(player)
-        gw.Debug(GW_LOG_NOTICE, 'player promoted: %s, %s', player, rank)
-        return GwPromoteSystemEventHandler:new({ player = player, rank = rank })
+        target = gw.GlobalName(target)
+        gw.Debug(GW_LOG_NOTICE, 'player promoted: %s, %s', target, rank)
+        return GwPromoteSystemEventHandler:new({ config = config, player = player, target = target, rank = rank })
 
     elseif message:match(pat_demote) then
 
-        local _, player, rank = message:match(pat_demote)
+        local player, target, rank = message:match(pat_demote)
         player = gw.GlobalName(player)
-        gw.Debug(GW_LOG_NOTICE, 'player demoted: %s, %s', player, rank)
-        return GwDemoteSystemEventHandler:new({ player = player, rank = rank })
+        target = gw.GlobalName(target)
+        gw.Debug(GW_LOG_NOTICE, 'player demoted: %s, %s', target, rank)
+        return GwDemoteSystemEventHandler:new({ config = config, player = player, target = target, rank = rank })
 
     else
 
         -- Unhandled system message
-        return GwSystemEventHandler:new()
+        return GwSystemEventHandler:new({ config = config })
 
     end
 

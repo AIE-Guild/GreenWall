@@ -32,97 +32,295 @@ lu = require('luaunit')
 require('Loader')
 
 --
+-- Mocks
+--
+local MockChan = {}
+MockChan.__index = MockChan
+
+function MockChan:new()
+    local self = {}
+    setmetatable(self, MockChan)
+    self.input = {}
+    return self
+end
+
+function MockChan:send(mtype, ...)
+    table.insert(self.input, { mtype, ... })
+end
+
+local MockCache = {}
+MockCache.__index = MockCache
+
+function MockCache:new(output)
+    local self = {}
+    setmetatable(self, MockCache)
+    self.input = {}
+    self.output = output and true or false
+    return self
+end
+
+function MockCache:hold(s)
+    table.insert(self.input, s)
+    return self.output
+end
+
+local MockConfig = {}
+MockConfig.__index = MockConfig
+
+function MockConfig:new(holddown)
+    local self = {}
+    setmetatable(self, MockConfig)
+    self.channel = { guild = MockChan:new() }
+    self.comember_cache = MockCache:new(holddown)
+    self.is_reset = false
+    return self
+end
+
+function MockConfig:reset()
+    self.is_reset = true
+end
+
+
+--
 -- Test Cases
 --
 
 TestSystemEventHandler = {}
 
-function TestSystemEventHandler:test_online()
+function TestSystemEventHandler:test_online_init()
+    config = MockConfig:new()
     message = "|Hplayer:Eggolas|h[Eggolas]|h has come online."
-    sysmsg = GwSystemEventHandler:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwOnlineSystemEventHandler)
-    lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
-    lu.assertNil(sysmsg.rank)
+    handler = GwSystemEventHandler:factory(config, message)
+    lu.assertEquals(getmetatable(handler), GwOnlineSystemEventHandler)
+    lu.assertEquals(handler.player, "Eggolas-EarthenRing")
+    lu.assertNil(handler.rank)
+    lu.assertEquals(handler.config, config)
 end
 
-function TestSystemEventHandler:test_online_raw()
+function TestSystemEventHandler:test_online_raw_init()
+    config = MockConfig:new()
     message = "Eggolas has come |cff298F00online|r."
-    sysmsg = GwSystemEventHandler:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwOnlineSystemEventHandler)
-    lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
-    lu.assertNil(sysmsg.rank)
+    handler = GwSystemEventHandler:factory(config, message)
+    lu.assertEquals(getmetatable(handler), GwOnlineSystemEventHandler)
+    lu.assertEquals(handler.player, "Eggolas-EarthenRing")
+    lu.assertNil(handler.rank)
 end
 
-function TestSystemEventHandler:test_offline()
+function TestSystemEventHandler:test_online_run()
+    config = MockConfig:new()
+    message = "|Hplayer:Eggolas|h[Eggolas]|h has come online."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertEquals(config.comember_cache.input[1], "Eggolas-EarthenRing")
+end
+
+function TestSystemEventHandler:test_online_run_cached()
+    config = MockConfig:new(true)
+    message = "|Hplayer:Eggolas|h[Eggolas]|h has come online."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertEquals(config.comember_cache.input[1], "Eggolas-EarthenRing")
+end
+
+function TestSystemEventHandler:test_offline_init()
+    config = MockConfig:new()
     message = "Eggolas has gone offline."
-    sysmsg = GwSystemEventHandler:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwOfflineSystemEventHandler)
-    lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
-    lu.assertNil(sysmsg.rank)
+    handler = GwSystemEventHandler:factory(config, message)
+    lu.assertEquals(getmetatable(handler), GwOfflineSystemEventHandler)
+    lu.assertEquals(handler.player, "Eggolas-EarthenRing")
+    lu.assertNil(handler.rank)
 end
 
-function TestSystemEventHandler:test_join()
+function TestSystemEventHandler:test_offline_run()
+    config = MockConfig:new()
+    message = "Eggolas has gone offline."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertEquals(config.comember_cache.input[1], "Eggolas-EarthenRing")
+end
+
+function TestSystemEventHandler:test_offline_run_cached()
+    config = MockConfig:new(true)
+    message = "Eggolas has gone offline."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertEquals(config.comember_cache.input[1], "Eggolas-EarthenRing")
+end
+
+function TestSystemEventHandler:test_join_init()
+    config = MockConfig:new()
     message = "Eggolas has joined the guild."
-    sysmsg = GwSystemEventHandler:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwJoinSystemEventHandler)
-    lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
-    lu.assertNil(sysmsg.rank)
+    handler = GwSystemEventHandler:factory(config, message)
+    lu.assertEquals(getmetatable(handler), GwJoinSystemEventHandler)
+    lu.assertEquals(handler.player, "Eggolas-EarthenRing")
+    lu.assertNil(handler.rank)
 end
 
-function TestSystemEventHandler:test_leave()
+function TestSystemEventHandler:test_join_run()
+    config = MockConfig:new()
+    message = "Ralff has joined the guild."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertEquals(config.channel.guild.input[1], { GW_MTYPE_BROADCAST, "join" })
+end
+
+function TestSystemEventHandler:test_join_run_skip()
+    config = MockConfig:new()
+    message = "Eggolas has joined the guild."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertNil(config.channel.guild.input[1])
+end
+
+function TestSystemEventHandler:test_leave_init()
+    config = MockConfig:new()
     message = "Eggolas has left the guild."
-    sysmsg = GwSystemEventHandler:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwLeaveSystemEventHandler)
-    lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
-    lu.assertNil(sysmsg.rank)
+    handler = GwSystemEventHandler:factory(config, message)
+    lu.assertEquals(getmetatable(handler), GwLeaveSystemEventHandler)
+    lu.assertEquals(handler.player, "Eggolas-EarthenRing")
+    lu.assertNil(handler.rank)
 end
 
-function TestSystemEventHandler:test_quit()
+function TestSystemEventHandler:test_leave_run()
+    config = MockConfig:new()
+    message = "Ralff has left the guild."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertEquals(config.channel.guild.input[1], { GW_MTYPE_BROADCAST, "leave" })
+    lu.assertTrue(config.is_reset)
+end
+
+function TestSystemEventHandler:test_leave_run_skip()
+    config = MockConfig:new()
+    message = "Eggolas has left the guild."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertNil(config.channel.guild.input[1])
+    lu.assertFalse(config.is_reset)
+end
+
+function TestSystemEventHandler:test_quit_init()
+    config = MockConfig:new()
     message = "You are no longer a member of SparkleMotion."
-    sysmsg = GwSystemEventHandler:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwQuitSystemEventHandler)
-    lu.assertEquals(sysmsg.player, "Ralff-EarthenRing")
-    lu.assertNil(sysmsg.rank)
+    handler = GwSystemEventHandler:factory(config, message)
+    lu.assertEquals(getmetatable(handler), GwQuitSystemEventHandler)
+    lu.assertEquals(handler.player, "Ralff-EarthenRing")
+    lu.assertNil(handler.rank)
 end
 
-function TestSystemEventHandler:test_remove()
+function TestSystemEventHandler:test_quit_run()
+    config = MockConfig:new()
+    message = "You are no longer a member of SparkleMotion."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertEquals(config.channel.guild.input[1], { GW_MTYPE_BROADCAST, "leave" })
+    lu.assertTrue(config.is_reset)
+end
+
+function TestSystemEventHandler:test_remove_init()
+    config = MockConfig:new()
     message = "Eggolas has been kicked out of the guild by Ralff."
-    sysmsg = GwSystemEventHandler:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwRemoveSystemEventHandler)
-    lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
-    lu.assertNil(sysmsg.rank)
+    handler = GwSystemEventHandler:factory(config, message)
+    lu.assertEquals(getmetatable(handler), GwRemoveSystemEventHandler)
+    lu.assertEquals(handler.player, "Eggolas-EarthenRing")
+    lu.assertNil(handler.rank)
 end
 
-function TestSystemEventHandler:test_kick()
+function TestSystemEventHandler:test_remove_run()
+    config = MockConfig:new()
+    message = "Ralff has been kicked out of the guild by Eggolas."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertEquals(config.channel.guild.input[1], { GW_MTYPE_BROADCAST, "remove" })
+    lu.assertTrue(config.is_reset)
+end
+
+function TestSystemEventHandler:test_remove_run_skip()
+    config = MockConfig:new()
+    message = "Eggolas has been kicked out of the guild by Ralff."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertNil(config.channel.guild.input[1])
+    lu.assertFalse(config.is_reset)
+end
+
+function TestSystemEventHandler:test_kick_init()
+    config = MockConfig:new()
     message = "You have been kicked out of the guild."
-    sysmsg = GwSystemEventHandler:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwKickSystemEventHandler)
-    lu.assertEquals(sysmsg.player, "Ralff-EarthenRing")
-    lu.assertNil(sysmsg.rank)
+    handler = GwSystemEventHandler:factory(config, message)
+    lu.assertEquals(getmetatable(handler), GwKickSystemEventHandler)
+    lu.assertEquals(handler.player, "Ralff-EarthenRing")
+    lu.assertNil(handler.rank)
 end
 
-function TestSystemEventHandler:test_promote()
-    message = "Rallf has promoted Eggolas to Cohort."
-    sysmsg = GwSystemEventHandler:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwPromoteSystemEventHandler)
-    lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
-    lu.assertEquals(sysmsg.rank, "Cohort")
+function TestSystemEventHandler:test_kick_run()
+    config = MockConfig:new()
+    message = "You have been kicked out of the guild."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertEquals(config.channel.guild.input[1], { GW_MTYPE_BROADCAST, "leave" })
+    lu.assertTrue(config.is_reset)
 end
 
-function TestSystemEventHandler:test_demote()
-    message = "Rallf has demoted Eggolas to Pleb."
-    sysmsg = GwSystemEventHandler:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwDemoteSystemEventHandler)
-    lu.assertEquals(sysmsg.player, "Eggolas-EarthenRing")
-    lu.assertEquals(sysmsg.rank, "Pleb")
+function TestSystemEventHandler:test_promote_init()
+    config = MockConfig:new()
+    message = "Ralff has promoted Eggolas to Cohort."
+    handler = GwSystemEventHandler:factory(config, message)
+    lu.assertEquals(getmetatable(handler), GwPromoteSystemEventHandler)
+    lu.assertEquals(handler.player, "Ralff-EarthenRing")
+    lu.assertEquals(handler.target, "Eggolas-EarthenRing")
+    lu.assertEquals(handler.rank, "Cohort")
+end
+
+function TestSystemEventHandler:test_promote_run()
+    config = MockConfig:new()
+    message = "Ralff has promoted Eggolas to Cohort."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertEquals(config.channel.guild.input[1], { GW_MTYPE_BROADCAST, "promote", "Eggolas-EarthenRing", "Cohort" })
+end
+
+function TestSystemEventHandler:test_promote_run_skip()
+    config = MockConfig:new()
+    message = "Stigg has promoted Eggolas to Cohort."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertNil(config.channel.guild.input[1])
+end
+
+function TestSystemEventHandler:test_demote_init()
+    config = MockConfig:new()
+    message = "Ralff has demoted Eggolas to Pleb."
+    handler = GwSystemEventHandler:factory(config, message)
+    lu.assertEquals(getmetatable(handler), GwDemoteSystemEventHandler)
+    lu.assertEquals(handler.player, "Ralff-EarthenRing")
+    lu.assertEquals(handler.target, "Eggolas-EarthenRing")
+    lu.assertEquals(handler.rank, "Pleb")
+end
+
+function TestSystemEventHandler:test_demote_run()
+    config = MockConfig:new()
+    message = "Ralff has demoted Eggolas to Pleb."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertEquals(config.channel.guild.input[1], { GW_MTYPE_BROADCAST, "demote", "Eggolas-EarthenRing", "Pleb" })
+end
+
+function TestSystemEventHandler:test_demote_run_skip()
+    config = MockConfig:new()
+    message = "Stigg has demoted Eggolas to Pleb."
+    handler = GwSystemEventHandler:factory(config, message)
+    handler:run()
+    lu.assertNil(config.channel.guild.input[1])
 end
 
 function TestSystemEventHandler:test_no_match()
+    config = MockConfig:new()
     message = "Don't panic."
-    sysmsg = GwSystemEventHandler:factory(message)
-    lu.assertEquals(getmetatable(sysmsg), GwSystemEventHandler)
-    lu.assertNil(sysmsg.player)
-    lu.assertNil(sysmsg.rank)
+    handler = GwSystemEventHandler:factory(config, message)
+    lu.assertEquals(getmetatable(handler), GwSystemEventHandler)
+    lu.assertNil(handler.player)
+    lu.assertNil(handler.rank)
 end
 
 
