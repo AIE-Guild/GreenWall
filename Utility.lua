@@ -92,15 +92,18 @@ end
 function gw.Debug(level, ...)
     local function get_caller()
         local s = debugstack(3, 1, 0)
-        local loc = strmatch(s, '([%a%._-]+:%d+): in function')
-        local fun = strmatch(s, 'in function \`([%a_-]+)\'')
-        return fun and loc .. '(' .. fun .. ')' or loc
+        local file, loc = strmatch(s, '%[string "(.+)"%]:(%d+): in function')
+        local f = strmatch(s, 'in function \`([%a_-]+)\'')
+        file = file == nil and "" or file
+        loc = loc == nil and "" or loc
+        f = f == nil and "?" or f
+        return format('%s:%s:%s', file, loc, f)
     end
 
     if gw.settings then
         if level <= gw.settings:get('debug') then
             local msg = string.format(unpack({ ... }))
-            local trace = format('[debug/%d@%s] %s', level, get_caller(), msg)
+            local trace = format('debug/%d [%s] %s', level, get_caller(), msg)
             gw.Log(trace)
             if gw.settings:get('verbose') then
                 DEFAULT_CHAT_FRAME:AddMessage(format('|cff009a7dGreenWall:|r |cff778899%s|r', trace))
