@@ -407,96 +407,9 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_SYSTEM' then
 
         local message = select(1, ...)
-
         gw.Debug(GW_LOG_DEBUG, 'event=%s, message=%q', event, message)
-
-        local pat_online = ERR_FRIEND_ONLINE_SS:format('(.+)', '(.+)'):gsub('([%[%]])', '%%%1')
-        local pat_offline = ERR_FRIEND_OFFLINE_S:format('(.+)')
-        local pat_join = ERR_GUILD_JOIN_S:format('(.+)')
-        local pat_leave = ERR_GUILD_LEAVE_S:format('(.+)')
-        local pat_quit = ERR_GUILD_QUIT_S:format(gw.player)
-        local pat_removed = ERR_GUILD_REMOVE_SS:format('(.+)', '(.+)')
-        local pat_kick = ERR_GUILD_REMOVE_SS:format('(.+)', '(.+)')
-        local pat_promote = ERR_GUILD_PROMOTE_SSS:format('(.+)', '(.+)', '(.+)')
-        local pat_demote = ERR_GUILD_DEMOTE_SSS:format('(.+)', '(.+)', '(.+)')
-
-        if message:match(pat_online) then
-
-            local _, player = message:match(pat_online)
-            player = gw.GlobalName(player)
-            gw.config.comember_cache:hold(player)
-            gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
-
-        elseif message:match(pat_offline) then
-
-            local player = message:match(pat_offline)
-            player = gw.GlobalName(player)
-            gw.config.comember_cache:hold(player)
-            gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
-
-        elseif message:match(pat_join) then
-
-            local player = message:match(pat_join)
-            if gw.GlobalName(player) == gw.player then
-                -- We have joined the guild.
-                gw.Debug(GW_LOG_NOTICE, 'guild join detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'join')
-            end
-
-        elseif message:match(pat_leave) then
-
-            local player = message:match(pat_leave)
-            if gw.GlobalName(player) == gw.player then
-                -- We have left the guild.
-                gw.Debug(GW_LOG_NOTICE, 'guild quit detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
-                gw.config:reset()
-            end
-
-        elseif message:match(pat_quit) then
-
-            local player = message:match(pat_quit)
-            if gw.GlobalName(player) == gw.player then
-                -- We have left the guild.
-                gw.Debug(GW_LOG_NOTICE, 'guild quit detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
-                gw.config:reset()
-            end
-
-        elseif message:match(pat_removed) then
-
-            local player = message:match(pat_removed)
-            if gw.GlobalName(player) == gw.player then
-                -- We have been kicked from the guild.
-                gw.Debug(GW_LOG_NOTICE, 'guild kick detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
-                gw.config:reset()
-            end
-
-        elseif message:match(pat_kick) then
-
-            local target, player = message:match(pat_kick)
-            if gw.GlobalName(player) == gw.player then
-                gw.Debug(GW_LOG_NOTICE, 'you kicked %s', target)
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'remove', target)
-            end
-
-        elseif message:match(pat_promote) then
-
-            local player, target, rank = message:match(pat_promote)
-            if gw.GlobalName(player) == gw.player then
-                gw.Debug(GW_LOG_NOTICE, 'you promoted %s to %s', target, rank)
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'promote', target, rank)
-            end
-
-        elseif message:match(pat_demote) then
-
-            local player, target, rank = message:match(pat_demote)
-            if gw.GlobalName(player) == gw.player then
-                gw.Debug(GW_LOG_NOTICE, 'you demoted %s to %s', target, rank)
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'demote', target, rank)
-            end
-        end
+        handler = GwSystemEventHandler:factory(gw.config, message)
+        handler:run()
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
 
