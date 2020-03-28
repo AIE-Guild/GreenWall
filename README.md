@@ -123,12 +123,6 @@ You will be able to set the following options.
   
   Default: on
 
-- __achievements__ - _Show Co-Guild Achievement Announcements_
-
-  Show achievements from other co-guilds. 
-  
-  Default: off
-
 - __roster__ - _Show Co-Guild Roster Announcements_
 
   Show guild join and leave messages from other co-guilds. 
@@ -186,12 +180,6 @@ To view the current configuration, you would enter one of the following.
   Show co-guild identifier in messages. 
   
   Default: on
-
-- achievements [ on | off ]
-  
-  Show achievements from other co-guilds. 
-
-  Default: off
 
 - roster [ on | off ]
 
@@ -269,7 +257,7 @@ to establish communication with other co-guilds in a confederation.
 
 - Bridging
 
-  Replication of chat events within one guild into the guild, achievement, and officer chat of another guild.
+  Replication of chat events within one guild into the guild and officer chat of another guild.
 
 - Confederation
 

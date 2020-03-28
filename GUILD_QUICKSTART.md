@@ -20,7 +20,7 @@ Definitions
 -----------
 
 Bridging
-> Replication of chat events within one guild into the guild, achievement, and officer chat of another guild.
+> Replication of chat events within one guild into the guild and officer chat channels of another guild.
 
 Confederation
 > A large WoW guild that is partitioned into smaller guilds to comply with Blizzard's guild size limit.
