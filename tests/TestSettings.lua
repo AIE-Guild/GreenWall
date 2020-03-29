@@ -71,7 +71,6 @@ function TestSettingsCreate:test_initialize()
         lu.assertStrMatches(tab.created, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d')
         lu.assertStrMatches(tab.updated, '%d%d%d%d%-%d%d%-%d%d %d%d:%d%d:%d%d')
         lu.assertEquals(tab.tag, true)
-        lu.assertEquals(tab.achievements, false)
         lu.assertEquals(tab.roster, true)
         lu.assertEquals(tab.rank, false)
         lu.assertEquals(tab.debug, GW_LOG_NONE)
@@ -96,7 +95,6 @@ function TestSettingsLoad:setUp()
     GreenWall = {
         created = "2018-01-01 17:28:47",
         updated = "2018-01-01 01:04:46",
-        achievements = true,
         roster = false,
     }
     GreenWallAccount = {
@@ -123,7 +121,6 @@ end
 function TestSettingsLoad:test_character()
     local settings = GwSettings:new()
     lu.assertEquals(GreenWall.tag, true)
-    lu.assertEquals(GreenWall.achievements, true)
     lu.assertEquals(GreenWall.roster, false)
     lu.assertEquals(GreenWall.rank, false)
 end
@@ -149,14 +146,12 @@ function TestSettingsAccess:setUp()
         created = "2018-01-01 17:28:47",
         updated = "2018-01-01 01:04:46",
         tag = true,
-        achievements = true,
         logsize = 1024,
     }
     GreenWallAccount = {
         created = "2018-01-01 17:28:47",
         updated = "2018-01-01 01:04:46",
         tag = false,
-        achievements = false,
         logsize = 2048,
     }
 end
@@ -167,22 +162,18 @@ function TestSettingsAccess:test_get()
     lu.assertEquals(settings:get('mode'), GW_MODE_ACCOUNT)
 
     lu.assertEquals(settings:get('tag'), false)
-    lu.assertEquals(settings:get('achievements'), false)
     lu.assertEquals(settings:get('logsize'), 2048)
 
     lu.assertEquals(settings:get('tag',GW_MODE_CHARACTER), true)
-    lu.assertEquals(settings:get('achievements', GW_MODE_CHARACTER), true)
     lu.assertEquals(settings:get('logsize', GW_MODE_CHARACTER), 1024)
 
     settings:set('mode', GW_MODE_CHARACTER)
     lu.assertEquals(settings:get('mode'), GW_MODE_CHARACTER)
 
     lu.assertEquals(settings:get('tag'), true)
-    lu.assertEquals(settings:get('achievements'), true)
     lu.assertEquals(settings:get('logsize'), 1024)
 
     lu.assertEquals(settings:get('tag', GW_MODE_ACCOUNT), false)
-    lu.assertEquals(settings:get('achievements', GW_MODE_ACCOUNT), false)
     lu.assertEquals(settings:get('logsize', GW_MODE_ACCOUNT), 2048)
 end
 

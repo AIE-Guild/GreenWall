@@ -61,10 +61,6 @@ function GwSettings:new()
             value = true,
             desc = "co-guild tagging"
         },
-        achievements = {
-            value = false,
-            desc = "co-guild achievement announcements"
-        },
         roster = {
             value = true,
             desc = "co-guild roster announcements"
