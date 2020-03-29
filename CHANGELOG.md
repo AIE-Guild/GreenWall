@@ -6,6 +6,13 @@ This project uses [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Updated debug message call stack parsing for 8.3.
 
+### Removed
+- Removed unnecessary local co-guild use of the addon communication channel.
+
+### Added
+- `GreenWallAPI.GetChannelNumbers` function to query the custom chat channels in
+  use by GreenWall
+
 ### Changed
 - Updated the TOC for WoW 8.3.0.
 - Refactored CHAT_MSG_SYSTEM handling to use an abstract factory and added

@@ -145,3 +145,15 @@ Arguments:
 
 > Note: A `*` value passed as add-on is not a wildcard in this context, it will only matched instances where the handler was installed with `*` as the add-on.
 
+### Get channel information
+
+Query the hidden channels used by Greenwall.
+
+```lua
+GreenWallAPI.GetChannelNumbers()
+```
+
+Returns:
+
+- An array of integer values for the channels in use.
+
