@@ -7,8 +7,6 @@ This project uses [Semantic Versioning](http://semver.org/).
 - Removed replication of achievements and loot announcements between co-guilds.
   The `SendChatMessage` function was made partially protected in 8.2.5, and
   events that are not triggered by hardware events cannot use the function.
-
-### Removed
 - Removed unnecessary local co-guild use of the addon communication channel.
 
 ### Added
