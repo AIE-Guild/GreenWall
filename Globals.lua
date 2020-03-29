@@ -90,8 +90,6 @@ gw.usage = [[
         -- Toggle output logging to the GreenWall.lua file.
   logsize <length>
         -- Specify the maximum number of log entries to keep.
-  admin reload
-        -- (officer only) Force a reload of the configuration by all online guild members.
 
 ]]
 

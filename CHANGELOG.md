@@ -8,6 +8,13 @@ This project uses [Semantic Versioning](http://semver.org/).
   The `SendChatMessage` function was made partially protected in 8.2.5, and
   events that are not triggered by hardware events cannot use the function.
 
+### Removed
+- Removed unnecessary local co-guild use of the addon communication channel.
+
+### Added
+- `GreenWallAPI.GetChannelNumbers` function to query the custom chat channels in
+  use by GreenWall
+
 ### Changed
 - Updated the TOC for WoW 8.3.0.
 - Refactored CHAT_MSG_SYSTEM handling to use an abstract factory and added

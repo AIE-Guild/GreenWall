@@ -109,17 +109,6 @@ local function GwSlashCmd(message, editbox)
 
         GwSettingCmd(command, argstr)
 
-    elseif command == 'admin' then
-
-        if gw.IsOfficer() then
-            if argstr == 'reload' then
-                gw.SendLocal(GW_MTYPE_CONTROL, 'reload')
-                gw.Write('Broadcast configuration reload request.')
-            end
-        else
-            gw.Error('The admin command may only be issued by an officer.')
-        end
-
     elseif command == 'reload' or command == 'refresh' then
 
         gw.Write('Reloading configuration.')
@@ -170,7 +159,6 @@ function GreenWall_OnLoad(self)
     --
     self:RegisterEvent('ADDON_LOADED')
     self:RegisterEvent('CHANNEL_UI_UPDATE')
-    self:RegisterEvent('CHAT_MSG_ADDON')
     self:RegisterEvent('CHAT_MSG_CHANNEL')
     self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN')
     self:RegisterEvent('CHAT_MSG_CHANNEL_LEAVE')
@@ -300,13 +288,6 @@ function GreenWall_OnEvent(self, event, ...)
         -- Messages will be forwarded by the ChatEdit_ParseText hook
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
-
-    elseif event == 'CHAT_MSG_ADDON' then
-
-        local prefix, payload, dist, sender = select(1, ...)
-        if prefix == 'GreenWall' and dist == 'GUILD' then
-            gw.ReceiveLocal(gw.GlobalName(sender), payload)
-        end
 
     elseif event == 'CHAT_MSG_CHANNEL_JOIN' then
 
