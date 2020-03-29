@@ -70,8 +70,6 @@ gw.usage = [[
         -- Reload the configuration.
   reset
         -- Reset communications and reload the configuration.
-  achievements <on|off>
-        -- Toggle display of confederation achievements.
   roster <on|off>
         -- Toggle display of confederation online, offline, join, and leave messages.
   rank <on|off>

@@ -3,10 +3,10 @@
 This project uses [Semantic Versioning](http://semver.org/).
 
 ## [1.11.0] -- Unreleased
-### Fixed
-- Updated debug message call stack parsing for 8.3.
-
 ### Removed
+- Removed replication of achievements and loot announcements between co-guilds.
+  The `SendChatMessage` function was made partially protected in 8.2.5, and
+  events that are not triggered by hardware events cannot use the function.
 - Removed unnecessary local co-guild use of the addon communication channel.
 
 ### Added
@@ -17,6 +17,9 @@ This project uses [Semantic Versioning](http://semver.org/).
 - Updated the TOC for WoW 8.3.0.
 - Refactored CHAT_MSG_SYSTEM handling to use an abstract factory and added
   full unit testing for the polymorphic classes. 
+
+### Fixed
+- Updated debug message call stack parsing for 8.3.
 
 ## [1.10.1] -- 2019-09-24
 ### Updated
