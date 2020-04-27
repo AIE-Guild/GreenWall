@@ -48,16 +48,8 @@ function gw.handlerGuildChat(type, guild_id, content, arglist)
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_LEAVE_S, sender), guild_id, arglist)
             end
         elseif action == 'remove' then
-            if gw.settings:get('rank') then
+            if gw.settings:get('roster') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_REMOVE_SS, target, sender), guild_id, arglist)
-            end
-        elseif action == 'promote' then
-            if gw.settings:get('rank') then
-                gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_PROMOTE_SSS, sender, target, rank), guild_id, arglist)
-            end
-        elseif action == 'demote' then
-            if gw.settings:get('rank') then
-                gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_DEMOTE_SSS, sender, target, rank), guild_id, arglist)
             end
         end
     else

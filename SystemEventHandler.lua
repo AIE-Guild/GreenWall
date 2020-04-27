@@ -32,10 +32,8 @@ local pat_leave = ERR_GUILD_LEAVE_S:format('(.+)')
 local pat_quit = ERR_GUILD_QUIT_S:format('(.+)')
 local pat_removed = ERR_GUILD_REMOVE_SS:format('(.+)', '(.+)')
 local pat_kick = ERR_GUILD_REMOVE_SELF
-local pat_promote = ERR_GUILD_PROMOTE_SSS:format('(.+)', '(.+)', '(.+)')
-local pat_demote = ERR_GUILD_DEMOTE_SSS:format('(.+)', '(.+)', '(.+)')
 
-GwSystemEventHandler = { config = nil, player = nil, rank = nil }
+GwSystemEventHandler = { config = nil, player = nil }
 
 function GwSystemEventHandler:new(obj)
     obj = obj or {}
@@ -108,22 +106,6 @@ end
 
 GwPromoteSystemEventHandler = GwSystemEventHandler:new()
 
-function GwPromoteSystemEventHandler:run()
-    if self.player == gw.player then
-        gw.Debug(GW_LOG_NOTICE, 'you promoted %s to %s', self.target, self.rank)
-        self.config.channel.guild:send(GW_MTYPE_BROADCAST, 'promote', self.target, self.rank)
-    end
-end
-
-GwDemoteSystemEventHandler = GwSystemEventHandler:new()
-
-function GwDemoteSystemEventHandler:run()
-    if self.player == gw.player then
-        gw.Debug(GW_LOG_NOTICE, 'you demoted %s to %s', self.target, self.rank)
-        self.config.channel.guild:send(GW_MTYPE_BROADCAST, 'demote', self.target, self.rank)
-    end
-end
-
 function GwSystemEventHandler:factory(config, message)
     -- Remove coloring
     message = string.gsub(message, "|c%w%w%w%w%w%w%w%w([^|]*)|r", "%1")
@@ -183,22 +165,6 @@ function GwSystemEventHandler:factory(config, message)
         player = gw.GlobalName(player)
         gw.Debug(GW_LOG_NOTICE, 'player removed: %s', player)
         return GwKickSystemEventHandler:new({ config = config, player = player })
-
-    elseif message:match(pat_promote) then
-
-        local player, target, rank = message:match(pat_promote)
-        player = gw.GlobalName(player)
-        target = gw.GlobalName(target)
-        gw.Debug(GW_LOG_NOTICE, 'player promoted: %s, %s', target, rank)
-        return GwPromoteSystemEventHandler:new({ config = config, player = player, target = target, rank = rank })
-
-    elseif message:match(pat_demote) then
-
-        local player, target, rank = message:match(pat_demote)
-        player = gw.GlobalName(player)
-        target = gw.GlobalName(target)
-        gw.Debug(GW_LOG_NOTICE, 'player demoted: %s, %s', target, rank)
-        return GwDemoteSystemEventHandler:new({ config = config, player = player, target = target, rank = rank })
 
     else
 

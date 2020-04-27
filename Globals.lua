@@ -72,8 +72,6 @@ gw.usage = [[
         -- Reset communications and reload the configuration.
   roster <on|off>
         -- Toggle display of confederation online, offline, join, and leave messages.
-  rank <on|off>
-        -- Toggle display of confederation promotion and demotion messages.
   tag <on|off>
         -- Show co-guild identifier in messages.
   ochat <on|off>
