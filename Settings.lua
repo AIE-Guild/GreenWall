@@ -65,10 +65,6 @@ function GwSettings:new()
             value = true,
             desc = "co-guild roster announcements"
         },
-        rank = {
-            value = false,
-            desc = "co-guild rank announcements"
-        },
         debug = {
             value = GW_LOG_NONE,
             min = 0,
