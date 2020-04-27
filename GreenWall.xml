@@ -111,22 +111,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                     <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild roster announcements");</OnLoad>
                 </Scripts>
             </CheckButton>
-            <CheckButton name="$parentOptionRank" inherits="InterfaceOptionsCheckButtonTemplate">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRoster"
-                            relativePoint="BOTTOMLEFT">
-                        <Offset>
-                            <AbsDimension x="0" y="-8"/>
-                        </Offset>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild rank announcements");</OnLoad>
-                </Scripts>
-            </CheckButton>
             <Slider name="$parentOptionJoinDelay" inherits="OptionsSliderTemplate">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRank" relativeFrom="BOTTOMLEFT">
+                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRoster" relativeFrom="BOTTOMLEFT">
                         <Offset>
                             <AbsDimension x="8" y="-64"/>
                         </Offset>

@@ -129,12 +129,6 @@ You will be able to set the following options.
   
   Default: on 
 
-- __rank__ - _Show Co-Guild Rank Announcements_
-
-  Show promotion and demotion messages from other co-guilds. 
-
-  Default: off 
-  
 - __joindelay__ - _Channel Join Delay_
 
   Adjust the time in seconds GreenWall will wait for a the system default channels (e.g. General, Local Defense). 
@@ -186,12 +180,6 @@ To view the current configuration, you would enter one of the following.
   Show guild join and leave messages from other co-guilds. 
 
   Default: on 
-
-- rank [ on | off ]
-
-  Show promotion and demotion messages from other co-guilds. 
-  
-  Default: off 
 
 - ochat [ on | off ]
 
