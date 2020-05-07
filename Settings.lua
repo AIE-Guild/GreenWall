@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -61,17 +61,9 @@ function GwSettings:new()
             value = true,
             desc = "co-guild tagging"
         },
-        achievements = {
-            value = false,
-            desc = "co-guild achievement announcements"
-        },
         roster = {
             value = true,
             desc = "co-guild roster announcements"
-        },
-        rank = {
-            value = false,
-            desc = "co-guild rank announcements"
         },
         debug = {
             value = GW_LOG_NONE,

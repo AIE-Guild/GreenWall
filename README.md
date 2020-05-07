@@ -123,24 +123,12 @@ You will be able to set the following options.
   
   Default: on
 
-- __achievements__ - _Show Co-Guild Achievement Announcements_
-
-  Show achievements from other co-guilds. 
-  
-  Default: off
-
 - __roster__ - _Show Co-Guild Roster Announcements_
 
   Show guild join and leave messages from other co-guilds. 
   
   Default: on 
 
-- __rank__ - _Show Co-Guild Rank Announcements_
-
-  Show promotion and demotion messages from other co-guilds. 
-
-  Default: off 
-  
 - __joindelay__ - _Channel Join Delay_
 
   Adjust the time in seconds GreenWall will wait for a the system default channels (e.g. General, Local Defense). 
@@ -187,23 +175,11 @@ To view the current configuration, you would enter one of the following.
   
   Default: on
 
-- achievements [ on | off ]
-  
-  Show achievements from other co-guilds. 
-
-  Default: off
-
 - roster [ on | off ]
 
   Show guild join and leave messages from other co-guilds. 
 
   Default: on 
-
-- rank [ on | off ]
-
-  Show promotion and demotion messages from other co-guilds. 
-  
-  Default: off 
 
 - ochat [ on | off ]
 
@@ -269,7 +245,7 @@ to establish communication with other co-guilds in a confederation.
 
 - Bridging
 
-  Replication of chat events within one guild into the guild, achievement, and officer chat of another guild.
+  Replication of chat events within one guild into the guild and officer chat of another guild.
 
 - Confederation
 
@@ -400,7 +376,7 @@ issue tracker, please e-mail the details and I will add an issue record.
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

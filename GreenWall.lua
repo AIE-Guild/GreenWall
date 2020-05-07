@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -109,17 +109,6 @@ local function GwSlashCmd(message, editbox)
 
         GwSettingCmd(command, argstr)
 
-    elseif command == 'admin' then
-
-        if gw.IsOfficer() then
-            if argstr == 'reload' then
-                gw.SendLocal(GW_MTYPE_CONTROL, 'reload')
-                gw.Write('Broadcast configuration reload request.')
-            end
-        else
-            gw.Error('The admin command may only be issued by an officer.')
-        end
-
     elseif command == 'reload' or command == 'refresh' then
 
         gw.Write('Reloading configuration.')
@@ -170,15 +159,12 @@ function GreenWall_OnLoad(self)
     --
     self:RegisterEvent('ADDON_LOADED')
     self:RegisterEvent('CHANNEL_UI_UPDATE')
-    self:RegisterEvent('CHAT_MSG_ADDON')
     self:RegisterEvent('CHAT_MSG_CHANNEL')
     self:RegisterEvent('CHAT_MSG_CHANNEL_JOIN')
     self:RegisterEvent('CHAT_MSG_CHANNEL_LEAVE')
     self:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE')
     self:RegisterEvent('CHAT_MSG_GUILD')
-    self:RegisterEvent('CHAT_MSG_LOOT')
     self:RegisterEvent('CHAT_MSG_OFFICER')
-    self:RegisterEvent('CHAT_MSG_GUILD_ACHIEVEMENT')
     self:RegisterEvent('CHAT_MSG_SYSTEM')
     self:RegisterEvent('GUILD_ROSTER_UPDATE')
     self:RegisterEvent('PLAYER_ENTERING_WORLD')
@@ -297,38 +283,11 @@ function GreenWall_OnEvent(self, event, ...)
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
 
-    elseif event == 'CHAT_MSG_LOOT' then
-
-        local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
-        item = gw.GetItemString(message)
-        if item and gw.IsLegendary(item) then
-            if gw.iCmp(gw.GlobalName(sender), gw.player) then
-                newmsg = message:gsub('You receive', gw.player .. ' receives') -- Convert to third-person
-                gw.config.channel.guild:send(GW_MTYPE_LOOT, newmsg)
-            end
-        end
-
     elseif event == 'CHAT_MSG_OFFICER' then
 
         -- Messages will be forwarded by the ChatEdit_ParseText hook
         local message, sender, language, _, _, flags, _, chanNum = select(1, ...)
         gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
-
-    elseif event == 'CHAT_MSG_ADDON' then
-
-        local prefix, payload, dist, sender = select(1, ...)
-        if prefix == 'GreenWall' and dist == 'GUILD' then
-            gw.ReceiveLocal(gw.GlobalName(sender), payload)
-        end
-
-    elseif event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then
-
-        local message, sender, _, _, _, flags, _, chanNum = select(1, ...)
-        gw.Debug(GW_LOG_DEBUG, 'event=%s, sender=%s, message=%q', event, sender, message)
-        if gw.iCmp(gw.GlobalName(sender), gw.player) then
-            gw.config.channel.guild:send(GW_MTYPE_ACHIEVEMENT, message)
-        end
 
     elseif event == 'CHAT_MSG_CHANNEL_JOIN' then
 
@@ -407,96 +366,9 @@ function GreenWall_OnEvent(self, event, ...)
     elseif event == 'CHAT_MSG_SYSTEM' then
 
         local message = select(1, ...)
-
         gw.Debug(GW_LOG_DEBUG, 'event=%s, message=%q', event, message)
-
-        local pat_online = ERR_FRIEND_ONLINE_SS:format('(.+)', '(.+)'):gsub('([%[%]])', '%%%1')
-        local pat_offline = ERR_FRIEND_OFFLINE_S:format('(.+)')
-        local pat_join = ERR_GUILD_JOIN_S:format('(.+)')
-        local pat_leave = ERR_GUILD_LEAVE_S:format('(.+)')
-        local pat_quit = ERR_GUILD_QUIT_S:format(gw.player)
-        local pat_removed = ERR_GUILD_REMOVE_SS:format('(.+)', '(.+)')
-        local pat_kick = ERR_GUILD_REMOVE_SS:format('(.+)', '(.+)')
-        local pat_promote = ERR_GUILD_PROMOTE_SSS:format('(.+)', '(.+)', '(.+)')
-        local pat_demote = ERR_GUILD_DEMOTE_SSS:format('(.+)', '(.+)', '(.+)')
-
-        if message:match(pat_online) then
-
-            local _, player = message:match(pat_online)
-            player = gw.GlobalName(player)
-            gw.config.comember_cache:hold(player)
-            gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
-
-        elseif message:match(pat_offline) then
-
-            local player = message:match(pat_offline)
-            player = gw.GlobalName(player)
-            gw.config.comember_cache:hold(player)
-            gw.Debug(GW_LOG_DEBUG, 'comember_cache: updated %s', player)
-
-        elseif message:match(pat_join) then
-
-            local player = message:match(pat_join)
-            if gw.GlobalName(player) == gw.player then
-                -- We have joined the guild.
-                gw.Debug(GW_LOG_NOTICE, 'guild join detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'join')
-            end
-
-        elseif message:match(pat_leave) then
-
-            local player = message:match(pat_leave)
-            if gw.GlobalName(player) == gw.player then
-                -- We have left the guild.
-                gw.Debug(GW_LOG_NOTICE, 'guild quit detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
-                gw.config:reset()
-            end
-
-        elseif message:match(pat_quit) then
-
-            local player = message:match(pat_quit)
-            if gw.GlobalName(player) == gw.player then
-                -- We have left the guild.
-                gw.Debug(GW_LOG_NOTICE, 'guild quit detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
-                gw.config:reset()
-            end
-
-        elseif message:match(pat_removed) then
-
-            local player = message:match(pat_removed)
-            if gw.GlobalName(player) == gw.player then
-                -- We have been kicked from the guild.
-                gw.Debug(GW_LOG_NOTICE, 'guild kick detected.')
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'leave')
-                gw.config:reset()
-            end
-
-        elseif message:match(pat_kick) then
-
-            local target, player = message:match(pat_kick)
-            if gw.GlobalName(player) == gw.player then
-                gw.Debug(GW_LOG_NOTICE, 'you kicked %s', target)
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'remove', target)
-            end
-
-        elseif message:match(pat_promote) then
-
-            local player, target, rank = message:match(pat_promote)
-            if gw.GlobalName(player) == gw.player then
-                gw.Debug(GW_LOG_NOTICE, 'you promoted %s to %s', target, rank)
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'promote', target, rank)
-            end
-
-        elseif message:match(pat_demote) then
-
-            local player, target, rank = message:match(pat_demote)
-            if gw.GlobalName(player) == gw.player then
-                gw.Debug(GW_LOG_NOTICE, 'you demoted %s to %s', target, rank)
-                gw.config.channel.guild:send(GW_MTYPE_BROADCAST, 'demote', target, rank)
-            end
-        end
+        handler = GwSystemEventHandler:factory(gw.config, message)
+        handler:run()
 
     elseif event == 'GUILD_ROSTER_UPDATE' then
 

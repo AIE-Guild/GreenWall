@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -64,15 +64,13 @@ GW_CTYPE_ADDON      = 2
 --
 GW_MTYPE_NONE           = 0
 GW_MTYPE_CHAT           = 1
-GW_MTYPE_ACHIEVEMENT    = 2
-GW_MTYPE_LOOT           = 3
-GW_MTYPE_BROADCAST      = 4
-GW_MTYPE_CONTROL        = 5
-GW_MTYPE_REQUEST        = 6
-GW_MTYPE_RESPONSE       = 7
-GW_MTYPE_NOTICE         = 8
-GW_MTYPE_ADDON          = 9
-GW_MTYPE_EXTERNAL       = 10
+GW_MTYPE_BROADCAST      = 2
+GW_MTYPE_CONTROL        = 3
+GW_MTYPE_REQUEST        = 4
+GW_MTYPE_RESPONSE       = 5
+GW_MTYPE_NOTICE         = 6
+GW_MTYPE_ADDON          = 7
+GW_MTYPE_EXTERNAL       = 8
 
 
 --

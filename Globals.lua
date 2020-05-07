@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -70,12 +70,8 @@ gw.usage = [[
         -- Reload the configuration.
   reset
         -- Reset communications and reload the configuration.
-  achievements <on|off>
-        -- Toggle display of confederation achievements.
   roster <on|off>
         -- Toggle display of confederation online, offline, join, and leave messages.
-  rank <on|off>
-        -- Toggle display of confederation promotion and demotion messages.
   tag <on|off>
         -- Show co-guild identifier in messages.
   ochat <on|off>
@@ -92,8 +88,6 @@ gw.usage = [[
         -- Toggle output logging to the GreenWall.lua file.
   logsize <length>
         -- Specify the maximum number of log entries to keep.
-  admin reload
-        -- (officer only) Force a reload of the configuration by all online guild members.
 
 ]]
 

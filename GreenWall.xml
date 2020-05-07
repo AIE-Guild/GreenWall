@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -98,22 +98,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                     <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild tags");</OnLoad>
                 </Scripts>
             </CheckButton>
-            <CheckButton name="$parentOptionAchievements" inherits="InterfaceOptionsCheckButtonTemplate">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionTag"
-                            relativePoint="BOTTOMLEFT">
-                        <Offset>
-                            <AbsDimension x="0" y="-8"/>
-                        </Offset>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild achievement announcements");</OnLoad>
-                </Scripts>
-            </CheckButton>
             <CheckButton name="$parentOptionRoster" inherits="InterfaceOptionsCheckButtonTemplate">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionAchievements"
+                    <Anchor point="TOPLEFT" relativeTo="$parentOptionTag"
                             relativePoint="BOTTOMLEFT">
                         <Offset>
                             <AbsDimension x="0" y="-8"/>
@@ -124,22 +111,9 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
                     <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild roster announcements");</OnLoad>
                 </Scripts>
             </CheckButton>
-            <CheckButton name="$parentOptionRank" inherits="InterfaceOptionsCheckButtonTemplate">
-                <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRoster"
-                            relativePoint="BOTTOMLEFT">
-                        <Offset>
-                            <AbsDimension x="0" y="-8"/>
-                        </Offset>
-                    </Anchor>
-                </Anchors>
-                <Scripts>
-                    <OnLoad>getglobal(self:GetName() .. "Text"):SetText("Show co-guild rank announcements");</OnLoad>
-                </Scripts>
-            </CheckButton>
             <Slider name="$parentOptionJoinDelay" inherits="OptionsSliderTemplate">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRank" relativeFrom="BOTTOMLEFT">
+                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRoster" relativeFrom="BOTTOMLEFT">
                         <Offset>
                             <AbsDimension x="8" y="-64"/>
                         </Offset>

@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,19 @@ while true do
     end
 end
 f:close()
+
+--
+-- Constants
+--
+ERR_FRIEND_ONLINE_SS = "|Hplayer:%s|h[%s]|h has come online."
+ERR_FRIEND_OFFLINE_S = "%s has gone offline."
+ERR_GUILD_JOIN_S = "%s has joined the guild."
+ERR_GUILD_LEAVE_S = "%s has left the guild."
+ERR_GUILD_QUIT_S = "You are no longer a member of %s."
+ERR_GUILD_REMOVE_SS = "%s has been kicked out of the guild by %s."
+ERR_GUILD_REMOVE_SELF = "You have been kicked out of the guild."
+ERR_GUILD_PROMOTE_SSS = "%s has promoted %s to %s."
+ERR_GUILD_DEMOTE_SSS = "%s has demoted %s to %s."
 
 function date(...)
     return os.date(...)

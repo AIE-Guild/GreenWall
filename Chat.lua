@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,14 +37,6 @@ function gw.handlerGuildChat(type, guild_id, content, arglist)
     local sender = arglist[2]
     if type == GW_MTYPE_CHAT then
         gw.ReplicateMessage('GUILD', content[1], guild_id, arglist)
-    elseif type == GW_MTYPE_ACHIEVEMENT then
-        if gw.settings:get('achievements') then
-            gw.ReplicateMessage('GUILD_ACHIEVEMENT', content[1], guild_id, arglist)
-        end
-    elseif type == GW_MTYPE_LOOT then
-        if gw.settings:get('achievements') then
-            gw.ReplicateMessage('LOOT', content[1], guild_id, arglist)
-        end
     elseif type == GW_MTYPE_BROADCAST then
         local action, target, rank = unpack(content)
         if action == 'join' then
@@ -56,16 +48,8 @@ function gw.handlerGuildChat(type, guild_id, content, arglist)
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_LEAVE_S, sender), guild_id, arglist)
             end
         elseif action == 'remove' then
-            if gw.settings:get('rank') then
+            if gw.settings:get('roster') then
                 gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_REMOVE_SS, target, sender), guild_id, arglist)
-            end
-        elseif action == 'promote' then
-            if gw.settings:get('rank') then
-                gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_PROMOTE_SSS, sender, target, rank), guild_id, arglist)
-            end
-        elseif action == 'demote' then
-            if gw.settings:get('rank') then
-                gw.ReplicateMessage('SYSTEM', format(ERR_GUILD_DEMOTE_SSS, sender, target, rank), guild_id, arglist)
             end
         end
     else
@@ -95,8 +79,6 @@ end
 -- Accepted values:
 -- 'GUILD'
 -- 'OFFICER'
--- 'GUILD_ACHIEVEMENT'
--- 'LOOT'
 -- 'SYSTEM'
 -- @param message The message to replicate.
 -- @param guild_id (optional) Guild ID of the sender.
@@ -119,7 +101,8 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
 
     local i
     for i = 1, NUM_CHAT_WINDOWS do
-        if i ~= 2 then -- skip combat log
+        if i ~= 2 then
+            -- skip combat log
             gw.frame_table = { GetChatWindowMessages(i) }
             local v
             for _, v in ipairs(gw.frame_table) do
@@ -127,9 +110,9 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
                     local frame = 'ChatFrame' .. i
                     if _G[frame] then
                         gw.Debug(GW_LOG_DEBUG, 'frame=%s, event=%s, sender=%s, message=%q',
-                            frame, event, sender, message)
+                                frame, event, sender, message)
                         gw.ChatFrame_MessageEventHandler(_G[frame], 'CHAT_MSG_' .. event, message,
-                            sender, language, '', target, flags, 0, 0, '', 0, line, guid)
+                                sender, language, '', target, flags, 0, 0, '', 0, line, guid)
                     end
                     break
                 end
@@ -138,91 +121,4 @@ function gw.ReplicateMessage(event, message, guild_id, arglist)
     end
 end
 
-
---- Sends an encoded message to the rest of the same container on the add-on channel.
--- @param type The message type: GW_MTYPE_CONTROL, GW_MTYPE_REQUEST, or GW_MTYPE_RESPONSE.
--- @param message Text of the message.
-function gw.SendLocal(type, message)
-
-    gw.Debug(GW_LOG_INFO, 'type=%s, message=%q', type, message)
-
-    local opcode
-    if type == nil then
-        gw.Debug(GW_LOG_ERROR, 'cont_msg: missing arguments.')
-        return
-    elseif type == GW_MTYPE_CONTROL then
-        opcode = 'I'
-    elseif type == GW_MTYPE_REQUEST then
-        opcode = 'C'
-    elseif type == GW_MTYPE_RESPONSE then
-        opcode = 'R'
-    else
-        gw.Debug(GW_LOG_ERROR, 'unknown message type: %s', type)
-        return
-    end
-
-    local payload = strsub(strjoin('#', opcode, message), 1, 255)
-    gw.Debug(GW_LOG_DEBUG, 'message=%q', payload)
-    C_ChatInfo.SendAddonMessage('GreenWall', payload, 'GUILD')
-end
-
---- Parses and handles an encoded message from the add-on channel.
--- @param sender The sender of the message.
--- @param message The encoded message.
--- @return True on successful handling, false on failure.
-function gw.ReceiveLocal(sender, message)
-
-    gw.Debug(GW_LOG_INFO, 'sender=%s, message=%q', sender, message)
-
-    if not gw.iCmp(gw.GlobalName(sender), gw.player) then
-
-        local opcode, payload = strsplit('#', message)
-        payload = payload or ''
-        gw.Debug(GW_LOG_DEBUG, 'opcode=%s, payload=%s', opcode, payload)
-
-        if opcode == 'I' then
-
-            if message == 'reload' then
-                if gw.IsOfficer(sender) then
-                    if gw.config.timer.reload:hold() then
-                        gw.Write('Received configuration reload request from %s; hold-down in effect, skipping.', sender)
-                    else
-                        gw.Write('Received configuration reload request from %s.', sender)
-                        gw.config:reload()
-                        gw.config.timer.reload:start()
-                    end
-                end
-            end
-
-        elseif opcode == 'C' then
-
-            if message == 'officer' then
-                -- A query for officers
-                if gw.IsOfficer() then
-                    gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
-                end
-            end
-
-        elseif opcode == 'R' then
-
-            if message == 'officer' then
-                -- A response to the officer query
-                if gw.IsOfficer(sender) then
-                    if gw.IsOfficer() then
-                        gw.Debug(GW_LOG_NOTICE, 'giving %s moderator status', sender)
-                        ChannelModerator(gw.config.channel.guild.name, sender)
-                    else
-                        gw.Debug(GW_LOG_NOTICE, 'giving %s owner status', sender)
-                        SetChannelOwner(gw.config.channel.guild.name, sender)
-                        ChannelUnmoderator(gw.config.channel.guild.name, gw.player)
-                    end
-                else
-                    gw.Debug(GW_LOG_WARNING, 'officer spoofing attempt from %s', sender)
-                end
-            end
-        end
-    end
-
-    return true
-end
 

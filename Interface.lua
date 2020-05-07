@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,9 +40,7 @@ function GreenWallInterfaceFrame_LoadOptions(self, mode)
     end
     getglobal(self:GetName() .. "OptionMode"):SetChecked(mode == GW_MODE_ACCOUNT)
     getglobal(self:GetName() .. "OptionTag"):SetChecked(gw.settings:get('tag', mode))
-    getglobal(self:GetName() .. "OptionAchievements"):SetChecked(gw.settings:get('achievements', mode))
     getglobal(self:GetName() .. "OptionRoster"):SetChecked(gw.settings:get('roster', mode))
-    getglobal(self:GetName() .. "OptionRank"):SetChecked(gw.settings:get('rank', mode))
     getglobal(self:GetName() .. "OptionJoinDelay"):SetValue(gw.settings:get('joindelay', mode))
     if (gw.IsOfficer()) then
         getglobal(self:GetName() .. "OptionOfficerChat"):SetChecked(gw.settings:get('ochat', mode))
@@ -77,10 +75,7 @@ function GreenWallInterfaceFrame_SaveUpdates(self)
     local mode = getglobal(self:GetName() .. "OptionMode"):GetChecked() and GW_MODE_ACCOUNT or GW_MODE_CHARACTER
     gw.settings:set('mode', mode)
     gw.settings:set('tag', getglobal(self:GetName() .. "OptionTag"):GetChecked() and true or false, mode)
-    gw.settings:set('achievements',
-        getglobal(self:GetName() .. "OptionAchievements"):GetChecked() and true or false, mode)
     gw.settings:set('roster', getglobal(self:GetName() .. "OptionRoster"):GetChecked() and true or false, mode)
-    gw.settings:set('rank', getglobal(self:GetName() .. "OptionRank"):GetChecked() and true or false, mode)
     gw.settings:set('joindelay', getglobal(self:GetName() .. "OptionJoinDelay"):GetValue(), mode)
     if (gw.IsOfficer()) then
         gw.settings:set('ochat', getglobal(self:GetName() .. "OptionOfficerChat"):GetChecked() and true or false, mode)

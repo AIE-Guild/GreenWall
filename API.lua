@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ end
 
 --- Insert a handler for addon messages from the guild confederation.
 -- @param handler A callback function.
--- @param addon The name of the addon that you want to receive meaasges from
+-- @param addon The name of the addon that you want to receive messages from
 --  (the same one used for the name of the TOC file).  If the value '*' is
 --  supplied, messages from all addons will be handled.
 -- @param priority A signed integer indicating relative priority, lower value
@@ -77,8 +77,10 @@ function GreenWallAPI.AddMessageHandler(handler, addon, priority)
     local id = generate_id(handler)
     gw.Debug(GW_LOG_INFO, 'add API handler; id=%s, addon=%s, priority=%d', id, addon, priority)
 
-    table.insert(gw.api_table, {id, addon, priority, handler})
-    table.sort(gw.api_table, function (a, b) return a[2] < b[2] end)
+    table.insert(gw.api_table, { id, addon, priority, handler })
+    table.sort(gw.api_table, function(a, b)
+        return a[2] < b[2]
+    end)
 
     return id
 end
@@ -91,7 +93,7 @@ function GreenWallAPI.RemoveMessageHandler(id)
     rv = false
     if addon ~= '*' then
         addon = GetAddOnInfo(addon)
-        assert(addon ~=nil)
+        assert(addon ~= nil)
     end
     for i, e in ipairs(gw.api_table) do
         if id == e[1] then
@@ -109,7 +111,7 @@ end
 --  all table entries will be removed.
 --
 -- Note: A '*' value passed as addon is not a wildcard in this context,
--- it will only matche instances where the handler was installed with
+-- it will only match instances where the handler was installed with
 -- '*' as the addon.
 function GreenWallAPI.ClearMessageHandlers(addon)
     if addon == nil then
@@ -129,6 +131,19 @@ function GreenWallAPI.ClearMessageHandlers(addon)
 end
 
 
+--- Query the hidden channels used by Greenwall.
+-- @return An array of integer values for the channels in use.
+function GreenWallAPI.GetChannelNumbers()
+    local rv = {}
+    if gw.config.channel.guild ~= nil then
+        table.insert(rv, gw.config.channel.guild.number)
+    end
+    if gw.config.channel.officer ~= nil then
+        table.insert(rv, gw.config.channel.officer.number)
+    end
+    return rv
+end
+
 --- The API handler dispatcher
 -- @param addon The sending addon
 -- @param sender The sending player
@@ -144,3 +159,5 @@ function gw.APIDispatcher(addon, sender, guild_id, message)
         end
     end
 end
+
+

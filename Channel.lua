@@ -2,7 +2,7 @@
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2019 Mark Rogaski
+Copyright (c) 2010-2020 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -206,11 +206,6 @@ function GwChannel:join()
                 end
             end
 
-            -- Gratuitous officer announcement, veracity of the claim should be verified by the receiver.
-            if gw.IsOfficer() then
-                gw.SendLocal(GW_MTYPE_RESPONSE, 'officer')
-            end
-
             return true
 
         end
@@ -262,7 +257,6 @@ Transmit Methods
 -- @param type The message type.
 --   Accepted values are:
 --     GW_MTYPE_CHAT
---     GW_MTYPE_ACHIEVEMENT
 --     GW_MTYPE_BROADCAST
 --     GW_MTYPE_NOTICE
 --     GW_MTYPE_REQUEST
@@ -298,10 +292,6 @@ function GwChannel:tl_send(type, message)
     local opcode
     if type == GW_MTYPE_CHAT then
         opcode = 'C'
-    elseif type == GW_MTYPE_ACHIEVEMENT then
-        opcode = 'A'
-    elseif type == GW_MTYPE_LOOT then
-        opcode = 'L'
     elseif type == GW_MTYPE_BROADCAST then
         opcode = 'B'
     elseif type == GW_MTYPE_NOTICE then
@@ -471,10 +461,6 @@ function GwChannel:tl_receive(...)
     local type = GW_MTYPE_NONE
     if opcode == 'C' then
         type = GW_MTYPE_CHAT
-    elseif opcode == 'A' then
-        type = GW_MTYPE_ACHIEVEMENT
-    elseif opcode == 'L' then
-        type = GW_MTYPE_LOOT
     elseif opcode == 'B' then
         type = GW_MTYPE_BROADCAST
     elseif opcode == 'N' then
@@ -486,7 +472,7 @@ function GwChannel:tl_receive(...)
     elseif opcode == 'E' then
         type = GW_MTYPE_EXTERNAL
     else
-        gw.Debug(GW_LOG_ERROR, 'unknown segment opcode: %s', opcode)
+        gw.Debug(GW_LOG_WARNING, 'unknown segment opcode: %s', opcode)
     end
     return sender, guild_id, type, message
 end
