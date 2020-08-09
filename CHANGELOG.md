@@ -2,7 +2,12 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## [1.11.0] -- Unreleased
+## [1.11.1] -- 2020-08-09
+### Fixed
+- Added a conditional check for successfully parsed addon version for minimum
+  version enforcement.  This is a tactical fix to address the semantic version parsing.
+
+## [1.11.0] -- 2020-04-27
 ### Removed
 - Removed replication of achievements, promotions, demotions,  and loot
   announcements between co-guilds. The `SendChatMessage` function was made
@@ -643,6 +648,7 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+[1.11.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.10.1...v1.11.0
 [1.10.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.15...v1.10.0
