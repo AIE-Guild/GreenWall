@@ -281,7 +281,7 @@ function GwConfig:load()
     --
     local min = semver(self.minimum)
     local cur = semver(gw.version)
-    if min then
+    if min and cur then
         if cur < min then
             gw.Error('Guild configuration specifies a minimum version of %s (%s currently installed).', tostring(min), tostring(cur))
         end
