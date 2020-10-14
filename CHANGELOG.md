@@ -3,8 +3,8 @@
 This project uses [Semantic Versioning](http://semver.org/).
 
 ## [1.11.2] -- 2020-10-13
-### Fixed
-- Replaced usage of deprecated GuildRoster() with C_GuildInfo.GuildRoster().
+### Changed
+- Replaced usage of deprecated GuildRoster() with C_GuildInfo.GuildRoster() (RETAIL).
 
 ## [1.11.1] -- 2020-08-09
 ### Fixed
