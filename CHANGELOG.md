@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.11.2] -- 2020-10-13
+### Fixed
+- Replaced usage of deprecated GuildRoster() with C_GuildInfo.GuildRoster().
+
 ## [1.11.1] -- 2020-08-09
 ### Fixed
 - Added a conditional check for successfully parsed addon version for minimum
@@ -648,6 +652,8 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+
+[1.11.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.1...v1.11.2
 [1.11.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.10.1...v1.11.0
 [1.10.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.10.0...v1.10.1
