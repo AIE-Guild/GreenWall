@@ -2,6 +2,42 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.11.2] -- 2020-10-13
+### Changed
+- Replaced usage of deprecated GuildRoster() with C_GuildInfo.GuildRoster() (RETAIL).
+
+## [1.11.1] -- 2020-08-09
+### Fixed
+- Added a conditional check for successfully parsed addon version for minimum
+  version enforcement.  This is a tactical fix to address the semantic version parsing.
+
+## [1.11.0] -- 2020-04-27
+### Removed
+- Removed replication of achievements, promotions, demotions,  and loot
+  announcements between co-guilds. The `SendChatMessage` function was made
+  partially protected in 8.2.5, and events that are not triggered by hardware
+  events cannot use the function.
+- Removed unnecessary local co-guild use of the addon communication channel.
+
+### Added
+- `GreenWallAPI.GetChannelNumbers` function to query the custom chat channels in
+  use by GreenWall
+
+### Changed
+- Updated the TOC for WoW 8.3.0.
+- Refactored CHAT_MSG_SYSTEM handling to use an abstract factory and added
+  full unit testing for the polymorphic classes. 
+
+### Fixed
+- Updated debug message call stack parsing for 8.3.
+
+## [1.10.1] -- 2019-09-24
+### Updated
+- Updated the TOC for WoW 8.2.5.
+
+### Added
+- Added unit test coverage reporting through Coveralls.
+
 ## [1.10.0] -- 2019-09-05
 ### Changed
 - Moved to customer branch approach for WoW Classic releases.
@@ -616,6 +652,11 @@ flapping roster announcements for characters in peer co-guilds.
 ## 0.9.00 -- 2010-11-01
 Initial commit.
 
+
+[1.11.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.1...v1.11.2
+[1.11.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.0...v1.11.1
+[1.11.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.10.1...v1.11.0
+[1.10.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.15...v1.10.0
 [1.9.15]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.14...v1.9.15
 [1.9.14]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.13...v1.9.14
