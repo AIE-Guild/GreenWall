@@ -1,15 +1,15 @@
-## Interface: 80300
+## Interface: 90001
 ## Title: GreenWall
 ## Notes: Common communication channel as a replacement for guild chat in guild confederations.
 ## Author: Mark Rogaski <stigg@aie-guild.org>
-## Version: 1.11.1
+## Version: 1.11.2
 ## URL: https://github.com/AIE-Guild/GreenWall
 ## URL: https://www.curseforge.com/wow/addons/greenwall
 ## DefaultState: enabled
 ## SavedVariables: GreenWallAccount
 ## SavedVariablesPerCharacter: GreenWall,GreenWallMeta,GreenWallLog
 ## X-Category: Guild
-## X-Date: 2020-08-09
+## X-Date: 2020-10-13
 
 Lib\Load.xml
 Constants.lua
