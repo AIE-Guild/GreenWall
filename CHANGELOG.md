@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.11.3] -- 2020-12-19
+### Changed
+- Updated the TOC for WoW 9.0.2.
+
 ## [1.11.2] -- 2020-10-13
 ### Fixed
 - Replaced usage of deprecated GuildRoster() with C_GuildInfo.GuildRoster().
