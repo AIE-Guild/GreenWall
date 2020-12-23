@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.11.4] -- 2020-12-23
+### Updated
+- Updated the README to point to the current connected realm documentation.
+
 ## [1.11.3] -- 2020-12-19
 ### Changed
 - Updated the TOC for WoW 9.0.2.
@@ -657,6 +661,8 @@ flapping roster announcements for characters in peer co-guilds.
 Initial commit.
 
 
+[1.11.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.3...v1.11.4
+[1.11.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.2...v1.11.3
 [1.11.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.1...v1.11.2
 [1.11.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.10.1...v1.11.0
