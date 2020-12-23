@@ -23,7 +23,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 
 GreenWall is a World of Warcraft add-on that allows multiple guilds within a single realm, or 
-[connected realms](https://worldofwarcraft.com/en-us/news/11393305) to share guild chat as if they were one guild.
+[connected realms](https://us.battle.net/support/en/article/14296) to share guild chat as if they were one guild.
 When a member in one guild types something in guild chat, members of the other connected guilds (co-guilds) 
 will see what was said and can respond.
 
