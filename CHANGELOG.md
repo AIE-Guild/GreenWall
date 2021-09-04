@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## [1.11.6] -- 2021-09-03
+### Updated
+- Updated the TOC for WoW 9.1.0.
+
 ## [1.11.5] -- 2021-03-14
 ### Updated
 - Updated the TOC for WoW 9.0.5.
@@ -665,6 +669,7 @@ flapping roster announcements for characters in peer co-guilds.
 Initial commit.
 
 
+[1.11.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.5...v1.11.6
 [1.11.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.4...v1.11.5
 [1.11.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.3...v1.11.4
 [1.11.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.2...v1.11.3
