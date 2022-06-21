@@ -2,32 +2,36 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## [1.11.6] -- 2021-09-03
+## 1.11.7 -- 2022-06-20
+### Updated
+- Updated the TOC for WoW 9.2.5.
+
+## 1.11.6 -- 2021-09-03
 ### Updated
 - Updated the TOC for WoW 9.1.0.
 
-## [1.11.5] -- 2021-03-14
+## 1.11.5 -- 2021-03-14
 ### Updated
 - Updated the TOC for WoW 9.0.5.
 
-## [1.11.4] -- 2020-12-23
+## 1.11.4 -- 2020-12-23
 ### Updated
 - Updated the README to point to the current connected realm documentation.
 
-## [1.11.3] -- 2020-12-19
+## 1.11.3 -- 2020-12-19
 ### Changed
 - Updated the TOC for WoW 9.0.2.
 
-## [1.11.2] -- 2020-10-13
+## 1.11.2 -- 2020-10-13
 ### Fixed
 - Replaced usage of deprecated GuildRoster() with C_GuildInfo.GuildRoster().
 
-## [1.11.1] -- 2020-08-09
+## 1.11.1 -- 2020-08-09
 ### Fixed
 - Added a conditional check for successfully parsed addon version for minimum
   version enforcement.  This is a tactical fix to address the semantic version parsing.
 
-## [1.11.0] -- 2020-04-27
+## 1.11.0 -- 2020-04-27
 ### Removed
 - Removed replication of achievements, promotions, demotions,  and loot
   announcements between co-guilds. The `SendChatMessage` function was made
@@ -47,45 +51,45 @@ This project uses [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Updated debug message call stack parsing for 8.3.
 
-## [1.10.1] -- 2019-09-24
+## 1.10.1 -- 2019-09-24
 ### Updated
 - Updated the TOC for WoW 8.2.5.
 
 ### Added
 - Added unit test coverage reporting through Coveralls.
 
-## [1.10.0] -- 2019-09-05
+## 1.10.0 -- 2019-09-05
 ### Changed
 - Moved to customer branch approach for WoW Classic releases.
 
 ### Removed
 - Removed transitional code for handling PLAYER_ENTERING_WORLD.
 
-## [1.9.15] -- 2019-08-27
+## 1.9.15 -- 2019-08-27
 ### Changed
 - Cleaned up project to support CurseForge automatic packaging.
 
-## [1.9.14] -- 2019-08-22
+## 1.9.14 -- 2019-08-22
 ### Added
 - Added compatibility support for Incognito.
 
-## [1.9.13] -- 2019-07-02
+## 1.9.13 -- 2019-07-02
 ### Updated
 - Updated the TOC for WoW 8.2.
 
 ### Removed
 - Removed Gitter badge from documentation.
 
-## [1.9.12] -- 2019-01-10
+## 1.9.12 -- 2019-01-10
 ### Fixed
 - Added missing message alteration for Name2Chat.
 
-## [1.9.11] -- 2019-01-06
+## 1.9.11 -- 2019-01-06
 ### Fixed
 - Added ID tagging support for Identity-2 and Name2Chat under the WoW 8.1.0 changes.
 - Changed legendary loot notifications from second-person to third-person.
 
-## [1.9.10] -- 2019-01-04
+## 1.9.10 -- 2019-01-04
 ### Fixed
 - Fixed GreenWall_ParseText message filtering to filter blank messages.
 
@@ -95,17 +99,17 @@ This project uses [Semantic Versioning](http://semver.org/).
 ### Changed
 - Removed unused CRC import.
 
-## [1.9.9] -- 2018-12-13
+## 1.9.9 -- 2018-12-13
 ### Fixed
 - Added chat interception workaround for guild chat changes in BFA 8.1.
 
 _Thank you to Ashayo for the patch._
 
-## [1.9.8] -- 2018-08-23
+## 1.9.8 -- 2018-08-23
 ### Changed
 - Refactored system message pattern matching.
 
-## [1.9.7] -- 2018-08-11
+## 1.9.7 -- 2018-08-11
 ### Fixed
 - Removed a debug statement that was raising format errors.
 
@@ -114,42 +118,42 @@ _Thank you to Legracen from AIE for helping with the fault isolation._
 ### Changed
 - Refactored gw.Debug to test the debug level before formatting the message.
 
-## [1.9.6] -- 2018-08-10
+## 1.9.6 -- 2018-08-10
 ### Fixed
 - Restored context menu availability for speakers in other co-guilds.
 
-## [1.9.5] -- 2018-07-19
+## 1.9.5 -- 2018-07-19
 ### Fixed
 - Checks for ElvUI compatibility now recognize ElvUI user profiles.
 
 _Thank you, again, to Simpy from the ElvUI team._
 
-## [1.9.4] -- 2018-07-19
+## 1.9.4 -- 2018-07-19
 ### Fixed
 - Applied workaround for chat channel sender regression introduced in 8.0.1.
 
 ### Removed
 - Removed pre-8.0 call to bare SendLocal.
 
-## [1.9.3] -- 2018-07-17
+## 1.9.3 -- 2018-07-17
 ### Updated
 - Updated the TOC for WoW 8.0.
 
-## [1.9.2] -- 2018-06-11
+## 1.9.2 -- 2018-06-11
 ### Fixed
 - Updated compatibility mode for ElvUI 10.74 changes to chat.
 - Removed combat log from chat window scanning.
 
 _Thank you to Simpy from the ElvUI team for the fixes._
 
-## [1.9.1] -- 2018-04-28
+## 1.9.1 -- 2018-04-28
 ### Fixed
 - SendAddonMessage is now called in the C_ChatInfo namespace for 8.0.x.
 
 ### Changed
 - Moved WoW build information to gw.build global.
 
-## [1.9.0] -- 2018-01-08
+## 1.9.0 -- 2018-01-08
 ### Added
 - Added support for shared, account-level settings per character.  Each character can either use the account
   settings or a character-specific configuration.  If an existing GreenWall configuration exists for the character
@@ -173,53 +177,53 @@ _Thank you to Simpy from the ElvUI team for the fixes._
 - Removed luadoc HTML output.
 - HTML copies of other documentation.
 
-## [1.8.5] -- 2017-08-29
+## 1.8.5 -- 2017-08-29
 ### Fixed
 - Applied a workaround for 7.3.0 where GuildControlSetRank() was made
   protected.  Checking for rank access is now determined by reading the 
   officer note of the GM.
 
-## [1.8.4] -- 2017-08-29
+## 1.8.4 -- 2017-08-29
 ### Updated
 - Updated the TOC for WoW 7.3.
 
-## [1.8.3] -- 2017-04-16
+## 1.8.3 -- 2017-04-16
 ### Updated
 - Updated the TOC for WoW 7.2.
 
-## [1.8.2] -- 2017-01-12
+## 1.8.2 -- 2017-01-12
 ### Added
 - The version command now give WoW version information.
 
-## [1.8.1] -- 2016-10-25
+## 1.8.1 -- 2016-10-25
 ### Fixed
 - Corrected configuration whitespace grooming.
 
 ### Changed
 - Updated TOC for WoW 7.1.
 
-## [1.8.0] -- 2016-09-20
+## 1.8.0 -- 2016-09-20
 ### Fixed
 - Added whitespace trimming to configuration parser.
 
 ### Changed
 - Compatibility messages are now raised as debugging output.
 
-## [1.7.3] -- 2016-08-03
+## 1.7.3 -- 2016-08-03
 ### Fixed
 - Corrected global name parsing to account for UTF-8.
 - Updated API documentation.
 
-## [1.7.2] -- 2016-07-20
+## 1.7.2 -- 2016-07-20
 ### Fixed
 - Workaround for delayed bridge channel join caused by missing 
   CHAT_MSG_CHANNEL_NOTICE events.
 
-## [1.7.1] -- 2016-07-20
+## 1.7.1 -- 2016-07-20
 ### Changed
 - Updated TOC for WoW 7.0.3.
 
-## [1.7.0] -- 2016-01-01
+## 1.7.0 -- 2016-01-01
 ### Fixed
 - Improved message validation during adaptation layer decoding.
 - Fixed message handling logic.
@@ -234,7 +238,7 @@ _Thank you to Simpy from the ElvUI team for the fixes._
 ### Removed
 - Removed version number from options screen title.
 
-## [1.6.6] -- 2015-12-16
+## 1.6.6 -- 2015-12-16
 ### Fixed
 - A check is now done for officer status before sending a gratuitous officer
   announcement.
@@ -245,11 +249,11 @@ _Thank you to Simpy from the ElvUI team for the fixes._
 - Added Markdown change log.
 - Added channel-specific hold downs for join failures.
 
-## [1.6.5] -- 2015-06-24
+## 1.6.5 -- 2015-06-24
 ### Changed
 - Updated TOC for WoW 6.2.
 
-## [1.6.4] -- 2015-03-07
+## 1.6.4 -- 2015-03-07
 ### Changed
 - Refactored the user option validation.
 - Modified the GwHoldDown object.  Renamed `GwHoldDown:set()` to
@@ -260,24 +264,24 @@ _Thank you to Simpy from the ElvUI team for the fixes._
 ### Added
 - Added a user option (joindelay) to control the channel join hold-down.
 
-## [1.6.3] -- 2015-03-04
+## 1.6.3 -- 2015-03-04
 ### Changed
 - Restored original channel hold-down timer value of 30 seconds.
 
-## [1.6.2] -- 2015-03-01
+## 1.6.2 -- 2015-03-01
 ### Changed
 - Removed lazy sweeper case in the event loop and replaced it with a callback
 for handling hold-down expiry.
 - Reduced channel hold-down to 10 seconds.
 
-## [1.6.1] -- 2015-02-28
+## 1.6.1 -- 2015-02-28
 ### Fixed
 - Added conditional to check achievements flag on receipt of achievement spam.
 
 ### Added
 - Added guild ID to debugging output on message receipt.
 
-## [1.6.0] -- 2015-02-24
+## 1.6.0 -- 2015-02-24
 ### Changed
 - Comprehensive refactor to allow new features in 2.0.
 - Refactored configuration parser.
@@ -291,7 +295,7 @@ for handling hold-down expiry.
 - Added GwHoldDown and GwHoldDownCache objects.
 - Added LibStub libraries for SHA256, Salsa20, CRC16-CCITT, and Base64.
 
-## [1.5.4] -- 2014-12-12
+## 1.5.4 -- 2014-12-12
 ### Fixed
 - Corrected comparisons of character names to account for capitalization
   normalization in the API.
@@ -299,21 +303,21 @@ for handling hold-down expiry.
 ### Changed
 - Updated luadoc.
 
-## [1.5.3] -- 2014-11-11
+## 1.5.3 -- 2014-11-11
 ### Fixed
 - Added comember cache updates for channel join/leave events. This stops
 flapping roster announcements for characters in peer co-guilds.
 
-## [1.5.2] -- 2014-10-31
+## 1.5.2 -- 2014-10-31
 ### Fixed
 - Fixed the General chat delay lockout.
 - Improved the tests for officer status.
 
-## [1.5.1] -- 2014-10-15
+## 1.5.1 -- 2014-10-15
 ### Fixed
 - Fixed regular expression for realm name in GwGlobalName.
 
-## [1.5.0] -- 2015-10-14
+## 1.5.0 -- 2015-10-14
 ### Fixed
 - Updated for fully qualified names.
 
@@ -324,11 +328,11 @@ flapping roster announcements for characters in peer co-guilds.
 ### Added
 - Added support for guilds on connected realms.
 
-## [1.4.1] -- 2014-08-10
+## 1.4.1 -- 2014-08-10
 ### Fixed
 - Corrected the processing of the reload request.
 
-## [1.4.0] -- 2014-03-22
+## 1.4.0 -- 2014-03-22
 ### Changed
 - Update documentation for Interface Options.
 - Cleaned up debugging levels.
@@ -336,32 +340,32 @@ flapping roster announcements for characters in peer co-guilds.
 ### Added
 - Added Interface Options panel for GreenWall options.
 
-## [1.3.6] -- 2014-02-18
+## 1.3.6 -- 2014-02-18
 ### Fixed
 - Fixed sender identification under WoW 5.4.7.
 
 ### Added
 - Added realm name to gwPlayerName.
 
-## [1.3.5] -- 2014-0120
+## 1.3.5 -- 2014-0120
 ### Added
 - Added missing roster notification functionality.
 
-## [1.3.4] -- 2013-11-17
+## 1.3.4 -- 2013-11-17
 ### Changed
 - Changed officer note format and updated parsing.
 
-## [1.3.3] -- 2013-09-10
+## 1.3.3 -- 2013-09-10
 ### Changed
 - Updated TOC for WoW 5.4.0.
 
-## [1.3.2] -- 2013-08-07
+## 1.3.2 -- 2013-08-07
 ### Fixed
 - Fixed message integrity checking for duplicated messages.
 - Fixed messages generated on guild join, leave, or kick.
 - Corrected formatting of documentation.
 
-## [1.3.1] -- 2013-08-06
+## 1.3.1 -- 2013-08-06
 ### Changed
 - Project moved to [GitHub](https://github.com/AIE-Guild/GreenWall).
 - All text documentation has been converted to Markdown and HTML.
@@ -370,7 +374,7 @@ flapping roster announcements for characters in peer co-guilds.
 ### Added
 - Guild configuration format documentation has been added.
 
-## [1.3.0] -- 2013-06-09
+## 1.3.0 -- 2013-06-09
 ### Fixed
 - Fixed handling of a kick from a guild.
 - Fixed variable names for input validation in GwStringHash().
@@ -381,23 +385,23 @@ flapping roster announcements for characters in peer co-guilds.
 ### Added
 - Added support for a newer, compact configuration format.
 
-## [1.2.7] -- 2013-02-27
+## 1.2.7 -- 2013-02-27
 ### Changed
 - Updated TOC for WoW 5.2.0.
 
-## [1.2.6] -- 2012-12-04
+## 1.2.6 -- 2012-12-04
 ### Changed
 - Updated TOC for WoW 5.1.0.
 
-## [1.2.5] -- 2012-09-01
+## 1.2.5 -- 2012-09-01
 ### Fixed
 - Localized _ to avoid the taint issues with glyphs in 5.0.4.
 
-## [1.2.4] -- 2012-08-29
+## 1.2.4 -- 2012-08-29
 ### Changed
 - Updated TOC for WoW 5.0.4.
 
-## [1.2.3] -- 2012-08-25
+## 1.2.3 -- 2012-08-25
 ### Changed
 - Replaced the 32-bit string hash used to obfuscate channel names in the
   debugging output with a standard CRC-16-CCITT implementation to avoid
@@ -409,11 +413,11 @@ flapping roster announcements for characters in peer co-guilds.
 - Added extra debugging information for current guild information.
 - Added value checking for missing coguild ID in GwSendConfederationMsg().
 
-## [1.2.2] -- 2012-11-12
+## 1.2.2 -- 2012-11-12
 ### Fixed
 - Fixed officer chat bridging for the guild leader.
 
-## [1.2.1] -- 2011-11-29
+## 1.2.1 -- 2011-11-29
 ### Changed
 - Updated TOC for WoW version 4.3.
 
@@ -421,7 +425,7 @@ flapping roster announcements for characters in peer co-guilds.
 - Added link to LemonKing's add-on in the documentation.
 - Documented prequisites.
 
-## [1.2.0] -- 2011-11-26
+## 1.2.0 -- 2011-11-26
 ### Fixed
 - Fixed unnecessary channel resets due to configuration reload.
 - Fixed behavior during UI reload.
@@ -456,15 +460,15 @@ flapping roster announcements for characters in peer co-guilds.
 - Removed channel protection code.
 - Removed SHA1 library.
 
-## [1.1.07] -- 2011-06-28
+## 1.1.07 -- 2011-06-28
 ### Changed
 - Updated TOC for WoW version 4.2.
 
-## [1.1.06] -- 2011-03-21
+## 1.1.06 -- 2011-03-21
 ### Changed
 - Babel now disabled by default.
 
-## [1.1.05] -- 2011-03-21
+## 1.1.05 -- 2011-03-21
 ### Changed
 - Moved scan of chat windows to chat message event handlers.
 - Sorted clauses in the main event switch for legibility.
@@ -474,7 +478,7 @@ flapping roster announcements for characters in peer co-guilds.
 - Added RegisterAddonMessagePrefix call for 4.1 changes.
 - Added Babel.
 
-## [1.1.04] -- 2011-01-15
+## 1.1.04 -- 2011-01-15
 ### Changed
 - Minor updates for Curse packager.
 - Cleaned up status display code.
@@ -482,7 +486,7 @@ flapping roster announcements for characters in peer co-guilds.
 ### Added
 - Added BSD-derived license.
 
-## [1.1.03] -- 2011-01-14
+## 1.1.03 -- 2011-01-14
 ### Changed
 - Moved `GuildRoster` call to PLAYER_LOGIN handler.
 - Limited conditions under which reinitialization occurred on
@@ -495,7 +499,7 @@ flapping roster announcements for characters in peer co-guilds.
 - Added connection statistics gathering.
 - Added LuaDoc data for functions and procedures.
 
-## [1.1.02] -- 2010-12-11
+## 1.1.02 -- 2010-12-11
 ### Fixed
 - Fixed missing assignment of channel number on join.
 
@@ -513,50 +517,50 @@ flapping roster announcements for characters in peer co-guilds.
 - Removed event registration for channel leave events.
 - Removed squelch message on reload flood.
 
-## [1.1.01] -- 2010-12-06
+## 1.1.01 -- 2010-12-06
 ### Fixed
 - Fixed status output when no channel has been configured.
 
 ### Added
 - Added co-guild tagging.
 
-## [1.1.00] -- 2010-12-05
+## 1.1.00 -- 2010-12-05
 ### Added
 - Added announcement flag check for logout announcements.
 
 ### Removed
 - Removed unused moderation release code.
 
-## [1.0.18] -- 2010-12-04
+## 1.0.18 -- 2010-12-04
 ### Added
 - Added options line to configuration.
 
-## [1.0.17] -- 2010-12-04
+## 1.0.17 -- 2010-12-04
 ### Fixed
 - Fixed SavedVariables processing.
 
-## [1.0.16] -- 2010-12-04
+## 1.0.16 -- 2010-12-04
 ### Fixed
 - Removed moderator handling and switched to better handling of owner status.
 
-## [1.0.15] -- 2010-12-03
+## 1.0.15 -- 2010-12-03
 ### Fixed
 - Removed faulty `tContains()` for `gwPeerTable` checks to stop
   prolific kicking.
 
-## [1.0.14] -- 2010-12-03
+## 1.0.14 -- 2010-12-03
 ### Fixed
 - Fixed missing argument to `GetGuildInfo()`.
 
-## [1.0.13] -- 2010-12-03
+## 1.0.13 -- 2010-12-03
 ### Changed
 - Updated guild change/update handling.
 
-## [1.0.12] -- 2010-12-03
+## 1.0.12 -- 2010-12-03
 ### Fixed
 - Fixed /who and channel join event processing.
 
-## [1.0.11] -- 2010-12-03
+## 1.0.11 -- 2010-12-03
 ### Fixed
 - Limited handling of channel owner/moderator changes to the common channel.
 
@@ -572,18 +576,18 @@ flapping roster announcements for characters in peer co-guilds.
 ### Removed
 - Removed proactive channel leave before a join.
 
-## [1.0.10] -- 2010-11-22
+## 1.0.10 -- 2010-11-22
 ### Changed
 - Rewrote guild lookups.
 
 ### Added
 - Added extra slash commands.
 
-## [1.0.09] -- 2010-11-21
+## 1.0.09 -- 2010-11-21
 ### Fixed
 - Missing negation in channel defense code.
 
-## [1.0.08] -- 2010-11-21
+## 1.0.08 -- 2010-11-21
 ### Fixed
 - Corrected guild join handling.
 
@@ -593,29 +597,29 @@ flapping roster announcements for characters in peer co-guilds.
 ### Removed
 - Removed channel bans.
 
-## [1.0.07] -- 2010-11-17
+## 1.0.07 -- 2010-11-17
 ### Fixed
 - Typos in variable names.
 
-## [1.0.06] -- 2010-11-13
+## 1.0.06 -- 2010-11-13
 ### Added
 - Added online/offline notices.
 
-## [1.0.05] -- 2010-11-13
+## 1.0.05 -- 2010-11-13
 ### Fixed
 - Fixed the placement and use of `GwLeaveChannel()`.
 
 ### Changed
 - Changed container messaging system to generalize the request message type.
 
-## [1.0.04] -- 2010-11-13
+## 1.0.04 -- 2010-11-13
 ### Fixed
 - Fixed container recognition in configuration processing.
 
 ### Added
 - Added debugging output to slash command handling.
 
-## [1.0.03] -- 2010-11-12
+## 1.0.03 -- 2010-11-12
 ### Changed
 - Changed configuration to support common configurations across co-guilds.
 - Refactored configuration parsing.
@@ -624,16 +628,16 @@ flapping roster announcements for characters in peer co-guilds.
 ### Added
 - Added variable field to the saved variables.
 
-## [1.0.02] -- 2010-11-12
+## 1.0.02 -- 2010-11-12
 ### Added
 - Added container IDs to channel messages to avoid duplicates within the
   same co-guild.
 
-## [1.0.01] -- 2010-11-12
+## 1.0.01 -- 2010-11-12
 ### Added
 - Brought back GUILD_ROSTER_UPDATE to get around the guild info loading delay.
 
-## [1.0.00] -- 2010-11-11
+## 1.0.00 -- 2010-11-11
 ### Changed
 - Cleaned up debugging statements.
 
@@ -648,7 +652,7 @@ flapping roster announcements for characters in peer co-guilds.
 ### Removed
 -Removed GUILD_ROSTER_UPDATE event handling.
 
-## [0.9.02] -- 2010-11-06
+## 0.9.02 -- 2010-11-06
 ### Fixed
 - Fixed parsing of peer entries in configuration.
 
@@ -658,7 +662,7 @@ flapping roster announcements for characters in peer co-guilds.
 ### Removed
 - Removed slash command code, left stub.
 
-## [0.9.01] -- 2010-11-06
+## 0.9.01 -- 2010-11-06
 ### Changed
 - Abstracted several functions.
 
@@ -667,98 +671,3 @@ flapping roster announcements for characters in peer co-guilds.
 
 ## 0.9.00 -- 2010-11-01
 Initial commit.
-
-
-[1.11.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.5...v1.11.6
-[1.11.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.4...v1.11.5
-[1.11.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.3...v1.11.4
-[1.11.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.2...v1.11.3
-[1.11.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.1...v1.11.2
-[1.11.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.11.0...v1.11.1
-[1.11.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.10.1...v1.11.0
-[1.10.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.10.0...v1.10.1
-[1.10.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.15...v1.10.0
-[1.9.15]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.14...v1.9.15
-[1.9.14]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.13...v1.9.14
-[1.9.13]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.12...v1.9.13
-[1.9.12]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.11...v1.9.12
-[1.9.11]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.10...v1.9.11
-[1.9.10]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.9...v1.9.10
-[1.9.9]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.8...v1.9.9
-[1.9.8]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.7...v1.9.8
-[1.9.7]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.6...v1.9.7
-[1.9.6]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.5...v1.9.6
-[1.9.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.4...v1.9.5
-[1.9.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.3...v1.9.4
-[1.9.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.2...v1.9.3
-[1.9.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.1...v1.9.2
-[1.9.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.9.0...v1.9.1
-[1.9.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.5...v1.9.0
-[1.8.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.4...v1.8.5
-[1.8.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.3...v1.8.4
-[1.8.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.2...v1.8.3
-[1.8.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.1...v1.8.2
-[1.8.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.8.0...v1.8.1
-[1.8.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.3...v1.8.0
-[1.7.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.2...v1.7.3
-[1.7.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.1...v1.7.2
-[1.7.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.7.0...v1.7.1
-[1.7.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.6...v1.7.0
-[1.6.6]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.5...v1.6.6
-[1.6.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.4...v1.6.5
-[1.6.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.3...v1.6.4
-[1.6.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.2...v1.6.3
-[1.6.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.1...v1.6.2
-[1.6.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.6.0...v1.6.1
-[1.6.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.5.4...v1.6.0
-[1.5.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.5.3...v1.5.4
-[1.5.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.5.2...v1.5.3
-[1.5.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.5.1...v1.5.2
-[1.5.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.5.0...v1.5.1
-[1.5.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.4.1...v1.5.0
-[1.4.1]: https://github.com/AIE-Guild/GreenWall/compare/v1.4.0...v1.4.1
-[1.4.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.3.6...v1.4.0
-[1.3.6]: https://github.com/AIE-Guild/GreenWall/compare/v1.3.5...v1.3.6
-[1.3.5]: https://github.com/AIE-Guild/GreenWall/compare/v1.3.4...v1.3.5
-[1.3.4]: https://github.com/AIE-Guild/GreenWall/compare/v1.3.3...v1.3.4
-[1.3.3]: https://github.com/AIE-Guild/GreenWall/compare/v1.3.2...v1.3.3
-[1.3.2]: https://github.com/AIE-Guild/GreenWall/compare/v1.3.1...v1.3.2
-[1.3.1]: https://github.com/AIE-Guild/GreenWall/compare/release-1.3.0...v1.3.1
-[1.3.0]: https://github.com/AIE-Guild/GreenWall/compare/release-1.2.7...release-1.3.0
-[1.2.7]: https://github.com/AIE-Guild/GreenWall/compare/release-1.2.6...release-1.2.7
-[1.2.6]: https://github.com/AIE-Guild/GreenWall/compare/release-1.2.5...release-1.2.6
-[1.2.5]: https://github.com/AIE-Guild/GreenWall/compare/release-1.2.4...release-1.2.5
-[1.2.4]: https://github.com/AIE-Guild/GreenWall/compare/release-1.2.3...release-1.2.4
-[1.2.3]: https://github.com/AIE-Guild/GreenWall/compare/release-1.2.2...release-1.2.3
-[1.2.2]: https://github.com/AIE-Guild/GreenWall/compare/release-1.2.1...release-1.2.2
-[1.2.1]: https://github.com/AIE-Guild/GreenWall/compare/release-1.2.0...release-1.2.1
-[1.2.0]: https://github.com/AIE-Guild/GreenWall/compare/v1.1.07...release-1.2.0
-[1.1.07]: https://github.com/AIE-Guild/GreenWall/compare/v1.1.06...v1.1.07
-[1.1.06]: https://github.com/AIE-Guild/GreenWall/compare/v1.1.05...v1.1.06
-[1.1.05]: https://github.com/AIE-Guild/GreenWall/compare/v1.1.04...v1.1.05
-[1.1.04]: https://github.com/AIE-Guild/GreenWall/compare/v1.1.03...v1.1.04
-[1.1.03]: https://github.com/AIE-Guild/GreenWall/compare/v1.1.02...v1.1.03
-[1.1.02]: https://github.com/AIE-Guild/GreenWall/compare/v1.1.01...v1.1.02
-[1.1.01]: https://github.com/AIE-Guild/GreenWall/compare/v1.1.00...v1.1.01
-[1.1.00]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.18...v1.1.00
-[1.0.18]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.17...v1.0.18
-[1.0.17]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.16...v1.0.17
-[1.0.16]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.15...v1.0.16
-[1.0.15]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.14...v1.0.15
-[1.0.14]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.13...v1.0.14
-[1.0.13]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.12...v1.0.13
-[1.0.12]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.11...v1.0.12
-[1.0.11]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.10...v1.0.11
-[1.0.10]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.09...v1.0.10
-[1.0.09]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.08...v1.0.09
-[1.0.08]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.07...v1.0.08
-[1.0.07]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.06...v1.0.07
-[1.0.06]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.05...v1.0.06
-[1.0.05]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.04...v1.0.05
-[1.0.04]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.03...v1.0.04
-[1.0.03]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.02...v1.0.03
-[1.0.02]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.01...v1.0.02
-[1.0.01]: https://github.com/AIE-Guild/GreenWall/compare/v1.0.00...v1.0.01
-[1.0.00]: https://github.com/AIE-Guild/GreenWall/compare/v0.9.02...v1.0.00
-[0.9.02]: https://github.com/AIE-Guild/GreenWall/compare/v0.9.01...v0.9.02
-[0.9.01]: https://github.com/AIE-Guild/GreenWall/compare/v0.9.00...v0.9.01
