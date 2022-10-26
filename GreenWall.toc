@@ -1,4 +1,4 @@
-## Interface: 90205
+## Interface: 100000
 ## Title: GreenWall
 ## Notes: Common communication channel as a replacement for guild chat in guild confederations.
 ## Author: Mark Rogaski <stigg@aie-guild.org>
