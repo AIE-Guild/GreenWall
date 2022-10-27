@@ -113,7 +113,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
             </CheckButton>
             <Slider name="$parentOptionJoinDelay" inherits="OptionsSliderTemplate">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRoster" relativeFrom="BOTTOMLEFT">
+                    <Anchor point="TOPLEFT" relativeTo="$parentOptionRoster">
                         <Offset>
                             <AbsDimension x="8" y="-64"/>
                         </Offset>
