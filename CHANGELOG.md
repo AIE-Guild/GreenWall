@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.11 -- 2023-02-17
+### Updated
+- Updated the TOC for WoW Classic WotLK 3.4.3.
+
 ## 1.11.9 -- 2023-02-17
 ### Updated
 - Updated the TOC for WoW 10.0.5.
