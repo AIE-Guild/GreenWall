@@ -2,6 +2,11 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.11 -- 2023-11-11
+
+### Updated
+- Updated the TOC for WoW Classic 1.14.4.
+
 ## 1.11.8 -- 2022-10-26
 ### Updated
 - Updated the TOC for WoW 10.0.0.
