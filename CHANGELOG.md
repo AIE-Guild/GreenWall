@@ -2,9 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## 1.11.12 -- 2024-07-23
+## 1.11.12 -- 2024-07-30
 ### Updated
 - Updated the TOC for WoW 11.0.0.
+- Fix for Greenwall settings not displaying in Options>AddOns Tab and the related 'InterfaceOptions_AddCategory' (a nil value) error.
 
 ## 1.11.11 -- 2023-11-11
 ### Updated
