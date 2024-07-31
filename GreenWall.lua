@@ -190,9 +190,8 @@ function GreenWall_OnLoad(self)
     if InterfaceOptions_AddCategory then
         InterfaceOptions_AddCategory(self)
     else
-        local category, layout = Settings.RegisterCanvasLayoutCategory(self, self.name);
-        Settings.RegisterAddOnCategory(category);
-        addon.settingsCategory = category
+        local category = Settings.RegisterCanvasLayoutCategory(self, self.name)
+        Settings.RegisterAddOnCategory(category)
     end
 end
 
