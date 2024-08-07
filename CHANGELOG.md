@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.13 -- 2024-08-04
+### Updated
+- Updated the TOC for WoW Classic Cataclysm 4.4.0.
+
 ## 1.11.11 -- 2023-02-17
 ### Updated
 - Updated the TOC for WoW Classic WotLK 3.4.3.
