@@ -2,180 +2,269 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## 1.11.13 -- 2024-08-04
+## 1.11.14 -- 2024-08-13
+
+### Fixed
+
+- Replaced deprecated GetAddOnMetadata and IsAddOnLoaded with C_AddOns namespaced functions.
+
+## 1.11.13 -- 2024-07-31
+
+### Fixed
+
+- Removed reference to undefined variable.
+
+## 1.11.12 -- 2024-07-30
+
+### Fixed
+
+- Fix for Greenwall settings not displaying in Options>AddOns Tab and the related 'InterfaceOptions_AddCategory' (a nil
+  value) error.
+
 ### Updated
+
 - Updated the TOC for WoW Classic Cataclysm 4.4.0.
 
 ## 1.11.11 -- 2023-02-17
+
 ### Updated
+
 - Updated the TOC for WoW Classic WotLK 3.4.3.
 
 ## 1.11.9 -- 2023-02-17
+
 ### Updated
+
 - Updated the TOC for WoW 10.0.5.
 
 ## 1.11.8 -- 2022-10-26
+
 ### Updated
+
 - Updated the TOC for WoW 10.0.0.
 
 ### Removed
+
 - Removed an unsupported anchor positioning element.
 
 ## 1.11.7 -- 2022-06-20
+
 ### Updated
+
 - Updated the TOC for WoW 9.2.5.
 
 ## 1.11.6 -- 2021-09-03
+
 ### Updated
+
 - Updated the TOC for WoW 9.1.0.
 
 ## 1.11.5 -- 2021-03-14
+
 ### Updated
+
 - Updated the TOC for WoW 9.0.5.
 
 ## 1.11.4 -- 2020-12-23
+
 ### Updated
+
 - Updated the README to point to the current connected realm documentation.
 
 ## 1.11.3 -- 2020-12-19
+
 ### Changed
+
 - Updated the TOC for WoW 9.0.2.
 
 ## 1.11.2 -- 2020-10-13
+
 ### Fixed
+
 - Replaced usage of deprecated GuildRoster() with C_GuildInfo.GuildRoster().
 
 ## 1.11.1 -- 2020-08-09
+
 ### Fixed
+
 - Added a conditional check for successfully parsed addon version for minimum
-  version enforcement.  This is a tactical fix to address the semantic version parsing.
+  version enforcement. This is a tactical fix to address the semantic version parsing.
 
 ## 1.11.0 -- 2020-04-27
+
 ### Removed
-- Removed replication of achievements, promotions, demotions,  and loot
+
+- Removed replication of achievements, promotions, demotions, and loot
   announcements between co-guilds. The `SendChatMessage` function was made
   partially protected in 8.2.5, and events that are not triggered by hardware
   events cannot use the function.
 - Removed unnecessary local co-guild use of the addon communication channel.
 
 ### Added
+
 - `GreenWallAPI.GetChannelNumbers` function to query the custom chat channels in
   use by GreenWall
 
 ### Changed
+
 - Updated the TOC for WoW 8.3.0.
 - Refactored CHAT_MSG_SYSTEM handling to use an abstract factory and added
-  full unit testing for the polymorphic classes. 
+  full unit testing for the polymorphic classes.
 
 ### Fixed
+
 - Updated debug message call stack parsing for 8.3.
 
 ## 1.10.1 -- 2019-09-24
+
 ### Updated
+
 - Updated the TOC for WoW 8.2.5.
 
 ### Added
+
 - Added unit test coverage reporting through Coveralls.
 
 ## 1.10.0 -- 2019-09-05
+
 ### Changed
+
 - Moved to customer branch approach for WoW Classic releases.
 
 ### Removed
+
 - Removed transitional code for handling PLAYER_ENTERING_WORLD.
 
 ## 1.9.15 -- 2019-08-27
+
 ### Changed
+
 - Cleaned up project to support CurseForge automatic packaging.
 
 ## 1.9.14 -- 2019-08-22
+
 ### Added
+
 - Added compatibility support for Incognito.
 
 ## 1.9.13 -- 2019-07-02
+
 ### Updated
+
 - Updated the TOC for WoW 8.2.
 
 ### Removed
+
 - Removed Gitter badge from documentation.
 
 ## 1.9.12 -- 2019-01-10
+
 ### Fixed
+
 - Added missing message alteration for Name2Chat.
 
 ## 1.9.11 -- 2019-01-06
+
 ### Fixed
+
 - Added ID tagging support for Identity-2 and Name2Chat under the WoW 8.1.0 changes.
 - Changed legendary loot notifications from second-person to third-person.
 
 ## 1.9.10 -- 2019-01-04
+
 ### Fixed
+
 - Fixed GreenWall_ParseText message filtering to filter blank messages.
 
 ### Added
+
 - Added warning for any transmission of a blank message on a channel.
 
 ### Changed
+
 - Removed unused CRC import.
 
 ## 1.9.9 -- 2018-12-13
+
 ### Fixed
+
 - Added chat interception workaround for guild chat changes in BFA 8.1.
 
 _Thank you to Ashayo for the patch._
 
 ## 1.9.8 -- 2018-08-23
+
 ### Changed
+
 - Refactored system message pattern matching.
 
 ## 1.9.7 -- 2018-08-11
+
 ### Fixed
+
 - Removed a debug statement that was raising format errors.
 
 _Thank you to Legracen from AIE for helping with the fault isolation._
 
 ### Changed
+
 - Refactored gw.Debug to test the debug level before formatting the message.
 
 ## 1.9.6 -- 2018-08-10
+
 ### Fixed
+
 - Restored context menu availability for speakers in other co-guilds.
 
 ## 1.9.5 -- 2018-07-19
+
 ### Fixed
+
 - Checks for ElvUI compatibility now recognize ElvUI user profiles.
 
 _Thank you, again, to Simpy from the ElvUI team._
 
 ## 1.9.4 -- 2018-07-19
+
 ### Fixed
+
 - Applied workaround for chat channel sender regression introduced in 8.0.1.
 
 ### Removed
+
 - Removed pre-8.0 call to bare SendLocal.
 
 ## 1.9.3 -- 2018-07-17
+
 ### Updated
+
 - Updated the TOC for WoW 8.0.
 
 ## 1.9.2 -- 2018-06-11
+
 ### Fixed
+
 - Updated compatibility mode for ElvUI 10.74 changes to chat.
 - Removed combat log from chat window scanning.
 
 _Thank you to Simpy from the ElvUI team for the fixes._
 
 ## 1.9.1 -- 2018-04-28
+
 ### Fixed
+
 - SendAddonMessage is now called in the C_ChatInfo namespace for 8.0.x.
 
 ### Changed
+
 - Moved WoW build information to gw.build global.
 
 ## 1.9.0 -- 2018-01-08
+
 ### Added
-- Added support for shared, account-level settings per character.  Each character can either use the account
-  settings or a character-specific configuration.  If an existing GreenWall configuration exists for the character
+
+- Added support for shared, account-level settings per character. Each character can either use the account
+  settings or a character-specific configuration. If an existing GreenWall configuration exists for the character
   character mode will be the default, otherwise account mode is the default.
 - Added confederation announcements of legendary items looted.
 - Moved configuration handling to a proxy class to allow a single point
@@ -184,244 +273,337 @@ _Thank you to Simpy from the ElvUI team for the fixes._
 - Added a dedication in memoriam to Roger K White (aka Ralff), we will always miss you.
 
 ### Fixed
+
 - Corrected item string matching for legendary loot toasts.
 
 ### Changed
+
 - Pointed documentation to new CurseForge URL.
 
 ### Updated
+
 - Rewrote the project README.
 
 ### Removed
+
 - Removed luadoc HTML output.
 - HTML copies of other documentation.
 
 ## 1.8.5 -- 2017-08-29
+
 ### Fixed
+
 - Applied a workaround for 7.3.0 where GuildControlSetRank() was made
-  protected.  Checking for rank access is now determined by reading the 
+  protected. Checking for rank access is now determined by reading the
   officer note of the GM.
 
 ## 1.8.4 -- 2017-08-29
+
 ### Updated
+
 - Updated the TOC for WoW 7.3.
 
 ## 1.8.3 -- 2017-04-16
+
 ### Updated
+
 - Updated the TOC for WoW 7.2.
 
 ## 1.8.2 -- 2017-01-12
+
 ### Added
+
 - The version command now give WoW version information.
 
 ## 1.8.1 -- 2016-10-25
+
 ### Fixed
+
 - Corrected configuration whitespace grooming.
 
 ### Changed
+
 - Updated TOC for WoW 7.1.
 
 ## 1.8.0 -- 2016-09-20
+
 ### Fixed
+
 - Added whitespace trimming to configuration parser.
 
 ### Changed
+
 - Compatibility messages are now raised as debugging output.
 
 ## 1.7.3 -- 2016-08-03
+
 ### Fixed
+
 - Corrected global name parsing to account for UTF-8.
 - Updated API documentation.
 
 ## 1.7.2 -- 2016-07-20
+
 ### Fixed
-- Workaround for delayed bridge channel join caused by missing 
+
+- Workaround for delayed bridge channel join caused by missing
   CHAT_MSG_CHANNEL_NOTICE events.
 
 ## 1.7.1 -- 2016-07-20
+
 ### Changed
+
 - Updated TOC for WoW 7.0.3.
 
 ## 1.7.0 -- 2016-01-01
+
 ### Fixed
+
 - Improved message validation during adaptation layer decoding.
 - Fixed message handling logic.
 
 ### Changed
+
 - Updated color of addon messages in chat.
 
 ### Added
+
 - Confederation bridging API for third-party add-ons.
 - Automatic Prat-3.0 compatibility mode.
 
 ### Removed
+
 - Removed version number from options screen title.
 
 ## 1.6.6 -- 2015-12-16
+
 ### Fixed
+
 - A check is now done for officer status before sending a gratuitous officer
   announcement.
 - Added officer note data validation before parsing.
 
 ### Added
+
 - Automatic ElvUI compatibility mode. Thank you, Blazeflack.
 - Added Markdown change log.
 - Added channel-specific hold downs for join failures.
 
 ## 1.6.5 -- 2015-06-24
+
 ### Changed
+
 - Updated TOC for WoW 6.2.
 
 ## 1.6.4 -- 2015-03-07
+
 ### Changed
+
 - Refactored the user option validation.
-- Modified the GwHoldDown object.  Renamed `GwHoldDown:set()` to
- `GwHoldDown:start()` and created a new 'GwHoldDown:set()' mutator to
+- Modified the GwHoldDown object. Renamed `GwHoldDown:set()` to
+  `GwHoldDown:start()` and created a new 'GwHoldDown:set()' mutator to
   change the interval.
 - Moved the Semantic Versioning parser to a LibStub library.
 
 ### Added
+
 - Added a user option (joindelay) to control the channel join hold-down.
 
 ## 1.6.3 -- 2015-03-04
+
 ### Changed
+
 - Restored original channel hold-down timer value of 30 seconds.
 
 ## 1.6.2 -- 2015-03-01
+
 ### Changed
+
 - Removed lazy sweeper case in the event loop and replaced it with a callback
-for handling hold-down expiry.
+  for handling hold-down expiry.
 - Reduced channel hold-down to 10 seconds.
 
 ## 1.6.1 -- 2015-02-28
+
 ### Fixed
+
 - Added conditional to check achievements flag on receipt of achievement spam.
 
 ### Added
+
 - Added guild ID to debugging output on message receipt.
 
 ## 1.6.0 -- 2015-02-24
+
 ### Changed
+
 - Comprehensive refactor to allow new features in 2.0.
 - Refactored configuration parser.
 - Split GreenWall_Core.lua into multiple files.
 - Removed excess semicolons ... Lua is not Perl.
 
 ### Added
+
 - Added GwConfig object to contain configuration.
-- Added GwChannel objects for channel management, implementing transport and 
+- Added GwChannel objects for channel management, implementing transport and
   adaptation layers for communication.
 - Added GwHoldDown and GwHoldDownCache objects.
 - Added LibStub libraries for SHA256, Salsa20, CRC16-CCITT, and Base64.
 
 ## 1.5.4 -- 2014-12-12
+
 ### Fixed
+
 - Corrected comparisons of character names to account for capitalization
   normalization in the API.
 
 ### Changed
+
 - Updated luadoc.
 
 ## 1.5.3 -- 2014-11-11
+
 ### Fixed
+
 - Added comember cache updates for channel join/leave events. This stops
-flapping roster announcements for characters in peer co-guilds.
+  flapping roster announcements for characters in peer co-guilds.
 
 ## 1.5.2 -- 2014-10-31
+
 ### Fixed
+
 - Fixed the General chat delay lockout.
 - Improved the tests for officer status.
 
 ## 1.5.1 -- 2014-10-15
+
 ### Fixed
+
 - Fixed regular expression for realm name in GwGlobalName.
 
 ## 1.5.0 -- 2015-10-14
+
 ### Fixed
+
 - Updated for fully qualified names.
 
 ### Changed
+
 - Switched to MIT license.
 - Minor changes to debug messages.
 
 ### Added
+
 - Added support for guilds on connected realms.
 
 ## 1.4.1 -- 2014-08-10
+
 ### Fixed
+
 - Corrected the processing of the reload request.
 
 ## 1.4.0 -- 2014-03-22
+
 ### Changed
+
 - Update documentation for Interface Options.
 - Cleaned up debugging levels.
 
 ### Added
+
 - Added Interface Options panel for GreenWall options.
 
 ## 1.3.6 -- 2014-02-18
+
 ### Fixed
+
 - Fixed sender identification under WoW 5.4.7.
 
 ### Added
+
 - Added realm name to gwPlayerName.
 
 ## 1.3.5 -- 2014-0120
+
 ### Added
+
 - Added missing roster notification functionality.
 
 ## 1.3.4 -- 2013-11-17
+
 ### Changed
+
 - Changed officer note format and updated parsing.
 
 ## 1.3.3 -- 2013-09-10
+
 ### Changed
+
 - Updated TOC for WoW 5.4.0.
 
 ## 1.3.2 -- 2013-08-07
+
 ### Fixed
+
 - Fixed message integrity checking for duplicated messages.
 - Fixed messages generated on guild join, leave, or kick.
 - Corrected formatting of documentation.
 
 ## 1.3.1 -- 2013-08-06
+
 ### Changed
+
 - Project moved to [GitHub](https://github.com/AIE-Guild/GreenWall).
 - All text documentation has been converted to Markdown and HTML.
 - All URLs have been updated in the TOC.
 
 ### Added
+
 - Guild configuration format documentation has been added.
 
 ## 1.3.0 -- 2013-06-09
+
 ### Fixed
+
 - Fixed handling of a kick from a guild.
 - Fixed variable names for input validation in GwStringHash().
 
 ### Changed
+
 - Simplified the unpacking of inter-guild messages.
 
 ### Added
+
 - Added support for a newer, compact configuration format.
 
 ## 1.2.7 -- 2013-02-27
+
 ### Changed
+
 - Updated TOC for WoW 5.2.0.
 
 ## 1.2.6 -- 2012-12-04
+
 ### Changed
+
 - Updated TOC for WoW 5.1.0.
 
 ## 1.2.5 -- 2012-09-01
+
 ### Fixed
+
 - Localized _ to avoid the taint issues with glyphs in 5.0.4.
 
 ## 1.2.4 -- 2012-08-29
+
 ### Changed
+
 - Updated TOC for WoW 5.0.4.
 
 ## 1.2.3 -- 2012-08-25
+
 ### Changed
+
 - Replaced the 32-bit string hash used to obfuscate channel names in the
   debugging output with a standard CRC-16-CCITT implementation to avoid
   overflow issues with `string.format()` in MoP.
@@ -429,29 +611,38 @@ flapping roster announcements for characters in peer co-guilds.
   passing and replication.
 
 ### Added
+
 - Added extra debugging information for current guild information.
 - Added value checking for missing coguild ID in GwSendConfederationMsg().
 
 ## 1.2.2 -- 2012-11-12
+
 ### Fixed
+
 - Fixed officer chat bridging for the guild leader.
 
 ## 1.2.1 -- 2011-11-29
+
 ### Changed
+
 - Updated TOC for WoW version 4.3.
 
 ### Added
+
 - Added link to LemonKing's add-on in the documentation.
 - Documented prequisites.
 
 ## 1.2.0 -- 2011-11-26
+
 ### Fixed
+
 - Fixed unnecessary channel resets due to configuration reload.
 - Fixed behavior during UI reload.
 - Corrected join/leave handling.
 - Corrected case statement for handling chat events.
 
 ### Changed
+
 - Switched to [Semantic Versioning](http://semver.org/).
 - Separated guild info parsing from the `GwRefreshComms()` function.
 - Factored out some ugly flags.
@@ -462,6 +653,7 @@ flapping roster announcements for characters in peer co-guilds.
 - Masked all channel names and passwords in debugging output.
 
 ### Added
+
 - Added officer chat support.
 - Added message queuing.
 - Added a GwIsOfficer() check to the officer chat configuration phase to
@@ -476,37 +668,50 @@ flapping roster announcements for characters in peer co-guilds.
 - Added README.txt and GUILD_QUICKSTART.txt.
 
 ### Removed
+
 - Removed channel protection code.
 - Removed SHA1 library.
 
 ## 1.1.07 -- 2011-06-28
+
 ### Changed
+
 - Updated TOC for WoW version 4.2.
 
 ## 1.1.06 -- 2011-03-21
+
 ### Changed
+
 - Babel now disabled by default.
 
 ## 1.1.05 -- 2011-03-21
+
 ### Changed
+
 - Moved scan of chat windows to chat message event handlers.
 - Sorted clauses in the main event switch for legibility.
 
 ### Added
+
 - Added `GwReplicateMessage()` function.
 - Added RegisterAddonMessagePrefix call for 4.1 changes.
 - Added Babel.
 
 ## 1.1.04 -- 2011-01-15
+
 ### Changed
+
 - Minor updates for Curse packager.
 - Cleaned up status display code.
 
 ### Added
+
 - Added BSD-derived license.
 
 ## 1.1.03 -- 2011-01-14
+
 ### Changed
+
 - Moved `GuildRoster` call to PLAYER_LOGIN handler.
 - Limited conditions under which reinitialization occurred on
   PLAYER_GUILD_UPDATE.
@@ -514,153 +719,213 @@ flapping roster announcements for characters in peer co-guilds.
 - Cleaned up prep/refresh/join flow for connecting to the common channel.
 
 ### Added
+
 - Added a delay mechanism to prevent hijacking of general channel.
 - Added connection statistics gathering.
 - Added LuaDoc data for functions and procedures.
 
 ## 1.1.02 -- 2010-12-11
+
 ### Fixed
+
 - Fixed missing assignment of channel number on join.
 
 ### Changed
+
 - Redacted sensitive data in the status output.
 
 ### Added
+
 - Added hold-downs for join and configuration messages.
 - Added a configuration flag to enable replication of achievement messages.
 - Added frame identifier to Tx debug messages.
 - Added help text with command listing.
 
 ### Removed
+
 - Removed tabs from the source code!
 - Removed event registration for channel leave events.
 - Removed squelch message on reload flood.
 
 ## 1.1.01 -- 2010-12-06
+
 ### Fixed
+
 - Fixed status output when no channel has been configured.
 
 ### Added
+
 - Added co-guild tagging.
 
 ## 1.1.00 -- 2010-12-05
+
 ### Added
+
 - Added announcement flag check for logout announcements.
 
 ### Removed
+
 - Removed unused moderation release code.
 
 ## 1.0.18 -- 2010-12-04
+
 ### Added
+
 - Added options line to configuration.
 
 ## 1.0.17 -- 2010-12-04
+
 ### Fixed
+
 - Fixed SavedVariables processing.
 
 ## 1.0.16 -- 2010-12-04
+
 ### Fixed
+
 - Removed moderator handling and switched to better handling of owner status.
 
 ## 1.0.15 -- 2010-12-03
+
 ### Fixed
+
 - Removed faulty `tContains()` for `gwPeerTable` checks to stop
   prolific kicking.
 
 ## 1.0.14 -- 2010-12-03
+
 ### Fixed
+
 - Fixed missing argument to `GetGuildInfo()`.
 
 ## 1.0.13 -- 2010-12-03
+
 ### Changed
+
 - Updated guild change/update handling.
 
 ## 1.0.12 -- 2010-12-03
+
 ### Fixed
+
 - Fixed /who and channel join event processing.
 
 ## 1.0.11 -- 2010-12-03
+
 ### Fixed
+
 - Limited handling of channel owner/moderator changes to the common channel.
 
 ### Changed
+
 - Simplified and improved `GwIsConnected()`.
 
 ### Added
+
 - Added a nil result check for the system message regex.
 - Added gratuitous container officer response on channel join.
 - Suspend confederation messages until container ID is known.
 - Limit scope of the channel debugging.
 
 ### Removed
+
 - Removed proactive channel leave before a join.
 
 ## 1.0.10 -- 2010-11-22
+
 ### Changed
+
 - Rewrote guild lookups.
 
 ### Added
+
 - Added extra slash commands.
 
 ## 1.0.09 -- 2010-11-21
+
 ### Fixed
+
 - Missing negation in channel defense code.
 
 ## 1.0.08 -- 2010-11-21
+
 ### Fixed
+
 - Corrected guild join handling.
 
 ### Added
+
 - Added more debugging code.
 
 ### Removed
+
 - Removed channel bans.
 
 ## 1.0.07 -- 2010-11-17
+
 ### Fixed
+
 - Typos in variable names.
 
 ## 1.0.06 -- 2010-11-13
+
 ### Added
+
 - Added online/offline notices.
 
 ## 1.0.05 -- 2010-11-13
+
 ### Fixed
+
 - Fixed the placement and use of `GwLeaveChannel()`.
 
 ### Changed
+
 - Changed container messaging system to generalize the request message type.
 
 ## 1.0.04 -- 2010-11-13
+
 ### Fixed
+
 - Fixed container recognition in configuration processing.
 
 ### Added
+
 - Added debugging output to slash command handling.
 
 ## 1.0.03 -- 2010-11-12
+
 ### Changed
+
 - Changed configuration to support common configurations across co-guilds.
 - Refactored configuration parsing.
 - Cleaned up slash command handling.
 
 ### Added
+
 - Added variable field to the saved variables.
 
 ## 1.0.02 -- 2010-11-12
+
 ### Added
+
 - Added container IDs to channel messages to avoid duplicates within the
   same co-guild.
 
 ## 1.0.01 -- 2010-11-12
+
 ### Added
+
 - Brought back GUILD_ROSTER_UPDATE to get around the guild info loading delay.
 
 ## 1.0.00 -- 2010-11-11
+
 ### Changed
+
 - Cleaned up debugging statements.
 
 ### Added
+
 - Added moderator/owner status handling.
 - Added kick/ban handling for interlopers.
 - Added channel leave if player leaves the guild.
@@ -669,24 +934,33 @@ flapping roster announcements for characters in peer co-guilds.
 - Added forced reload.
 
 ### Removed
+
 -Removed GUILD_ROSTER_UPDATE event handling.
 
 ## 0.9.02 -- 2010-11-06
+
 ### Fixed
+
 - Fixed parsing of peer entries in configuration.
 
 ### Changed
+
 - Expanded debugging code.
 
 ### Removed
+
 - Removed slash command code, left stub.
 
 ## 0.9.01 -- 2010-11-06
+
 ### Changed
+
 - Abstracted several functions.
 
 ### Added
+
 - Added peer configuration entries.
 
 ## 0.9.00 -- 2010-11-01
+
 Initial commit.
