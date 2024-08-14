@@ -26,7 +26,7 @@ run to verify the environment.
 #### Check that GreenWall is loaded
 
 ```lua
-if IsAddOnLoaded('GreenWall') then
+if C_AddOns.IsAddOnLoaded('GreenWall') then
 	...
 end
 ```
@@ -56,7 +56,7 @@ This combines all of the tests into one function.
 function apiAvailable()
     function testAPI()
         -- Raises and exception of GreenWall is loaded or is pre-1.7.
-        assert(IsAddOnLoaded('GreenWall'))
+        assert(C_AddOns.IsAddOnLoaded('GreenWall'))
         return GreenWallAPI.version
 	end
     

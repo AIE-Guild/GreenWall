@@ -2,6 +2,12 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.14 -- 2024-08-13
+
+### Fixed
+
+- Replaced deprecated GetAddOnMetadata and IsAddOnLoaded with C_AddOns namespaced functions.
+
 ## 1.11.13 -- 2024-07-31
 
 ### Fixed
