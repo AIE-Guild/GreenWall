@@ -39,7 +39,7 @@ gw = {
     api_table = {},
     compatibility = { identity = false, name2chat = false, incognito = false, elvui = false, prat = false, },
 }
-gw.version = GetAddOnMetadata('GreenWall', 'Version')
+gw.version = C_AddOns.GetAddOnMetadata('GreenWall', 'Version')
 gw.realm = GetRealmName()
 gw.player = UnitName('player') .. '-' .. gw.realm:gsub("%s+", "")
 gw.guild_status = ''

@@ -65,7 +65,7 @@ function strmatch(...)
     return string.match(...)
 end
 
-function GetAddOnMetadata(addon, field)
+function C_AddObs.GetAddOnMetadata(addon, field)
     if addon == TOC['Title'] then
         return TOC['Version']
     end
