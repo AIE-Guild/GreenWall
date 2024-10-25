@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.16 -- 2024-10-24
+
+- Really updated the TOC for WoW 11.0.5.
+
 ## 1.11.15 -- 2024-10-24
 
 - Updated the TOC for WoW 11.0.5.
