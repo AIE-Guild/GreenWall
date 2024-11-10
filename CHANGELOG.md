@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.16 -- 2024-11-10
+
+- Fixed interface options registration for removal of InterfaceOptions_AddCategory.
+
 ## 1.11.15 -- 2024-10-24
 
 - Updated TOC for WoW Classic 1.15.4.
