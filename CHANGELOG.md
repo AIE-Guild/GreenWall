@@ -2,6 +2,11 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.17 -- 2025-05-24
+
+- Fixed Lua errors.  Vielen dank, Jan Heise.
+- Updated TOC for WoW Classic 1.15.7.
+
 ## 1.11.16 -- 2024-11-10
 
 - Fixed interface options registration for removal of InterfaceOptions_AddCategory.
