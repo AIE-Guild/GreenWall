@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.18 -- 2025-05-24
+
+- Fixed TOC date.
+
 ## 1.11.17 -- 2025-05-24
 
 - Fixed Lua errors.  Vielen dank, Jan Heise.
