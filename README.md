@@ -60,13 +60,10 @@ Meeting these design goals does have a few requirements.
 - To be able to create or edit a co-guild configuration, you must be able to edit the guild information 
   field in the guild management panel (bound to the `j` key).
 
-### Twitch (Curse) App
+### CurseForge App
 
-![Twitch](https://raw.githubusercontent.com/AIE-Guild/GreenWall/assets/img/twitch_purple.png)
-
-GreenWall is officially distributed on [CurseForge](https://www.curseforge.com/wow/addons/greenwall) and 
-can be installed and updated with the [Twitch Desktop App](https://app.twitch.tv/).  This is the easiest
-installation method and is recommended for most users.
+GreenWall is officially distributed on [CurseForge](https://www.curseforge.com/wow/addons/greenwall) and
+can be installed and updated with the CurseForge client. This is the easiest installation method and is recommended for most users.
 
 ### Manual Installation
 
@@ -74,7 +71,7 @@ GreenWall can also be downloaded from [Github](https://github.com/AIE-Guild/Gree
 and installed manually.
 
 1. Download the compressed distribution file.
-2. Close World of Warcaft.
+2. Close World of Warcraft.
 3. Extract the contents of the file and place them in the World of Warcraft AddOns directory.
    - On Windows, `C:\Program Files (x86)\World of Warcraft\Interface\AddOns` or `C:\Program Files\World of Warcraft\Interface\AddOns`.
    - On OSX, `~/Applications/World of Warcraft/Interface/Addons`.
@@ -376,7 +373,7 @@ issue tracker, please e-mail the details and I will add an issue record.
 
 The MIT License (MIT)
 
-Copyright (c) 2010-2020 Mark Rogaski
+Copyright (c) 2010-2025 Mark Rogaski
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
