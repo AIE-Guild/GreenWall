@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.16+classic -- 2025-08-23
+
+- Updated the TOC for WoW Classic Mists of Pandaria 5.5.0 (Interface: 50500).
+
 ## 1.11.15 -- 2025-05-24
 
 - Updated the TOC for WoW Classic Cataclysm 4.4.2.
