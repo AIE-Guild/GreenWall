@@ -7,6 +7,7 @@ This project uses [Semantic Versioning](http://semver.org/).
 - Updated the TOC for WoW Classic Mists of Pandaria 5.5.4.
 - Added a CODEOWNERS file.
 - Removed duplicate license information.
+- Added a compatibility ship for ChatFrame_MessageEventHandler.
 
 ## 1.11.16+classic -- 2025-08-23
 
