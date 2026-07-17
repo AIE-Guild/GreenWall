@@ -2,6 +2,12 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.21 - 2026-07-17
+
+- Added compatibility shim for removed ChatFrame_MessageEventHandler function (submitted by gen2fish).
+- Updated TOC for WoW 12.0.7.
+- Removed duplicated license test in comments.
+
 ## 1.11.20 -- 2025-12-03
 
 - Updated the TOC for WoW 11.2.7.
