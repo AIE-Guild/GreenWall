@@ -2,6 +2,12 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.21 - 2026-07-17
+
+- Updated the TOC for WoW Classic Mists of Pandaria 5.5.4.
+- Added a CODEOWNERS file.
+- Removed duplicate license information.
+
 ## 1.11.16+classic -- 2025-08-23
 
 - Updated the TOC for WoW Classic Mists of Pandaria 5.5.0 (Interface: 50500).
