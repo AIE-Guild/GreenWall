@@ -2,6 +2,11 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.21 -- 2026-07-17
+
+- Updated TOC for WoW Classic 1.15.8.
+- Rebased changes from main branch.
+
 ## 1.11.17 -- 2025-05-24
 
 - Fixed Lua errors.  Vielen dank, Jan Heise.
