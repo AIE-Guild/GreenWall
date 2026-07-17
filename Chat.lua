@@ -1,31 +1,29 @@
---[[-----------------------------------------------------------------------
-
-The MIT License (MIT)
-
-Copyright (c) 2010-2020 Mark Rogaski
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
---]] -----------------------------------------------------------------------
-
 local semver = LibStub:GetLibrary("SemanticVersion-1.0")
 
+-- Compatibility shim: Retail moved/removed the old ChatFrame_MessageEventHandler global.
+-- Provide gw.ChatFrame_MessageEventHandler so older code keeps working.
+gw.ChatFrame_MessageEventHandler = gw.ChatFrame_MessageEventHandler or function(frame, event, ...)
+    -- Old clients / some builds still have the global:
+    local g = _G.ChatFrame_MessageEventHandler
+    if type(g) == "function" then
+      return g(frame, event, ...)
+    end
+  
+    -- Retail: dispatch through the frame’s OnEvent handler (Blizzard chat pipeline)
+    if frame and frame.GetScript then
+      local onEvent = frame:GetScript("OnEvent")
+      if type(onEvent) == "function" then
+        return onEvent(frame, event, ...)
+      end
+    end
+  
+    -- Last ditch: don't explode. (Optional)
+    -- You can omit this if you prefer silent failure.
+    if frame and frame.AddMessage then
+      local msg = ...
+      if msg then frame:AddMessage(tostring(msg)) end
+    end
+end
 
 --- Callback handler for guild chat messages.
 -- @param type Message type received.
