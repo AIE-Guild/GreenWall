@@ -135,39 +135,48 @@ function GwHoldDownCache:hold(s)
     local t = time()
     local rv = false
 
-    -- Check for hold-down
-    if self.cache[s] == nil then
-        self.cache[s] = t
-        gw.Debug(GW_LOG_DEBUG, 'cache miss; target=%s, cache=%s', s, tostring(self))
-    else
+    -- Check for hold-down. self.cache[k] stores the time the entry was
+    -- registered; an entry is "live" while (t - registered) < interval.
+    if self.cache[s] ~= nil and t - self.cache[s] < self.interval then
         gw.Debug(GW_LOG_DEBUG, 'cache hit; target=%s, cache=%s', s, tostring(self))
-        if self.cache[s] > t + self.interval then
-            rv = true
-        else
-            self.cache[s] = nil
+        rv = true
+    else
+        if self.cache[s] ~= nil then
             gw.Debug(GW_LOG_DEBUG, 'cache expire; target=%s, cache=%s', s, tostring(self))
+        else
+            gw.Debug(GW_LOG_DEBUG, 'cache miss; target=%s, cache=%s', s, tostring(self))
         end
+        self.cache[s] = t
     end
 
-    -- Prune if necessary
-    if #self.cache > self.soft_max then
-        for k, v in pairs(self.cache) do
-            if v > t + self.interval then
-                table.remove(self.cache, k)
+    -- Count live entries.  self.cache is hash-keyed, so #self.cache is
+    -- always 0 -- enumerate with pairs() instead.
+    local count = 0
+    for _ in pairs(self.cache) do
+        count = count + 1
+    end
+
+    -- Soft prune: drop expired entries.
+    if count > self.soft_max then
+        for k, registered in pairs(self.cache) do
+            if t - registered >= self.interval then
+                self.cache[k] = nil
+                count = count - 1
                 gw.Debug(GW_LOG_DEBUG, 'cache soft prune; target=%s, cache=%s', k, tostring(self))
             end
         end
     end
 
-    -- Hard prune if necessary
-    if #self.cache > self.hard_max then
+    -- Hard prune: evict oldest until under the cap.
+    if count > self.hard_max then
         local index = {}
-        for k, ts in pairs(self.cache) do
-            table.insert(index, {ts, k})
+        for k, registered in pairs(self.cache) do
+            table.insert(index, {registered, k})
         end
-        table.sort(index, function(a, b) return a[1] < b [1] end)
-        for i = self.hard_max, #index do
-            table.remove(self.cache, index[i][2])
+        table.sort(index, function(a, b) return a[1] < b[1] end)
+        local to_evict = count - self.hard_max
+        for i = 1, to_evict do
+            self.cache[index[i][2]] = nil
             gw.Debug(GW_LOG_DEBUG, 'cache hard prune; target=%s, cache=%s', index[i][2], tostring(self))
         end
     end

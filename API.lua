@@ -64,15 +64,10 @@ end
 -- @param id The ID of the callback function to remove.
 -- @return True if a matching handler is found, false otherwise.
 function GreenWallAPI.RemoveMessageHandler(id)
-    rv = false
-    if addon ~= '*' then
-        addon = GetAddOnInfo(addon)
-        assert(addon ~= nil)
-    end
     for i, e in ipairs(gw.api_table) do
         if id == e[1] then
-            gw.Debug(GW_LOG_INFO, 'remove API handler; id=%, addon=%s, priority=%d', e[1], e[2], e[3])
-            gw.api_table[i] = nil
+            gw.Debug(GW_LOG_INFO, 'remove API handler; id=%s, addon=%s, priority=%d', e[1], e[2], e[3])
+            table.remove(gw.api_table, i)
             return true
         end
     end
@@ -95,10 +90,11 @@ function GreenWallAPI.ClearMessageHandlers(addon)
         if addon ~= '*' then
             assert(addon == GetAddOnInfo(addon))
         end
-        for i, e in ipairs(gw.api_table) do
+        for i = #gw.api_table, 1, -1 do
+            local e = gw.api_table[i]
             if addon == e[2] then
-                gw.Debug(GW_LOG_INFO, 'remove API handler; id=%, addon=%s, priority=%d', e[1], e[2], e[3])
-                gw.api_table[i] = nil
+                gw.Debug(GW_LOG_INFO, 'remove API handler; id=%s, addon=%s, priority=%d', e[1], e[2], e[3])
+                table.remove(gw.api_table, i)
             end
         end
     end
