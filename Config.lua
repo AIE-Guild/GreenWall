@@ -262,9 +262,11 @@ function GwConfig:load()
     end
 
     --
-    -- Clean up.
+    -- Clean up.  self.channel is a hash table keyed by 'guild' / 'officer',
+    -- so ipairs() does not iterate it -- use pairs() so stale channels
+    -- left over from a previous configuration actually get cleared.
     --
-    for _, channel in ipairs(self.channel) do
+    for _, channel in pairs(self.channel) do
         if channel:is_stale() then
             channel:clear()
         end
