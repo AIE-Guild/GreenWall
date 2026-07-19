@@ -45,6 +45,73 @@ end
 
 
 --
+-- Message-handler registration, removal, and dispatch.
+--
+
+local function noop() end
+
+function TestAPI:setUp()
+    gw.api_table = {}
+    -- AddMessageHandler validates `addon == GetAddOnInfo(addon)` for non-'*' ids.
+    GetAddOnInfo = function(addon) return addon end
+    gw.player = 'Ralff'
+    gw.config = { guild_id = 'G1' }
+end
+
+function TestAPI:test_add_and_remove_handler()
+    local id = GreenWallAPI.AddMessageHandler(noop, '*', 0)
+    lu.assertEquals(#gw.api_table, 1)
+    lu.assertTrue(GreenWallAPI.RemoveMessageHandler(id))
+    lu.assertEquals(#gw.api_table, 0)
+    lu.assertFalse(GreenWallAPI.RemoveMessageHandler(id))     -- already gone
+    lu.assertFalse(GreenWallAPI.RemoveMessageHandler('nope')) -- never existed
+end
+
+function TestAPI:test_remove_middle_handler_leaves_no_hole()
+    local function h1() end
+    local function h2() end
+    local function h3() end
+    local id1 = GreenWallAPI.AddMessageHandler(h1, '*', 0)
+    local id2 = GreenWallAPI.AddMessageHandler(h2, '*', 0)
+    local id3 = GreenWallAPI.AddMessageHandler(h3, '*', 0)
+    lu.assertTrue(GreenWallAPI.RemoveMessageHandler(id2))     -- remove the middle entry
+    -- A nil-hole would truncate ipairs; table.remove keeps the array dense.
+    lu.assertEquals(#gw.api_table, 2)
+    local seen = {}
+    for _, e in ipairs(gw.api_table) do seen[e[1]] = true end
+    lu.assertTrue(seen[id1])
+    lu.assertTrue(seen[id3])
+    lu.assertNil(seen[id2])
+end
+
+function TestAPI:test_clear_by_addon_removes_all_matching()
+    GreenWallAPI.AddMessageHandler(noop, 'AddonA', 0)
+    GreenWallAPI.AddMessageHandler(noop, 'AddonA', 0)
+    GreenWallAPI.AddMessageHandler(noop, 'AddonB', 0)
+    lu.assertEquals(#gw.api_table, 3)
+    GreenWallAPI.ClearMessageHandlers('AddonA')  -- must remove BOTH AddonA entries
+    lu.assertEquals(#gw.api_table, 1)
+    lu.assertEquals(gw.api_table[1][2], 'AddonB')
+end
+
+function TestAPI:test_clear_all_handlers()
+    GreenWallAPI.AddMessageHandler(noop, '*', 0)
+    GreenWallAPI.AddMessageHandler(noop, 'AddonA', 0)
+    GreenWallAPI.ClearMessageHandlers()          -- nil -> remove everything
+    lu.assertEquals(#gw.api_table, 0)
+end
+
+function TestAPI:test_dispatch_matches_by_addon()
+    local hits = {}
+    GreenWallAPI.AddMessageHandler(function() hits.a = (hits.a or 0) + 1 end, 'AddonA', 0)
+    GreenWallAPI.AddMessageHandler(function() hits.b = (hits.b or 0) + 1 end, 'AddonB', 0)
+    gw.APIDispatcher('AddonA', 'Someone', 'G1', 'hello')
+    lu.assertEquals(hits.a, 1)   -- addon-matched handler fires
+    lu.assertNil(hits.b)         -- non-matching handler does not
+end
+
+
+--
 -- Run the tests
 --
 
