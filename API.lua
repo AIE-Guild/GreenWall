@@ -18,7 +18,7 @@ GreenWallAPI = {
 -- @param message The message to send. Accepts 8-bit data.
 function GreenWallAPI.SendMessage(addon, message)
     -- Validate addon id
-    assert(addon == GetAddOnInfo(addon))
+    assert(addon == C_AddOns.GetAddOnInfo(addon))
     gw.config.channel.guild:send(GW_MTYPE_EXTERNAL, addon, message)
 end
 
@@ -45,7 +45,7 @@ function GreenWallAPI.AddMessageHandler(handler, addon, priority)
     -- Validate the arguments
     assert(priority % 1 == 0)
     if addon ~= '*' then
-        assert(addon == GetAddOnInfo(addon))
+        assert(addon == C_AddOns.GetAddOnInfo(addon))
     end
 
     local id = generate_id(handler)
@@ -64,15 +64,10 @@ end
 -- @param id The ID of the callback function to remove.
 -- @return True if a matching handler is found, false otherwise.
 function GreenWallAPI.RemoveMessageHandler(id)
-    rv = false
-    if addon ~= '*' then
-        addon = GetAddOnInfo(addon)
-        assert(addon ~= nil)
-    end
     for i, e in ipairs(gw.api_table) do
         if id == e[1] then
-            gw.Debug(GW_LOG_INFO, 'remove API handler; id=%, addon=%s, priority=%d', e[1], e[2], e[3])
-            gw.api_table[i] = nil
+            gw.Debug(GW_LOG_INFO, 'remove API handler; id=%s, addon=%s, priority=%d', e[1], e[2], e[3])
+            table.remove(gw.api_table, i)
             return true
         end
     end
@@ -93,12 +88,13 @@ function GreenWallAPI.ClearMessageHandlers(addon)
         gw.api_table = {}
     else
         if addon ~= '*' then
-            assert(addon == GetAddOnInfo(addon))
+            assert(addon == C_AddOns.GetAddOnInfo(addon))
         end
-        for i, e in ipairs(gw.api_table) do
+        for i = #gw.api_table, 1, -1 do
+            local e = gw.api_table[i]
             if addon == e[2] then
-                gw.Debug(GW_LOG_INFO, 'remove API handler; id=%, addon=%s, priority=%d', e[1], e[2], e[3])
-                gw.api_table[i] = nil
+                gw.Debug(GW_LOG_INFO, 'remove API handler; id=%s, addon=%s, priority=%d', e[1], e[2], e[3])
+                table.remove(gw.api_table, i)
             end
         end
     end
