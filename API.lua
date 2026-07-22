@@ -18,7 +18,7 @@ GreenWallAPI = {
 -- @param message The message to send. Accepts 8-bit data.
 function GreenWallAPI.SendMessage(addon, message)
     -- Validate addon id
-    assert(addon == GetAddOnInfo(addon))
+    assert(addon == C_AddOns.GetAddOnInfo(addon))
     gw.config.channel.guild:send(GW_MTYPE_EXTERNAL, addon, message)
 end
 
@@ -45,7 +45,7 @@ function GreenWallAPI.AddMessageHandler(handler, addon, priority)
     -- Validate the arguments
     assert(priority % 1 == 0)
     if addon ~= '*' then
-        assert(addon == GetAddOnInfo(addon))
+        assert(addon == C_AddOns.GetAddOnInfo(addon))
     end
 
     local id = generate_id(handler)
@@ -88,7 +88,7 @@ function GreenWallAPI.ClearMessageHandlers(addon)
         gw.api_table = {}
     else
         if addon ~= '*' then
-            assert(addon == GetAddOnInfo(addon))
+            assert(addon == C_AddOns.GetAddOnInfo(addon))
         end
         for i = #gw.api_table, 1, -1 do
             local e = gw.api_table[i]
