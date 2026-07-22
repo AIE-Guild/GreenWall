@@ -326,7 +326,11 @@ function GwChannel:tl_flush()
                 end
                 -- Send the segment
                 gw.Debug(GW_LOG_INFO, 'channel=%d, segment=%q', self.number, segment)
-                SendChatMessage(segment, 'CHANNEL', nil, self.number)
+                if C_ChatInfo and C_ChatInfo.SendChatMessage then
+                    C_ChatInfo.SendChatMessage(segment, 'CHANNEL', nil, self.number)
+                else
+                    SendChatMessage(segment, 'CHANNEL', nil, self.number)
+                end
                 self.stats.txcnt = self.stats.txcnt + 1
                 count = count + 1
             else

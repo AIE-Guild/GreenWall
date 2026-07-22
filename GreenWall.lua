@@ -203,7 +203,24 @@ function GreenWall_ParseText(chat, send)
     end
 end
 
-hooksecurefunc("ChatEdit_ParseText", GreenWall_ParseText)
+--
+-- Patch 1.15.9 (and Retail 11.0) refactored the chat edit box into a mixin.
+-- The global ChatEdit_ParseText became a dead deprecation alias, and the client
+-- now calls the edit box's own ParseText method -- so hooking the global no
+-- longer fires and outbound bridging silently stops. Where the mixin method
+-- exists, hook each chat edit box instance's ParseText directly; otherwise fall
+-- back to the legacy global hook for older clients.
+--
+if ChatFrame1EditBox and ChatFrame1EditBox.ParseText then
+    for i = 1, NUM_CHAT_WINDOWS do
+        local editbox = _G['ChatFrame' .. i .. 'EditBox']
+        if editbox and editbox.ParseText then
+            hooksecurefunc(editbox, 'ParseText', GreenWall_ParseText)
+        end
+    end
+else
+    hooksecurefunc('ChatEdit_ParseText', GreenWall_ParseText)
+end
 
 --[[ -----------------------------------------------------------------------
 

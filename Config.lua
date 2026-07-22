@@ -133,7 +133,12 @@ function GwConfig:load()
     end
 
     -- Abort if configuration is not yet available
-    local info = GetGuildInfoText()     -- Guild information text.
+    local info                          -- Guild information text.
+    if C_GuildInfo and C_GuildInfo.GetInfoText then
+        info = C_GuildInfo.GetInfoText()
+    else
+        info = GetGuildInfoText()
+    end
     if info == '' then
         gw.Debug(GW_LOG_WARNING, 'guild configuration not available.')
         return false
@@ -262,9 +267,11 @@ function GwConfig:load()
     end
 
     --
-    -- Clean up.
+    -- Clean up.  self.channel is a hash table keyed by 'guild' / 'officer',
+    -- so ipairs() does not iterate it -- use pairs() so stale channels
+    -- left over from a previous configuration actually get cleared.
     --
-    for _, channel in ipairs(self.channel) do
+    for _, channel in pairs(self.channel) do
         if channel:is_stale() then
             channel:clear()
         end
@@ -282,7 +289,11 @@ end
 -- @return True is refresh submitted, false otherwise.
 function GwConfig:reload()
     self.valid = false
-    GuildRoster()
+    if C_GuildInfo and C_GuildInfo.GuildRoster then
+        C_GuildInfo.GuildRoster()
+    else
+        GuildRoster()
+    end
     gw.Debug(GW_LOG_INFO, 'roster update requested.')
     return true
 end
