@@ -133,7 +133,12 @@ function GwConfig:load()
     end
 
     -- Abort if configuration is not yet available
-    local info = GetGuildInfoText()     -- Guild information text.
+    local info                          -- Guild information text.
+    if C_GuildInfo and C_GuildInfo.GetInfoText then
+        info = C_GuildInfo.GetInfoText()
+    else
+        info = GetGuildInfoText()
+    end
     if info == '' then
         gw.Debug(GW_LOG_WARNING, 'guild configuration not available.')
         return false

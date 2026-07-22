@@ -52,8 +52,8 @@ local function noop() end
 
 function TestAPI:setUp()
     gw.api_table = {}
-    -- AddMessageHandler validates `addon == GetAddOnInfo(addon)` for non-'*' ids.
-    GetAddOnInfo = function(addon) return addon end
+    -- AddMessageHandler validates `addon == C_AddOns.GetAddOnInfo(addon)` for non-'*' ids.
+    C_AddOns.GetAddOnInfo = function(addon) return addon end
     gw.player = 'Ralff'
     gw.config = { guild_id = 'G1' }
 end

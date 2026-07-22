@@ -116,6 +116,75 @@ end
 
 
 --
+-- GwConfig:load() - guild info text should prefer the namespaced API
+-- (C_GuildInfo.GetInfoText) and fall back to the deprecated global
+-- (GetGuildInfoText).
+--
+
+TestConfigInfoText = {}
+
+function TestConfigInfoText:setUp()
+    self.saved = {
+        C_GuildInfo = C_GuildInfo,
+        GetGuildInfoText = GetGuildInfoText,
+        GetGuildName = gw.GetGuildName,
+        version = gw.version,
+        settings = gw.settings,
+        time = time,
+    }
+    gw.settings = GwSettings:new()
+    gw.version = '1.0.0'
+    gw.GetGuildName = function() return 'TestGuild' end
+    time = os.time
+end
+
+function TestConfigInfoText:tearDown()
+    C_GuildInfo = self.saved.C_GuildInfo
+    GetGuildInfoText = self.saved.GetGuildInfoText
+    gw.GetGuildName = self.saved.GetGuildName
+    gw.version = self.saved.version
+    gw.settings = self.saved.settings
+    time = self.saved.time
+end
+
+function TestConfigInfoText:test_prefers_C_GuildInfo()
+    local source
+    C_GuildInfo = { GetInfoText = function()
+        source = 'namespaced'
+        return 'GW:c:Chan:pass\nGW:v:1.0.0\n'
+    end }
+    GetGuildInfoText = function()
+        source = 'global'
+        return 'GW:c:Chan:pass\nGW:v:1.0.0\n'
+    end
+    GwConfig:new():load()
+    lu.assertEquals(source, 'namespaced')
+end
+
+function TestConfigInfoText:test_falls_back_to_global_when_absent()
+    local source
+    C_GuildInfo = nil
+    GetGuildInfoText = function()
+        source = 'global'
+        return 'GW:c:Chan:pass\nGW:v:1.0.0\n'
+    end
+    GwConfig:new():load()
+    lu.assertEquals(source, 'global')
+end
+
+function TestConfigInfoText:test_falls_back_when_method_missing()
+    local source
+    C_GuildInfo = {}    -- table present, but no GetInfoText field
+    GetGuildInfoText = function()
+        source = 'global'
+        return 'GW:c:Chan:pass\nGW:v:1.0.0\n'
+    end
+    GwConfig:new():load()
+    lu.assertEquals(source, 'global')
+end
+
+
+--
 -- Run the tests
 --
 
