@@ -2,6 +2,11 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.22 -- 2026-07-22
+
+- Updated TOC for WoW Classic 1.15.9.
+- Replaced GuildRoster usage with C_GuildInfo.GuildRoster. 
+
 ## 1.11.21 -- 2026-07-17
 
 - Updated TOC for WoW Classic 1.15.8.
