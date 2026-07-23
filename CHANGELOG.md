@@ -2,6 +2,11 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.22 - 2026-07-22
+
+- Added a CODEOWNERS file to the repository.
+- Removed unsupported InterfaceOptions_AddCategory function.
+
 ## 1.11.21 - 2026-07-17
 
 - Added compatibility shim for removed ChatFrame_MessageEventHandler function (submitted by gen2fish).
