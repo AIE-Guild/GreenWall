@@ -164,7 +164,6 @@ function GreenWall_OnLoad(self)
 
     local category = Settings.RegisterCanvasLayoutCategory(self, self.name)
     Settings.RegisterAddOnCategory(category)
-
 end
 
 
