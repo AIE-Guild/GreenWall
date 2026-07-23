@@ -161,7 +161,9 @@ function GreenWall_OnLoad(self)
     self.default = function(self)
         GreenWallInterfaceFrame_SetDefaults(self)
     end
-    InterfaceOptions_AddCategory(self)
+
+    local category = Settings.RegisterCanvasLayoutCategory(self, self.name)
+    Settings.RegisterAddOnCategory(category)
 end
 
 
