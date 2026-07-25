@@ -7,7 +7,11 @@ Workarounds for compatibility with other addons
 --
 -- Functions that may need to be overriden
 --
-gw.ChatFrame_MessageEventHandler = ChatFrame_MessageEventHandler
+-- Client 1.15.9 removed the ChatFrame_MessageEventHandler global; the handler
+-- is now a method on the chat frame (ChatFrameMixin:MessageEventHandler).
+gw.ChatFrame_MessageEventHandler = ChatFrame_MessageEventHandler or function(frame, event, ...)
+    return frame:MessageEventHandler(event, ...)
+end
 
 --
 -- Apply workarounds

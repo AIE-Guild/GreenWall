@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.23 -- 2026-07-25
+
+- Fixed guild chat replication on WoW Classic 1.15.9, which removed the ChatFrame_MessageEventHandler global.
+
 ## 1.11.22 -- 2026-07-22
 
 - Updated TOC for WoW Classic 1.15.9.
