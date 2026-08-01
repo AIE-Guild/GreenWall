@@ -164,6 +164,24 @@ function GreenWall_OnLoad(self)
 
     local category = Settings.RegisterCanvasLayoutCategory(self, self.name)
     Settings.RegisterAddOnCategory(category)
+
+    -- Settings.RegisterCanvasLayoutCategory (unlike the removed
+    -- InterfaceOptions_AddCategory it replaced) never calls self.okay,
+    -- self.cancel, or self.refresh - those belonged to the old panel
+    -- container's Okay/Cancel button flow. None of this panel's controls
+    -- have their own save-on-change handler, so every checkbox/slider here
+    -- visually toggles but GreenWallInterfaceFrame_SaveUpdates is never
+    -- invoked, meaning changes are silently discarded. Save immediately on
+    -- interaction instead, matching how the new Settings API expects
+    -- panels to behave.
+    local function GwSaveOnChange()
+        GreenWallInterfaceFrame_SaveUpdates(GreenWallInterfaceFrame)
+    end
+    GreenWallInterfaceFrameOptionMode:HookScript('OnClick', GwSaveOnChange)
+    GreenWallInterfaceFrameOptionTag:HookScript('OnClick', GwSaveOnChange)
+    GreenWallInterfaceFrameOptionRoster:HookScript('OnClick', GwSaveOnChange)
+    GreenWallInterfaceFrameOptionOfficerChat:HookScript('OnClick', GwSaveOnChange)
+    GreenWallInterfaceFrameOptionJoinDelay:HookScript('OnValueChanged', GwSaveOnChange)
 end
 
 
