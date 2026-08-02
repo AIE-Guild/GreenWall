@@ -2,6 +2,15 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.23 - 2026-08-02
+
+- Fixed persistence of interface options.
+- Fixed error message arguments.
+
+## 1.11.22 - 2026-07-22
+
+- Removed unsupported functions InterfaceOptions_AddCategory and GuildRoster.
+
 ## 1.11.21 - 2026-07-17
 
 - Updated the TOC for WoW Classic Mists of Pandaria 5.5.4.
