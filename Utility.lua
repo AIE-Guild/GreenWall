@@ -67,7 +67,7 @@ function gw.Debug(level, ...)
     local function get_caller()
         local s = debugstack(3, 1, 0)
         local file, loc = strmatch(s, '%[string "(.+)"%]:(%d+): in function')
-        local f = strmatch(s, 'in function \`([%a_-]+)\'')
+        local f = strmatch(s, 'in function `([%a_-]+)\'')
         file = file == nil and "" or file
         loc = loc == nil and "" or loc
         f = f == nil and "?" or f
@@ -243,7 +243,7 @@ end
 -- @param item An itemString.
 -- @return True is the item is legendary.
 function gw.IsLegendary(item)
-    _, _, rarity = GetItemInfo(item)
+    local _, _, rarity = GetItemInfo(item)
     if rarity == 5 then
         return true
     else
