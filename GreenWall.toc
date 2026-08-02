@@ -2,7 +2,7 @@
 ## Title: GreenWall
 ## Notes: Common communication channel as a replacement for guild chat in guild confederations.
 ## Author: Mark Rogaski <stigg@aie-guild.org>
-## Version: 1.11.24+classic-era
+## Version: 1.12.0+classic-era
 ## URL: https://github.com/AIE-Guild/GreenWall
 ## URL: https://www.curseforge.com/wow/addons/greenwall
 ## DefaultState: enabled

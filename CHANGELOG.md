@@ -2,6 +2,17 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.12.0 - 2026-08-02
+
+Integrating Pimptasty's "Greenwall - Revived" fork.
+
+- Fix hold-down cache, API handler removal, config cleanup, and a global leak.
+- Repair and extend the test mock.
+- Add regression tests for the fixes.
+- Migrate removed/deprecated WoW APIs (GetAddOnInfo, GetGuildInfoText, SendChatMessage).
+- Fix outbound bridging after the chat edit box mixin refactor.
+- Fix inbound bridging after the chat frame mixin refactor.
+
 ## 1.11.24 -- 2026-08-02
 
 - Fixed persistence of interface options.
