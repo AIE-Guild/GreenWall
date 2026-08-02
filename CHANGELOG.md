@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.11.23 - 2026-08-02
+
+- Fixed persistence of interface options.
+
 ## 1.11.22 - 2026-07-22
 
 - Added a CODEOWNERS file to the repository.
