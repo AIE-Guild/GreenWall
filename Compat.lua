@@ -7,17 +7,10 @@ Workarounds for compatibility with other addons
 --
 -- Functions that may need to be overriden
 --
--- Patch 1.15.9 (and Retail 11.0) rebuilt the chat frame as a mixin and removed
--- the global ChatFrame_MessageEventHandler outright -- MessageEventHandler is
--- now a method on each chat frame (ChatFrameMixin:MessageEventHandler). Use the
--- global where it still exists; otherwise adapt to the frame method so inbound
--- replication keeps working. ElvUI / Prat override this again below when loaded.
-if type(ChatFrame_MessageEventHandler) == 'function' then
-    gw.ChatFrame_MessageEventHandler = ChatFrame_MessageEventHandler
-else
-    gw.ChatFrame_MessageEventHandler = function(frame, ...)
-        return frame:MessageEventHandler(...)
-    end
+-- Client 1.15.9 removed the ChatFrame_MessageEventHandler global; the handler
+-- is now a method on the chat frame (ChatFrameMixin:MessageEventHandler).
+gw.ChatFrame_MessageEventHandler = ChatFrame_MessageEventHandler or function(frame, event, ...)
+    return frame:MessageEventHandler(event, ...)
 end
 
 --

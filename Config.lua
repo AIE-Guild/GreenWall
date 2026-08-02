@@ -289,11 +289,7 @@ end
 -- @return True is refresh submitted, false otherwise.
 function GwConfig:reload()
     self.valid = false
-    if C_GuildInfo and C_GuildInfo.GuildRoster then
-        C_GuildInfo.GuildRoster()
-    else
-        GuildRoster()
-    end
+    C_GuildInfo.GuildRoster()
     gw.Debug(GW_LOG_INFO, 'roster update requested.')
     return true
 end
