@@ -42,7 +42,7 @@ local function GwSettingCmd(key, value)
             if value:match('^-?%d+$') then
                 gw.settings:set(key, value + 0)
             else
-                gw.Error('%s setting must be numeric: %s', key)
+                gw.Error('%s setting must be numeric', key)
             end
         end
         gw.Write('%s is set to %s.',
