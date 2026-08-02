@@ -65,11 +65,64 @@ function strmatch(...)
     return string.match(...)
 end
 
-function C_AddObs.GetAddOnMetadata(addon, field)
+--
+-- WoW exposes a number of Lua string/table helpers as globals.
+--
+format = string.format
+gmatch = string.gmatch
+gsub = string.gsub
+strsub = string.sub
+strrep = string.rep
+strlower = string.lower
+strupper = string.upper
+
+function strjoin(delim, ...)
+    return table.concat({ ... }, delim)
+end
+
+function strtrim(s)
+    return (string.gsub(s, '^%s*(.-)%s*$', '%1'))
+end
+
+-- WoW strsplit(delimiter, str [, pieces]): delimiter is a set of single-char
+-- delimiters; returns the fields as multiple values.
+function strsplit(delim, str, limit)
+    local result = {}
+    local from = 1
+    while true do
+        local at
+        for i = 1, #delim do
+            local pos = string.find(str, delim:sub(i, i), from, true)
+            if pos and (at == nil or pos < at) then
+                at = pos
+            end
+        end
+        if not at then
+            result[#result + 1] = string.sub(str, from)
+            break
+        end
+        result[#result + 1] = string.sub(str, from, at - 1)
+        from = at + 1
+        if limit and #result == limit - 1 then
+            result[#result + 1] = string.sub(str, from)
+            break
+        end
+    end
+    return unpack(result)
+end
+
+tinsert = table.insert
+tremove = table.remove
+
+C_AddOns = {}
+function C_AddOns.GetAddOnMetadata(addon, field)
     if addon == TOC['Title'] then
         return TOC['Version']
     end
     return
+end
+function C_AddOns.IsAddOnLoaded(addon)
+    return false
 end
 
 function GetRealmName()
@@ -91,4 +144,14 @@ end
 
 function hooksecurefunc(...)
     return
+end
+
+function CreateFrame(...)
+    return {
+        SetScript = function() end,
+        RegisterEvent = function() end,
+        UnregisterEvent = function() end,
+        Show = function() end,
+        Hide = function() end,
+    }
 end
