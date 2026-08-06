@@ -151,13 +151,20 @@ end
 -- @param svtable Settings table reference
 -- @param meta True if meta options should be reset, false otherwise.
 function GwSettings:reset(svtable, meta)
+    -- GreenWallInterfaceFrame_SetDefaults calls this with no arguments, so a required svtable
+    -- made the Defaults button raise on the first key it looked at.
+    if svtable == nil then
+        svtable = self._data[self:mode()]
+    end
     for k, v in pairs(self._default) do
         if not v.meta or meta then
-            if svtable[k] == nil or self:validate(k, svtable[k]) then
-                svtable[k] = v.value
-            end
+            -- Unconditionally.  The "only if absent or invalid" guard belongs to initialize(),
+            -- which fills gaps; here the whole point is to overwrite values that are present and
+            -- valid, so carrying that guard over made reset() a no-op on any real store.
+            svtable[k] = v.value
         end
     end
+    svtable.updated = date('%Y-%m-%d %H:%M:%S')
 end
 
 
