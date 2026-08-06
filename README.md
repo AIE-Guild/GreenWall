@@ -215,10 +215,6 @@ To view the current configuration, you would enter one of the following.
 
   Print a summary of available commands. 
 
-- stats
-
-  Prints a summary of the connection statistics for the common communication channel(s). 
-
 - status
   
   Prints a summary of the GreenWall communication parameters and state variables. 
