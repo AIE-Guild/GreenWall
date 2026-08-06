@@ -112,6 +112,37 @@ end
 
 
 --
+-- A handler registered with '*' must receive messages from every addon.  The dispatcher tested
+-- whether the SENDER was named '*', which the registration asserts make impossible.
+--
+
+TestAPIWildcard = {}
+
+function TestAPIWildcard:setUp()
+    gw.api_table = {}
+    C_AddOns.GetAddOnInfo = function(addon) return addon end
+    gw.player = 'Ralff'
+    gw.config = { guild_id = 'G1' }
+end
+
+function TestAPIWildcard:test_wildcard_handler_receives_every_addon()
+    local hits = 0
+    GreenWallAPI.AddMessageHandler(function() hits = hits + 1 end, '*', 0)
+    gw.APIDispatcher('AddonA', 'Someone', 'G2', 'one')
+    gw.APIDispatcher('AddonB', 'Someone', 'G2', 'two')
+    lu.assertEquals(hits, 2)
+end
+
+function TestAPIWildcard:test_named_handler_is_still_selective()
+    local a, b = 0, 0
+    GreenWallAPI.AddMessageHandler(function() a = a + 1 end, 'AddonA', 0)
+    GreenWallAPI.AddMessageHandler(function() b = b + 1 end, 'AddonB', 0)
+    gw.APIDispatcher('AddonA', 'Someone', 'G2', 'hello')
+    lu.assertEquals(a, 1)
+    lu.assertEquals(b, 0)
+end
+
+--
 -- Run the tests
 --
 
