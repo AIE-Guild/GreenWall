@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## 1.12.1 - 2026-08-11
+
+- Updated TOC for WoW 12.1.0.
+
 ## 1.12.0 - 2026-08-02
 
 Integrating Pimptasty's "Greenwall - Revived" fork.
