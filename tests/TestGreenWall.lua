@@ -26,7 +26,13 @@ TestGreenWallChatSend = {}
 function TestGreenWallChatSend:setUp()
     self.now = 100
     self.sent = {}
+    self.deferred = {}
     GetTime = function() return self.now end
+    C_Timer = {
+        After = function(_, callback)
+            table.insert(self.deferred, callback)
+        end,
+    }
     gw.compatibility = {
         name2chat = false,
         identity = false,
@@ -48,8 +54,17 @@ function TestGreenWallChatSend:setUp()
     }
 end
 
+function TestGreenWallChatSend:runDeferred()
+    local deferred = self.deferred
+    self.deferred = {}
+    for _, callback in ipairs(deferred) do callback() end
+end
+
 function TestGreenWallChatSend:test_direct_guild_send_from_macro_is_forwarded()
     GreenWall_SendChatMessage('macro message', 'GUILD')
+
+    lu.assertEquals(self.sent, {})
+    self:runDeferred()
 
     lu.assertEquals(self.sent, {
         { 'GUILD', GW_MTYPE_CHAT, 'macro message' },
@@ -73,6 +88,9 @@ end
 function TestGreenWallChatSend:test_direct_officer_send_is_forwarded()
     GreenWall_SendChatMessage('officer macro', 'OFFICER')
 
+    lu.assertEquals(self.sent, {})
+    self:runDeferred()
+
     lu.assertEquals(self.sent, {
         { 'OFFICER', GW_MTYPE_CHAT, 'officer macro' },
     })
@@ -81,6 +99,7 @@ end
 function TestGreenWallChatSend:test_other_channels_and_blank_messages_are_ignored()
     GreenWall_SendChatMessage('party message', 'PARTY')
     GreenWall_SendChatMessage('   ', 'GUILD')
+    self:runDeferred()
 
     lu.assertEquals(self.sent, {})
 end
