@@ -2,6 +2,10 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+- Added new test workflow for Github.
+
 ## 1.12.0 - 2026-08-02
 
 Integrating Pimptasty's "Greenwall - Revived" fork.
