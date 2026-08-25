@@ -18,9 +18,11 @@
 
 ## Overview
 
-[![Build Status](https://travis-ci.org/AIE-Guild/GreenWall.svg?branch=master)](https://travis-ci.org/AIE-Guild/GreenWall)
-[![Coverage Status](https://coveralls.io/repos/github/AIE-Guild/GreenWall/badge.svg?branch=master)](https://coveralls.io/github/AIE-Guild/GreenWall?branch=master)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
+[![Retail Build Status](https://img.shields.io/github/actions/workflow/status/AIE-Guild/GreenWall/main.yml?branch=main&label=Retail)](https://github.com/AIE-Guild/GreenWall/tree/main)
+[![Classic Era Build Status](https://img.shields.io/github/actions/workflow/status/AIE-Guild/GreenWall/main.yml?branch=release%2Fclassic-era&label=Classic-Era)](https://github.com/AIE-Guild/GreenWall/tree/release/classic-era)
+[![Classic Status](https://img.shields.io/github/actions/workflow/status/AIE-Guild/GreenWall/main.yml?branch=release%2Fclassic&label=Classic)](https://github.com/AIE-Guild/GreenWall/tree/release/classic)
+[![Static Badge](https://img.shields.io/badge/Install-CurseForge-orange)](https://www.curseforge.com/wow/addons/greenwall)
+[![Static Badge](https://img.shields.io/badge/PR-contributors_welcome-blue)](https://github.com/AIE-Guild/GreenWall/pulls)
 
 GreenWall is a World of Warcraft add-on that allows multiple guilds within a single realm, or 
 [connected realms](https://us.battle.net/support/en/article/14296) to share guild chat as if they were one guild.
