@@ -251,7 +251,14 @@ function GreenWall_SendChatMessage(message, chatType)
 
     gw.Debug(GW_LOG_DEBUG, 'captured direct send; type=%s, message=%q', chatType, message)
     if type(message) == 'string' and message:match('%S') then
-        GreenWall_ForwardChatMessage(chatType, message)
+        -- This function runs as a secure post-hook of SendChatMessage. Sending
+        -- the GreenWall channel copy from inside that protected call stack can
+        -- trigger ADDON_ACTION_BLOCKED when another addon originated the guild
+        -- message. Defer only the captured direct-send path to the next frame;
+        -- typed edit-box messages continue to use GreenWall_ParseText above.
+        C_Timer.After(0, function()
+            GreenWall_ForwardChatMessage(chatType, message)
+        end)
     end
 end
 
