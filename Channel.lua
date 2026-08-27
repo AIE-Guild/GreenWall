@@ -166,14 +166,25 @@ function GwChannel:join()
             --
             -- Hide the channel
             --
-            for i = 1, 10 do
-                GwChannel.frame_table = { GetChatWindowMessages(i) }
-                for j, v in ipairs(GwChannel.frame_table) do
-                    if v == self.name then
-                        local frame = format('ChatFrame%d', i)
-                        if _G[frame] then
+            -- GetChatWindowChannels, not GetChatWindowMessages: the two are different lists, and
+            -- Blizzard reads them into RegisterForChannels and RegisterForMessages respectively
+            -- (Blizzard_ChatFrameBase/Classic/ChatFrameOverrides.lua:57-58). Messages holds
+            -- message-GROUP names ('GUILD', 'SAY'), which can never equal a channel name -- so
+            -- scanning it meant this loop never matched and the bridge channel was never hidden.
+            --
+            -- Channels come back as flat (name, zoneFlag) pairs, hence the stride of 2.
+            for i = 1, NUM_CHAT_WINDOWS do
+                local frame = _G[format('ChatFrame%d', i)]
+                if frame then
+                    local channels = { GetChatWindowChannels(i) }
+                    for j = 1, #channels, 2 do
+                        if channels[j] == self.name then
                             gw.Debug(GW_LOG_INFO, 'hiding channel: number=%d, name=%s, frame=%s',
-                                    self.number, gw.Redact(self.name), frame)
+                                    self.number, gw.Redact(self.name), frame:GetName())
+                            -- The FRAME, not its name. Since 1.15.9 ChatFrame_RemoveChannel is
+                            -- only a deprecation alias for ChatFrameMixin.RemoveChannel, which
+                            -- takes the frame as `self`; passing the name string indexes a
+                            -- string and raises.
                             ChatFrame_RemoveChannel(frame, self.name)
                         end
                     end
