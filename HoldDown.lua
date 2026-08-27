@@ -58,7 +58,17 @@ function GwHoldDown:start(f)
     self.timestamp = t
     self.scale = 0
 
-    local frame = CreateFrame('frame')
+    -- Keep the timer frame ON THE INSTANCE, and reuse it.
+    --
+    -- Two problems with a bare local here. It was the only reference to the frame, so once start()
+    -- returned nothing held it and the timer could stop ticking without a trace -- the callback
+    -- simply never ran and no error was raised. And a fresh frame per start() is a leak: the
+    -- client never reclaims a CreateFrame frame, and refresh_channels restarts these timers for
+    -- the whole session.
+    if not self.frame then
+        self.frame = CreateFrame('frame')
+    end
+    local frame = self.frame
     frame:SetScript('OnUpdate', handler)
 
     gw.Debug(GW_LOG_NOTICE, 'hold-down start; timer=%s, timestamp=%d, expiry=%d, function=%s',

@@ -141,6 +141,100 @@ end
 
 
 --
+-- GwConfig:is_container() called self:GetGuildName(), which GwConfig does not define, so every
+-- call raised.  And a version the regex accepted but semver() rejects aborted the whole parse.
+--
+
+TestConfigContainer = {}
+
+function TestConfigContainer:setUp()
+    self.saved = { GetGuildName = gw.GetGuildName }
+    gw.GetGuildName = function() return 'TestGuild' end
+end
+
+function TestConfigContainer:tearDown()
+    gw.GetGuildName = self.saved.GetGuildName
+end
+
+function TestConfigContainer:test_own_guild_is_in_the_confederation()
+    local config = GwConfig.initialize_param({})
+    config.guild_id = 'TG'
+    config.is_peer = GwConfig.is_peer
+    config.is_container = GwConfig.is_container
+    lu.assertTrue(config:is_container('TestGuild'))
+end
+
+function TestConfigContainer:test_peer_is_in_the_confederation()
+    local config = GwConfig.initialize_param({})
+    config.guild_id = 'TG'
+    config.peer = { DA = 'Dead Air' }
+    config.is_peer = GwConfig.is_peer
+    config.is_container = GwConfig.is_container
+    lu.assertTrue(config:is_container('Dead Air'))
+    lu.assertFalse(config:is_container('Some Randoms'))
+end
+
+function TestConfigContainer:test_own_guild_without_a_tag_is_not_configured()
+    local config = GwConfig.initialize_param({})
+    config.is_peer = GwConfig.is_peer
+    config.is_container = GwConfig.is_container
+    lu.assertFalse(config:is_container('TestGuild'))
+end
+
+
+TestConfigVersionDirective = {}
+
+function TestConfigVersionDirective:setUp()
+    self.saved = {
+        GetGuildInfoText = GetGuildInfoText,
+        GetGuildName = gw.GetGuildName,
+        version = gw.version,
+        settings = gw.settings,
+        time = time,
+    }
+    gw.settings = GwSettings:new()
+    -- Above any minimum these cases configure, so load() does not take the version-warning path
+    -- (gw.Error needs a DEFAULT_CHAT_FRAME that the mock does not provide).
+    gw.version = '9.9.9'
+    gw.GetGuildName = function() return 'TestGuild' end
+    time = os.time
+end
+
+function TestConfigVersionDirective:tearDown()
+    GetGuildInfoText = self.saved.GetGuildInfoText
+    gw.GetGuildName = self.saved.GetGuildName
+    gw.version = self.saved.version
+    gw.settings = self.saved.settings
+    time = self.saved.time
+end
+
+local function info(...)
+    return table.concat({ ... }, '\n') .. '\n'
+end
+
+function TestConfigVersionDirective:test_valid_minimum_version_is_recorded()
+    GetGuildInfoText = function()
+        return info('GW:c:Chan:pass', 'GW:v:1.2.3')
+    end
+    local config = GwConfig:new()
+    lu.assertTrue(config:load())
+    lu.assertEquals(config.minimum, '1.2.3')
+end
+
+function TestConfigVersionDirective:test_unparseable_version_does_not_abort_the_parse()
+    -- '1.2.3beta' passes a '^%d+%.%d+%.%d+%w*$' regex but semver() rejects it, and tostring()
+    -- with no argument then raised -- taking down the whole configuration over one mistyped line.
+    -- The directives after the bad line must still be read.
+    GetGuildInfoText = function()
+        return info('GW:c:Chan:pass', 'GW:v:1.2.3beta', 'GW:p:Dead Air:DA')
+    end
+    local config = GwConfig:new()
+    lu.assertTrue(config:load())
+    lu.assertEquals(config.minimum, '')
+    lu.assertEquals(config.peer['DA'], gw.GlobalName('Dead Air'))
+end
+
+--
 -- Run the tests
 --
 
