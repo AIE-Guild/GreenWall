@@ -5,6 +5,7 @@ This project uses [Semantic Versioning](http://semver.org/).
 ## Unreleased
 
 - Added new test workflow for Github.
+- Added Lua version to version command output.
 
 ## 1.12.1 - 2026-08-11
 
