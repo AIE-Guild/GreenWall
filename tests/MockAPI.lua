@@ -27,29 +27,7 @@ SOFTWARE.
 --
 -- These functions adapt or mock Lua extensions in the WoW API.
 --
-unpack = unpack or table.unpack
-
-local bitLoaded, bitLibrary = pcall(require, 'bit')
-if bitLoaded then
-    bit = bitLibrary or bit
-elseif bit32 then
-    bit = bit32
-else
-    -- Stock Lua 5.3+ has native bitwise operators but no global `bit`
-    -- library. Compile the compatibility functions from a string so this
-    -- test mock still parses on the Lua 5.1 runtime used by older CI jobs.
-    local compiler = loadstring or load
-    bit = assert(compiler([[
-        return {
-            band = function(a, b) return a & b end,
-            bor = function(a, b) return a | b end,
-            bxor = function(a, b) return a ~ b end,
-            bnot = function(a) return ~a end,
-            lshift = function(a, b) return a << b end,
-            rshift = function(a, b) return a >> b end,
-        }
-    ]]))()
-end
+require('bit')
 
 -- Read the TOC file
 local TOC = {}
