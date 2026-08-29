@@ -192,33 +192,73 @@ end
 Hooks
 
 --]] -----------------------------------------------------------------------
+local pendingEditBoxSend
+
+local function GreenWall_ForwardChatMessage(chatType, message)
+    if gw.compatibility.name2chat then
+        message = string.format('(%s) %s', Name2Chat.db.profile.name, message)
+    end
+    if gw.compatibility.identity then
+        message = Identity2:AlterMessage(message, Identity2.db.profile.channels[chatType])
+    end
+    if (chatType == 'GUILD') then
+        if gw.compatibility.incognito then
+            if Incognito.db.profile.enable and
+                    Incognito.db.profile.name and
+                    Incognito.db.profile.name ~= "" and
+                    Incognito.db.profile.guild then
+                message = "(" .. Incognito.db.profile.name .. "): " .. message
+            end
+        end
+        gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
+    elseif (chatType == 'OFFICER') then
+        gw.config.channel.officer:send(GW_MTYPE_CHAT, message)
+    end
+end
+
 function GreenWall_ParseText(chat, send)
     if (send == 1) then
         local chatType = chat:GetAttribute('chatType')
         local message = chat:GetText()
         gw.Debug(GW_LOG_DEBUG, 'type=%s, message=%q', chatType, message)
         if (message:match('%S')) then
-            if gw.compatibility.name2chat then
-                message = string.format('(%s) %s', Name2Chat.db.profile.name, message)
-            end
-            if gw.compatibility.identity then
-                message = Identity2:AlterMessage(message, Identity2.db.profile.channels[chatType])
-            end
-            if (chatType == 'GUILD') then
-                if gw.compatibility.incognito then
-                    if Incognito.db.profile.enable and
-                            Incognito.db.profile.name and
-                            Incognito.db.profile.name ~= "" and
-                            Incognito.db.profile.guild then
-                        message = "(" .. Incognito.db.profile.name .. "): " .. message
-                    end
-
-                end
-                gw.config.channel.guild:send(GW_MTYPE_CHAT, message)
-            elseif (chatType == 'OFFICER') then
-                gw.config.channel.officer:send(GW_MTYPE_CHAT, message)
+            if chatType == 'GUILD' or chatType == 'OFFICER' then
+                -- The actual SendChatMessage call follows this edit-box hook.
+                -- Remember it so the API hook below does not relay typed messages
+                -- twice. Macros bypass this callback and are handled by that hook.
+                pendingEditBoxSend = {
+                    chatType = chatType,
+                    message = message,
+                    time = GetTime(),
+                }
+                GreenWall_ForwardChatMessage(chatType, message)
             end
         end
+    end
+end
+
+function GreenWall_SendChatMessage(message, chatType)
+    if chatType ~= 'GUILD' and chatType ~= 'OFFICER' then
+        return
+    end
+
+    local pending = pendingEditBoxSend
+    pendingEditBoxSend = nil
+    if pending and pending.chatType == chatType and pending.message == message and
+            GetTime() - pending.time <= 1 then
+        return
+    end
+
+    gw.Debug(GW_LOG_DEBUG, 'captured direct send; type=%s, message=%q', chatType, message)
+    if type(message) == 'string' and message:match('%S') then
+        -- This function runs as a secure post-hook of SendChatMessage. Sending
+        -- the GreenWall channel copy from inside that protected call stack can
+        -- trigger ADDON_ACTION_BLOCKED when another addon originated the guild
+        -- message. Defer only the captured direct-send path to the next frame;
+        -- typed edit-box messages continue to use GreenWall_ParseText above.
+        C_Timer.After(0, function()
+            GreenWall_ForwardChatMessage(chatType, message)
+        end)
     end
 end
 
@@ -239,6 +279,14 @@ if ChatFrame1EditBox and ChatFrame1EditBox.ParseText then
     end
 else
     hooksecurefunc('ChatEdit_ParseText', GreenWall_ParseText)
+end
+
+-- Macro and addon-originated guild messages call SendChatMessage directly and
+-- never pass through the chat edit box hooks above.
+if C_ChatInfo and C_ChatInfo.SendChatMessage then
+    hooksecurefunc(C_ChatInfo, 'SendChatMessage', GreenWall_SendChatMessage)
+else
+    hooksecurefunc('SendChatMessage', GreenWall_SendChatMessage)
 end
 
 --[[ -----------------------------------------------------------------------

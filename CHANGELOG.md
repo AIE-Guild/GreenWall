@@ -7,6 +7,9 @@ This project uses [Semantic Versioning](http://semver.org/).
 - Added new test workflow for Github.
 - Removed GuildRoster tests now that C_GuildInfo namespace is standard.
 - Added Lua version to version command output.
+- Forward guild and officer messages sent directly by macros or addons.
+- Defer forwarded copies from direct-send hooks to avoid protected-call
+  failures when another addon originated the guild message.
 
 ## 1.12.0 - 2026-08-02
 
