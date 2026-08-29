@@ -63,6 +63,7 @@ jobs:
       run: |
         lua -lluacov tests/TestAPI.lua -v
         lua -lluacov tests/TestConfig.lua -v
+        lua -lluacov tests/TestGreenWall.lua -v
         lua -lluacov tests/TestHoldDown.lua -v
         lua -lluacov tests/TestSettings.lua -v
         lua -lluacov tests/TestSystemEventHandler.lua -v
