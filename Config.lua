@@ -213,9 +213,16 @@ function GwConfig:load()
                     end
                 elseif field[1] == 'v' then
                     -- Minimum version
-                    if strmatch(field[2], '^%d+%.%d+%.%d+%w*$') then
-                        self.minimum = tostring(semver(field[2]));
+                    -- Validate by PARSING rather than by regex: '^%d+%.%d+%.%d+%w*$' accepted
+                    -- forms semver() rejects (it wants a '-' before a pre-release, so '1.2.3beta'
+                    -- passed the regex and parsed to nothing), and tostring() with no argument
+                    -- then raised -- aborting the whole configuration parse over one mistyped line.
+                    local version = semver(tostring(field[2] or ''))
+                    if version then
+                        self.minimum = tostring(version);
                         gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
+                    else
+                        gw.Debug(GW_LOG_ERROR, "invalid minimum version, '%s'", tostring(field[2]));
                     end
                 elseif field[1] == 'o' then
                     -- Deprecated option list
@@ -225,9 +232,13 @@ function GwConfig:load()
                         key = strlower(key)
                         val = strlower(val)
                         if key == 'mv' then
-                            if strmatch(val, '^%d+%.%d+%.%d+%w*$') then
-                                self.minimum = tostring(semver(val));
+                            -- Same parse-don't-regex treatment as the v directive above.
+                            local version = semver(tostring(val or ''))
+                            if version then
+                                self.minimum = tostring(version);
                                 gw.Debug(GW_LOG_DEBUG, 'minimum version set to %s', self.minimum);
+                            else
+                                gw.Debug(GW_LOG_ERROR, "invalid minimum version, '%s'", tostring(val));
                             end
                         end
                     end
@@ -289,7 +300,14 @@ end
 -- @return True is refresh submitted, false otherwise.
 function GwConfig:reload()
     self.valid = false
-    C_GuildInfo.GuildRoster()
+    -- Feature-detect rather than calling bare.  The tests in tests/TestConfig.lua assert this
+    -- fallback, so without the guard the suite is red; and a client without C_GuildInfo raises
+    -- here on the very first configuration load, which is before the bridge ever comes up.
+    if C_GuildInfo and C_GuildInfo.GuildRoster then
+        C_GuildInfo.GuildRoster()
+    else
+        GuildRoster()
+    end
     gw.Debug(GW_LOG_INFO, 'roster update requested.')
     return true
 end
@@ -353,8 +371,10 @@ end
 -- @param guild The name of the guild to check.
 -- @return True if the target guild is in the confederation, false otherwise.
 function GwConfig:is_container(guild)
-    if guild == self:GetGuildName() then
-        return self.guild_id ~= nil
+    -- gw.GetGuildName(), not self:GetGuildName() -- GwConfig has no such method, so every call
+    -- raised "attempt to call method 'GetGuildName' (a nil value)" on the first line.
+    if guild == gw.GetGuildName() then
+        return self.guild_id ~= nil and self.guild_id ~= ''
     else
         return self:is_peer(guild)
     end

@@ -206,6 +206,43 @@ end
 
 
 --
+-- GwSettings:reset() is called by the Interface Options "Defaults" button with NO arguments, and
+-- its body only assigned a default when the stored value was absent or invalid -- a guard that
+-- belongs to initialize(), making reset() a no-op on any real store.
+--
+
+TestSettingsReset = {}
+
+function TestSettingsReset:setUp()
+    GreenWallMeta = nil
+    GreenWall = nil
+    GreenWallAccount = nil
+end
+
+function TestSettingsReset:test_overwrites_values_that_are_present_and_valid()
+    local settings = GwSettings:new()
+    settings:set('tag', false)
+    settings:set('logsize', 512)
+    settings:reset(GreenWallAccount)
+    lu.assertEquals(GreenWallAccount.tag, true)
+    lu.assertEquals(GreenWallAccount.logsize, 2048)
+end
+
+function TestSettingsReset:test_defaults_to_the_active_store()
+    local settings = GwSettings:new()
+    settings:set('tag', false)
+    settings:reset()
+    lu.assertEquals(settings:get('tag'), true)
+end
+
+function TestSettingsReset:test_leaves_meta_settings_alone()
+    local settings = GwSettings:new()
+    GreenWallMeta.mode = GW_MODE_CHARACTER
+    settings:reset()
+    lu.assertEquals(GreenWallMeta.mode, GW_MODE_CHARACTER)
+end
+
+--
 -- Run the tests
 --
 

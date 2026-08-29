@@ -135,6 +135,29 @@ end
 
 
 --
+-- GwHoldDown:start must keep the frame it creates.  A bare local went out of scope the moment
+-- start() returned, so nothing referenced the frame driving the timer.
+--
+
+TestHoldDownFrame = {}
+
+function TestHoldDownFrame:test_frame_is_retained()
+    local h = GwHoldDown:new(10)
+    h:start()
+    lu.assertNotNil(h.frame)
+end
+
+function TestHoldDownFrame:test_frame_is_reused_across_starts()
+    -- refresh_channels restarts these timers for the whole session; a fresh frame per start is a
+    -- leak, because the client never reclaims a CreateFrame frame.
+    local h = GwHoldDown:new(10)
+    h:start()
+    local first = h.frame
+    h:start()
+    lu.assertIs(h.frame, first)
+end
+
+--
 -- Run the tests
 --
 

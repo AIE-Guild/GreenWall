@@ -123,7 +123,12 @@ function gw.APIDispatcher(addon, sender, guild_id, message)
     local echo = sender == gw.player
     local guild = guild_id == gw.config.guild_id
     for _, e in ipairs(gw.api_table) do
-        if addon == e[2] or addon == '*' then
+        -- The wildcard belongs to the REGISTRATION, not to the sender: e[2] is the addon the
+        -- handler asked to hear from, and '*' there means "all of them" (API.md).  Testing
+        -- `addon == '*'` instead asked whether the SENDER was literally named '*', which
+        -- AddMessageHandler's and SendMessage's own asserts make impossible -- so no handler
+        -- registered with '*' had ever been dispatched to.
+        if addon == e[2] or e[2] == '*' then
             gw.Debug(GW_LOG_INFO, 'dispatch API handler; id=%s, addon=%s, priority=%d', e[1], e[2], e[3])
             e[4](addon, sender, message, echo, guild)
         end
