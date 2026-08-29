@@ -2,7 +2,7 @@
 
 This project uses [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## 1.12.1 - 2026-08-29
 
 - Added new test workflow for Github.
 - Removed GuildRoster tests now that C_GuildInfo namespace is standard.
