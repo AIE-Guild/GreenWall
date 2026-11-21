@@ -28,4 +28,3 @@ jobs:
         stale-pr-label: "stale"
         remove-stale-when-updated: "true"
         delete-branch: "true"
-        debug-only: "true"
