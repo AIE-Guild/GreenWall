@@ -42,14 +42,20 @@ gw.usage = [[
         -- Print connection status.
   reload
         -- Reload the configuration.
+  refresh
+        -- Reload the configuration. Alias for reload.
   reset
         -- Reset communications and reload the configuration.
+  mode <account|character>
+        -- Share settings across all characters on the account, or keep them per-character.
   roster <on|off>
         -- Toggle display of confederation online, offline, join, and leave messages.
   tag <on|off>
         -- Show co-guild identifier in messages.
   ochat <on|off>
         -- Enable officer chat bridging.
+  joindelay <seconds>
+        -- Seconds to wait for the default channels before joining the bridge channel.
   dump
         -- Print configuration and state information.
   debug <level>
